@@ -6,27 +6,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {GbExploreComponent} from './gb-explore.component';
-import {routing} from './gb-explore.routing';
-import {AccordionModule} from 'primeng';
-import {OverlayPanelModule} from 'primeng';
-import {RouterModule} from '@angular/router';
-import {GbCombinationConstraintComponent} from './constraint-components/gb-combination-constraint/gb-combination-constraint.component';
-import {GbConstraintComponent} from './constraint-components/gb-constraint/gb-constraint.component';
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { AccordionModule, AutoCompleteModule, CalendarModule, CheckboxModule, InputSwitchModule, MultiSelectModule, OverlayPanelModule, PanelModule } from 'primeng';
+import { TooltipModule } from 'primeng/tooltip';
+import { GbUtilsModule } from '../gb-utils-module/gb-utils.module';
+import { GbAnalytesDropzones } from './analytes-dropzones/gb-analytes-dropzones.component';
+import { GbCombinationConstraintComponent } from './constraint-components/gb-combination-constraint/gb-combination-constraint.component';
+import { GbConstraintComponent } from './constraint-components/gb-constraint/gb-constraint.component';
+import { GbExploreComponent } from './gb-explore.component';
+import { routing } from './gb-explore.routing';
+import { GbSelectionModule } from './gb-selection-component/gb-selection.module';
 
-import {FormsModule} from '@angular/forms';
-import {AutoCompleteModule} from 'primeng';
-import {CheckboxModule} from 'primeng';
-import {CalendarModule} from 'primeng';
-import {PanelModule} from 'primeng';
-import {InputSwitchModule} from 'primeng';
 
-import {MultiSelectModule} from 'primeng';
-import {GbSelectionModule} from './gb-selection-component/gb-selection.module';
 
-import {TooltipModule} from 'primeng/tooltip';
 
 @NgModule({
   imports: [
@@ -43,12 +38,14 @@ import {TooltipModule} from 'primeng/tooltip';
     MultiSelectModule,
     GbSelectionModule,
     TooltipModule,
+    GbUtilsModule,
   ],
   exports: [
     RouterModule,
   ],
   declarations: [
-    GbExploreComponent
+    GbExploreComponent,
+    GbAnalytesDropzones
   ],
   entryComponents: [
     GbConstraintComponent,

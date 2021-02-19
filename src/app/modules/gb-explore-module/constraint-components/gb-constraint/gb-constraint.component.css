@@ -81,7 +81,7 @@
 }
 
 .dropzone {
-  background-color: rgba(32, 178, 170, .2);
+  background-color: var(--gb-clinical-green-light-light);
 }
 
 .form-inline .btn-outline-secondary {

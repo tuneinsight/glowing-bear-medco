@@ -8,9 +8,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Constraint } from './constraint';
-import { Cohort } from './../../models/constraint-models/cohort';
 import { FormatHelper } from '../../utilities/format-helper';
+import { Cohort } from './../../models/constraint-models/cohort';
+import { Constraint } from './constraint';
+import { ConstraintVisitor } from './constraintVisitor';
 
 export class CohortConstraint extends Constraint {
   private _cohort: Cohort;
@@ -18,6 +19,11 @@ export class CohortConstraint extends Constraint {
   constructor() {
     super();
     this.textRepresentation = 'Cohort';
+  }
+
+  // visitor pattern https://refactoring.guru/design-patterns/visitor
+  accept<T>(v: ConstraintVisitor<T>): T {
+    return v.visitCohortConstraint(this)
   }
 
   clone(): CohortConstraint {

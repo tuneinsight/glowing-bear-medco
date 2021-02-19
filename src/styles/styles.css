@@ -8,7 +8,7 @@
 /*
   custom variables
 */
-:root {
+/* :root {
   --gb-loading-bg-color: #28AA9D;
   --gb-navbar-bg-color: #fdfdfd;
   --gb-orange-light: #ffa27f;
@@ -17,6 +17,19 @@
   --gb-clinical-green-light: #84c3bc;
   --gb-clinical-green-light-light: #c8eae6;
   --gb-clinical-green-dark: #2d8c81;
+  --gb-top-panel-height: 26px;
+} */
+
+:root {
+  /*for bioref*/
+  --gb-loading-bg-color: #295388;
+  --gb-navbar-bg-color: #fdfdfd;
+  --gb-orange-light: #ffa27f;
+  --gb-orange-light-light: #ffd9cb;
+  --gb-clinical-green: #295388;
+  --gb-clinical-green-light: #8488c3;
+  --gb-clinical-green-light-light: #c8d8ea;
+  --gb-clinical-green-dark: #2d528c;
   --gb-top-panel-height: 26px;
 }
 
@@ -252,7 +265,7 @@ body .hline {
 }
 
 .ui-menuitem-text {
-  color: hsl(0, 0%, 30%);
+  /* color: hsl(0, 0%, 30%); commented for bioref */
 }
 
 /*
@@ -412,16 +425,17 @@ form.term-search .ui-accordion-header:hover {
   padding-bottom: 2px;
   color: #8d8d8d;
   background-color: #ffffff !important;
-  border: none;
-  border-radius: 0em;
-  border-bottom-color: #bebebe;
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
+  border: none !important;
+  border-radius: 0em !important;
+  border-bottom-color: #bebebe !important;
+  border-bottom-style: solid !important;
+  border-bottom-width: 1px !important;
 }
+
 
 form.term-search .ui-accordion-header a {
   padding: 0em !important;
-  color: #404040;
+  color: #404040 !important;
   background-color: #ffffff;
   border: none;
   border-radius: 0em;
@@ -450,6 +464,7 @@ form.term-search .ui-accordion-content {
   padding: 0.5em;
 }
 
+
 form.term-search .ui-togglebutton {
   background-color: var(--gb-clinical-green);
   padding: 0em;
@@ -458,6 +473,7 @@ form.term-search .ui-togglebutton {
 form.term-search .ui-togglebutton:not(.ui-state-disabled).ui-state-active {
   background-color: var(--gb-clinical-green);
 }
+
 
 form.term-search
   .ui-togglebutton:not(.ui-state-disabled):not(.ui-state-active) {
@@ -472,7 +488,7 @@ form.term-search .ui-togglebutton.ui-button.ui-state-focus {
 form.term-search p-header > .ui-button-text {
   padding: 0.1em 0.2em 0.1em 1.9em;
   color: #404040 !important;
-  
+
 }
 
 form.term-search a:focus,
@@ -480,6 +496,8 @@ form.term-search a:hover {
   text-decoration: none;
   outline: none;
 }
+
+
 
 form.term-search .ui-dialog-footer button {
   height: auto;
@@ -504,6 +522,7 @@ form.term-search .pi-spin {
   color: transparent;
 }
 
+.concept-constraint-definition .ui-accordion-toggle-icon,
 form.term-search .ui-accordion-toggle-icon {
   color: #404040;
 }
@@ -515,6 +534,11 @@ form.term-search .full-path .path-separator {
 form.term-search .full-path .bold {
   font-weight: 700;
 }
+
+/*
+ * ------------------------------ Styles for cohort definition component -------------------------------
+ */
+
 
 /*
  * ------------------------------ Styles for gb-summary component -------------------------------
@@ -705,4 +729,9 @@ input.input-field {
 
 .small-font {
   font-size: small;
+}
+
+.query-btn-dirty {
+  border: 2px solid;
+  font-weight: bolder;
 }

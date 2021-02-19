@@ -28,39 +28,57 @@ export class NavbarService {
 
   private _isExplore = true;
   private _isExploreResults = false;
+  private _isExploreStats = false
   private _isAnalysis = false;
   private _isResults = false;
   private _isSurvivalRes = false;
 
   private _lastSuccessfulSurvival: number;
 
-  private EXPLORE_INDEX = 0;
-  private ANALYSIS_INDEX = 1;
-  private RESULTS_INDEX = 2;
+  private static get EXPLORE_INDEX() {return 0; }
+  private static get EXPLORE_STATISTICS_INDEX() { return 1; }
+  private static get ANALYSIS_INDEX() {return 2; }
+  private static get RESULTS_INDEX() {return 3; }
+
+  private static get EXPLORE_ROUTE () { return '/explore'; }
+  private static get EXPLORE_STATS_ROUTE() { return '/explore-statistics'; }
+  private static get ANALYSIS_ROUTE() { return '/analysis'; }
+  private static get RESULTS_ROUTE() { return '/results'; }
 
   constructor(private authService: AuthenticationService, private router: Router) {
+
     this._selectedSurvivalId = new Subject<number>()
     this._selectedSurvivalIDtoDelete = new Subject<number>()
+
+    const exploreTabLabel = this.authService.hasExploreStatsRole ? 'Cohort Building' : OperationType.EXPLORE
+
     this.items = [
 
       // 0: explore tab, default page
-      { label: OperationType.EXPLORE, routerLink: '/explore' },
+      { label: exploreTabLabel, routerLink: NavbarService.EXPLORE_ROUTE },
 
-      // 1: survival analysis tab
-      { label: OperationType.ANALYSIS, routerLink: '/analysis', visible: this.authService.hasAnalysisAuth },
+      // 1: explore statistics tab
+      { label: OperationType.EXPLORE_STATISTICS, routerLink: NavbarService.EXPLORE_STATS_ROUTE },
 
-      // 2: results tab
-      { label: 'Results', routerLink: '/results', visible: this.authService.hasAnalysisAuth }
+      // 2: survival analysis tab
+      { label: OperationType.ANALYSIS, routerLink: NavbarService.ANALYSIS_ROUTE, visible: this.authService.hasAnalysisAuth },
+
+      // 3: results tab
+      { label: 'Results', routerLink: NavbarService.RESULTS_ROUTE, visible: this.authService.hasAnalysisAuth }
     ]
 
     this.resultItems = []
     this._lastSuccessfulSurvival = 0
+
+    this.updateState(router.url)
   }
 
-  updateNavbar(routerLink: string) {
-    this.isExplore = (routerLink === '/explore' || routerLink === '');
-    this.isAnalysis = (routerLink === '/analysis');
-    this.isResults = (routerLink === '/results');
+
+  updateState(routerLink: string) {
+    this.isExplore = (routerLink === NavbarService.EXPLORE_ROUTE || routerLink === '');
+    this.isAnalysis = (routerLink === NavbarService.ANALYSIS_ROUTE);
+    this._isExploreStats = (routerLink === NavbarService.EXPLORE_STATS_ROUTE)
+    this.isResults = (routerLink === NavbarService.RESULTS_ROUTE);
     this.isSurvivalRes = false
     for (let i = 0; i < this.resultItems.length; i++) {
       if (routerLink === this.resultItems[i].routerLink.toString()) {
@@ -68,25 +86,21 @@ export class NavbarService {
         break
       }
     }
+  }
+
+  updateNavbar(routerLink: string) {
+    this.updateState(routerLink)
+
     console.log('Updated router link: ', routerLink)
 
     if (this.isExplore) {
-      this.activeItem = this.items[this.EXPLORE_INDEX];
+      this.activeItem = this._items[NavbarService.EXPLORE_INDEX];
+    } else if (this._isExploreStats) {
+      this.activeItem = this._items[NavbarService.EXPLORE_STATISTICS_INDEX];
     } else if (this.isAnalysis) {
-      this.activeItem = this.items[this.ANALYSIS_INDEX];
+      this.activeItem = this._items[NavbarService.ANALYSIS_INDEX];
     } else if (this.isResults) {
-      this.activeItem = this.items[this.RESULTS_INDEX];
-    } else {
-      if (this.isSurvivalRes) {
-        this.activeItem = this.items[this.RESULTS_INDEX]
-        for (let j = 0; j < this.resultItems.length; j++) {
-          if (this.resultItems[j].routerLink.toString() === routerLink) {
-            this.activeResultItem = this.resultItems[j]
-            this._selectedSurvivalId.next(j)
-            break
-          }
-        }
-      }
+      this.activeItem = this._items[NavbarService.RESULTS_INDEX];
     }
   }
 
@@ -109,6 +123,10 @@ export class NavbarService {
       this.activeResultItem = this.resultItems[index - 1]
       this.router.navigateByUrl(this.activeResultItem.routerLink.toString())
     }
+  }
+
+  navigateToExploreTab() {
+    this.router.navigateByUrl(NavbarService.EXPLORE_STATS_ROUTE)
   }
 
   navigateToNewResults() {
@@ -169,6 +187,10 @@ export class NavbarService {
 
   set isAnalysis(value: boolean) {
     this._isAnalysis = value
+  }
+
+  get isExploreStatistics(): boolean {
+    return this._isExploreStats
   }
 
   set isSurvivalRes(value: boolean) {

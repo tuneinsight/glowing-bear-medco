@@ -19,6 +19,7 @@ export class AuthenticationService {
   static readonly MEDCO_EXPLORE_ROLE = 'medco-explore';
   static readonly MEDCO_GEN_ANNOTATIONS_ROLE = 'medco-genomic-annotations';
   static readonly MEDCO_SURVIVAL_ANALYSIS_ROLE = 'medco-survival-analysis';
+  static readonly MEDCO_EXPLORE_STATS_ROLE = 'medco-explore-statistics'
 
   constructor(private config: AppConfig,
               private keycloakService: KeycloakService) { }
@@ -51,6 +52,10 @@ export class AuthenticationService {
         resolve();
       }
     }))
+  }
+
+  public hasExploreStatsRole(): boolean {
+    return this.userRoles.includes(AuthenticationService.MEDCO_EXPLORE_STATS_ROLE)
   }
 
   /**

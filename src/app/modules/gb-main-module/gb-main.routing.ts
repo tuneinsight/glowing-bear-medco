@@ -35,9 +35,13 @@ export const routes: Routes = [
       }
     ]
   },
+  {
+    path: 'explore-statistics',
+    loadChildren: '../gb-explore-statistics-module/gb-explore-statistics.module#GbExploreStatisticsModule'
+  },
   { // https://stackoverflow.com/questions/61084536/how-to-redirect-unknown-routes-to-home-route-in-angular-program
     path: '**', redirectTo: '/explore'
-  }
+  },
 ];
 
 export const routing: ModuleWithProviders<RouterModule> = RouterModule.forChild(routes);

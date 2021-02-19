@@ -1,0 +1,29 @@
+
+<div class="reference-interval" *ngIf="!hide">
+
+  <button type="button" class="gb-delete-button btn btn-outline-danger btn-sm pull-right" (click)="remove()"
+    alt="Remove statistical informations">
+    <i aria-hidden="true" class="fa fa-times"></i>
+  </button>
+
+  <div>
+    <h1>Reference values</h1>
+    <p>
+      Based on the given parameters, the query has returned <b>{{numberOfObservations()}}</b> entries
+    </p>
+  </div>
+
+  <div class="reference-interval-chart-container">
+    <template #chartContainer></template>
+  </div>
+
+  <div>
+    <p> The reference interval (95%) is:</p>
+    <div class="reference-interval-stat">
+      <p>
+        {{middleCI1}} ({{lowBoundCI1}}-{{highBoundCI1}}) - {{middleCI2}} ({{lowBoundCI2}}-{{highBoundCI2}})
+      </p>
+    </div>
+  </div>
+
+</div>

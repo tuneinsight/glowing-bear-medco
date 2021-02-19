@@ -67,7 +67,7 @@ export class TermSearchService {
         ...result, {
           name: displayName,
           isBold: !result.find(({ isBold }) => isBold) && displayName.toLowerCase().indexOf(this.searchTerm.toLowerCase()) !== -1
-      }], []).reverse(),
+        }], []).reverse(),
       handleFuncStart: (function (event) {
         event.stopPropagation();
         this.treeNodeService.selectedTreeNode = dataObject;
@@ -172,3 +172,6 @@ export class TermSearchService {
     this._isNoResults = value;
   }
 }
+
+
+

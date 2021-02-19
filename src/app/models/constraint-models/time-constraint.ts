@@ -6,8 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import {Constraint} from './constraint';
-import {DateOperatorState} from './date-operator-state';
+import { Constraint } from './constraint';
+import { ConstraintVisitor } from './constraintVisitor';
+import { DateOperatorState } from './date-operator-state';
 
 export class TimeConstraint extends Constraint {
 
@@ -39,6 +40,11 @@ export class TimeConstraint extends Constraint {
       }
     }
     this.textRepresentation = 'Time constraint';
+  }
+
+  // visitor pattern https://refactoring.guru/design-patterns/visitor
+  accept<T>(v: ConstraintVisitor<T>): T {
+    return v.visitTimeConstraint(this)
   }
 
   get className(): string {

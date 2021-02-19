@@ -8,6 +8,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import { ConstraintVisitor } from './constraintVisitor';
+
 export class Constraint {
 
   // The textual representation of this constraint
@@ -36,13 +38,21 @@ export class Constraint {
     this.excluded = false;
   }
 
+
+  // visitor pattern https://refactoring.guru/design-patterns/visitor
+  accept<T>(v: ConstraintVisitor<T>): T {
+    return v.visitConstraint(this)
+  }
+
   get textRepresentation(): string {
     return this._textRepresentation;
   }
 
   set textRepresentation(value: string) {
     this._textRepresentation = value;
+
   }
+
 
   get parentConstraint(): Constraint {
     return this._parentConstraint;
@@ -79,6 +89,7 @@ export class Constraint {
   get panelTimingSameInstance(): boolean {
     return this._panelTimingSameInstance
   }
+
 
 
 }

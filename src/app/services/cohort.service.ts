@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { combineLatest, Observable, Subject } from 'rxjs';
 import { ExploreQueryService } from './api/medco-node/explore-query.service';
 import { MedcoNetworkService } from './api/medco-network.service';
 import { ConstraintService } from './constraint.service';
@@ -23,6 +23,14 @@ import { CombinationConstraint } from '../models/constraint-models/combination-c
 import { ApiCohort } from '../models/api-request-models/medco-node/api-cohort';
 import { ErrorHelper } from '../utilities/error-helper';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ApiI2b2Panel } from '../models/api-request-models/medco-node/api-i2b2-panel';
+import { ApiQueryDefinition } from '../models/api-request-models/medco-node/api-query-definition';
+import { SavedCohortsPatientListService } from './saved-cohorts-patient-list.service';
+import { ApiNodeMetadata } from '../models/api-response-models/medco-network/api-node-metadata';
+import { OperationStatus } from '../models/operation-status';
+import { QueryService } from './query.service';
+import { ExploreStatisticsService } from './explore-statistics.service';
+import { take } from 'rxjs/operators';
 
 @Injectable()
 export class CohortService {
@@ -41,6 +49,9 @@ export class CohortService {
   public restoring: Subject<boolean>
   private _queryTiming: Subject<ApiI2b2Timing>
   private _panelTimings: Subject<ApiI2b2Timing[]>
+
+
+  private _lastPatientList: [ApiNodeMetadata[], number[][]]
 
   // constraint on cohort name
   _patternValidation: RegExp
@@ -140,10 +151,12 @@ export class CohortService {
 
   constructor(
     private exploreCohortsService: ExploreCohortsService,
-    private exploreQueryService: ExploreQueryService,
+    private exploreStatisticsService: ExploreStatisticsService,
+    private queryService: QueryService,
     private medcoNetworkService: MedcoNetworkService,
     private constraintService: ConstraintService,
-    private constraintReverseMappingService: ConstraintReverseMappingService) {
+    private constraintReverseMappingService: ConstraintReverseMappingService,
+    private savedCohortsPatientListService: SavedCohortsPatientListService) {
     this.restoring = new Subject<boolean>()
     this._queryTiming = new Subject<ApiI2b2Timing>()
     this._panelTimings = new Subject<ApiI2b2Timing[]>()
@@ -153,6 +166,78 @@ export class CohortService {
     }).bind(this))
     this._patternValidation = new RegExp('^\\w+$')
     this._cohorts = new Array<Cohort>()
+
+    this.queryService.queryResults.subscribe(
+      result => {
+        if ((result) && (result.patientLists)) {
+          this._lastPatientList = [result.nodes, result.patientLists];
+        }
+      }
+    )
+  }
+
+
+  saveCohortStatistics() {
+    this.exploreStatisticsService.rootConstraint.subscribe(
+      rootConstraint => {
+        const cohort = this.exploreStatisticsService.lastCohortDefinition
+        const timing = this.exploreStatisticsService.lastQueryTiming
+        this.saveCohort(rootConstraint, cohort, timing)
+      })
+  }
+
+  saveCohortExplore() {
+    this.saveCohort(this.constraintService.rootConstraint, this.queryService.lastDefinition, this.queryService.lastTiming)
+  }
+
+
+  private saveCohort(rootConstraint: CombinationConstraint,
+    cohortDefinition: ApiI2b2Panel[], queryTiming: ApiI2b2Timing) {
+    if (this.cohortName === '') {
+      throw ErrorHelper.handleNewUserInputError('You must provide a name for the cohort you want to save.');
+    } else if (!this.patternValidation.test(this.cohortName).valueOf()) {
+      throw ErrorHelper.handleNewUserInputError(`Name ${this.cohortName} can only contain alphanumerical symbols (without ö é ç ...) and underscores "_".`);
+    }
+
+    let existingCohorts = this.cohorts
+    if (existingCohorts.findIndex((c => c.name === this.cohortName).bind(this)) !== -1) {
+      throw ErrorHelper.handleNewUserInputError(`Name ${this.cohortName} already used.`);
+    }
+
+    let creationDates = new Array<Date>()
+    let updateDates = new Array<Date>()
+    let queryDefinitions = new Array<ApiQueryDefinition>()
+    const nunc = Date.now()
+    for (let i = 0; i < this.medcoNetworkService.nodes.length; i++) {
+      creationDates.push(new Date(nunc))
+      updateDates.push(new Date(nunc))
+      let definition = new ApiQueryDefinition()
+      definition.panels = cohortDefinition
+      definition.queryTiming = queryTiming
+      queryDefinitions.push(definition)
+    }
+
+    let cohort = new Cohort(
+      this.cohortName,
+      rootConstraint,
+      creationDates,
+      updateDates,
+    )
+    if (queryDefinitions.some(apiDef => (apiDef.panels) || (apiDef.queryTiming))) {
+      cohort.queryDefinition = queryDefinitions
+    }
+    cohort.patient_set_id = this.lastSuccessfulSet
+    this.postCohort(cohort)
+    MessageHelper.alert('success', 'Cohort successfully saved.');
+
+    // handle patient list locally
+    if (this._lastPatientList) {
+      this.savedCohortsPatientListService.insertPatientList(this.cohortName, this._lastPatientList[0], this._lastPatientList[1])
+      this.savedCohortsPatientListService.statusStorage.set(this.cohortName, OperationStatus.done)
+    } else {
+      MessageHelper.alert('error', 'There is no patient list cached from previous Explore Query. You may have to download the list again.')
+    }
+    this.cohortName = ''
   }
 
   get cohorts() {

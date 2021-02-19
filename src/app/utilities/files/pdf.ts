@@ -25,6 +25,22 @@ export class PDF {
     this._jsPDF.setFontSize(this.headersSize)
   }
 
+  getWidth() {
+    return this._jsPDF.internal.pageSize.getWidth()
+  }
+
+
+  addImageFromDataURL(imData: any, x0?: number, y0?: number, x1?: number, y1?: number) {
+    try {
+      this._jsPDF.addImage(imData, 'png', x0, y0 + this._lastElementY, x1, y1 + this._lastElementY)
+    } catch (err) {
+      throw ErrorHelper.handleError('during exportation of canvas data to PDF document', err)
+    }
+
+    console.log('Exported to PDF.')
+    this._lastElementY += y1 + this.verticalMarginImage
+  }
+
   addImage(sourceSVGRef: any, targetCanvasRef: any, x0: number, y0: number, x1: number, y1: number) {
     console.log('Parsing SVG')
     let serializer = new XMLSerializer();
@@ -52,14 +68,8 @@ export class PDF {
       throw ErrorHelper.handleError('while parsing canvas ref', err)
     }
     console.log('PNG data written. Exporting to PDF')
-    try {
-      this._jsPDF.addImage(imData, 'png', x0, y0 + this._lastElementY, x1, y1 + this._lastElementY)
-    } catch (err) {
-      throw ErrorHelper.handleError('during exportation of canvas data to PDF document', err)
-    }
 
-    console.log('Exported to PDF.')
-    this._lastElementY += y1 + this.verticalMarginImage
+    this.addImageFromDataURL(imData, x0, y0, x1, y1)
   }
 
   addTableFromObjects(headers: string[][], data: string[][], bodyColor = null) {

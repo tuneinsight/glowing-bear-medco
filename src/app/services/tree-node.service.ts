@@ -21,6 +21,7 @@ import {ExploreSearchService} from './api/medco-node/explore-search.service';
 import {Observable} from 'rxjs';
 import {ApiValueMetadata, DataType} from '../models/api-response-models/medco-node/api-value-metadata';
 import {Modifier} from '../models/constraint-models/modifier';
+import { MessageHelper } from '../utilities/message-helper';
 
 @Injectable()
 export class TreeNodeService {
@@ -91,7 +92,7 @@ export class TreeNodeService {
       (treeNodes: TreeNode[]) => {
         parentNode.attachChildTree(treeNodes);
         parentNode.attachModifierData(treeNodes);
-        this.processTreeNodes(parentNode.children, constraintService);
+        this.processTreeNodes(parentNode.children, constraintService, parentNode);
         this._isLoading = false;
         if (treeNodes.length === 0) {
           parentNode.leaf = true
@@ -112,14 +113,14 @@ export class TreeNodeService {
    * @param treeNodes
    * @param constraintService
    */
-  processTreeNodes(treeNodes: TreeNode[], constraintService: ConstraintService) {
+  processTreeNodes(treeNodes: TreeNode[], constraintService: ConstraintService, parentNode?: TreeNode) {
     if (!treeNodes) {
       return;
     }
     for (let node of treeNodes) {
-      this.processTreeNode(node, constraintService);
+      this.processTreeNode(node, constraintService, parentNode);
       if (node.hasChildren()) {
-        this.processTreeNodes(node.children, constraintService);
+        this.processTreeNodes(node.children, constraintService, node);
       }
     }
   }
@@ -131,7 +132,11 @@ export class TreeNodeService {
    * @param {Object} node
    * @param {ConstraintService} constraintService
    */
-  processTreeNode(node: TreeNode, constraintService: ConstraintService) {
+  processTreeNode(node: TreeNode, constraintService: ConstraintService, parentNode?: TreeNode) {
+
+    if (node.parent === undefined || node.parent === null) {
+      node.parent = parentNode
+    }
 
     // generate label
     node.label = node.displayName;
@@ -558,6 +563,37 @@ export class TreeNodeService {
   get rootTreeNodes(): TreeNode[] {
     return this._rootTreeNodes;
   }
+
+
+  processSelectedConstraint(): Concept {
+    let node = this.selectedTreeNode
+    if (!node) {
+      return null
+    }
+
+
+    if (node.encryptionDescriptor.encrypted) {
+      MessageHelper.alert('warn', 'Cannot select this concept as it is encrypted')
+      return
+    }
+
+    switch (node.nodeType) {
+      case TreeNodeType.CONCEPT:
+      case TreeNodeType.CONCEPT_FOLDER:
+      case TreeNodeType.MODIFIER:
+      case TreeNodeType.MODIFIER_FOLDER:
+        let constraint = this.constraintService.generateConstraintFromTreeNode(node, node ? node.dropMode : null)
+        let concept = (<ConceptConstraint>constraint).clone().concept
+        return concept
+      case TreeNodeType.CONCEPT_CONTAINER:
+      case TreeNodeType.MODIFIER_CONTAINER:
+        MessageHelper.alert('warn', `${node.displayName} is a container and cannot be used`)
+        break;
+      default:
+        break;
+    }
+  }
+
 
   get selectedTreeNode(): TreeNode {
     return this._selectedTreeNode;

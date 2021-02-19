@@ -2,7 +2,14 @@
   <p-accordion [multiple]="true">
 
     <div>
-      <p-accordionTab header="Latest explore query" [selected]="true">
+      <p-accordionTab header="Cohort definition" [selected]="true" *ngIf="inExploreStatsTab()">
+        <gb-cohort-definition></gb-cohort-definition>
+      </p-accordionTab>
+    </div>
+
+
+    <div>
+      <p-accordionTab header="Latest explore query" [selected]="true" *ngIf="!inExploreStatsTab()">
         <gb-summary></gb-summary>
       </p-accordionTab>
     </div>
@@ -18,14 +25,15 @@
           <p-button label="Search" (onClick)="termSearchService.onSearch()"></p-button>
           <span class="no-result-text" *ngIf="termSearchService.isNoResults">No results</span>
           <p-accordionTab #accordionTab *ngFor="let ontologyElement of termSearchService.results" draggable="true"
-              class="ui-ontology-elements">
-              <p-header class="ui-ontology-elements" draggable="true">
-                <span class="ui-button-text ui-unselectable-text">{{ontologyElement.name}}</span>
-              </p-header>
-              <span class="full-path" style="font-size: 0.8em;" *ngFor="let nodePath of ontologyElement.fullPath; let last = last">
-                <span [ngClass]="{'bold': !!nodePath.isBold}">{{nodePath.name}}</span>
-                <span *ngIf="!last" class="path-separator">></span>
-              </span>
+            class="ui-ontology-elements">
+            <p-header class="ui-ontology-elements" draggable="true">
+              <span class="ui-button-text ui-unselectable-text">{{ontologyElement.name}}</span>
+            </p-header>
+            <span class="full-path" style="font-size: 0.8em;"
+              *ngFor="let nodePath of ontologyElement.fullPath; let last = last">
+              <span [ngClass]="{'bold': !!nodePath.isBold}">{{nodePath.name}}</span>
+              <span *ngIf="!last" class="path-separator">></span>
+            </span>
           </p-accordionTab>
           <div *ngIf="termSearchService.isLoading" style="margin: auto;">
             <p class="loading-blink"><span>•</span><span>•</span><span>•</span></p>
@@ -35,8 +43,19 @@
     </div>
 
     <div>
-      <p-accordionTab header="Saved Cohorts" *ngIf="savedCohortsPatientListService.authorizedForPatientList" [selected]="true">
-        <gb-cohorts></gb-cohorts>
+      <p-accordionTab header="Saved Cohorts" *ngIf="savedCohortsPatientListService.authorizedForPatientList"
+        [selected]="true">
+        <gb-cohorts [displayRestoreButton]="!inExploreStatsTab()"></gb-cohorts>
+      </p-accordionTab>
+    </div>
+
+
+    <div *ngIf="inExploreStatsTab()">
+      <p-accordionTab header="Generate PDF report" [selected]="true">
+        <button type="button" (click)="exportStatsPDF()" alt="generate a pdf report with the statistical informations"
+          class="btn btn-outline-primary btn-sm gb-data-selection-overview-panel-btn">
+          <span>Export</span>
+        </button>
       </p-accordionTab>
     </div>
 

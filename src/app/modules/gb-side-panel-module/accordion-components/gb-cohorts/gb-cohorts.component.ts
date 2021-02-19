@@ -8,16 +8,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, OnInit, ElementRef, ViewEncapsulation, AfterViewInit, ViewChild } from '@angular/core';
-import { ConfirmationService } from 'primeng';
-import { OverlayPanel } from 'primeng'
-import {CohortService} from '../../../../services/cohort.service';
-import {SavedCohortsPatientListService} from '../../../../services/saved-cohorts-patient-list.service';
-import {ConstraintService} from '../../../../services/constraint.service';
-import {Cohort} from '../../../../models/cohort-models/cohort';
-import {savePatientListToCSVFile} from '../../../../utilities/files/csv';
-import {OperationStatus} from '../../../../models/operation-status';
-import {ErrorHelper} from '../../../../utilities/error-helper';
+import { AfterViewInit, Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ConfirmationService, OverlayPanel } from 'primeng';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { Cohort } from '../../../../models/cohort-models/cohort';
+import { OperationStatus } from '../../../../models/operation-status';
+import { CohortService } from '../../../../services/cohort.service';
+import { SavedCohortsPatientListService } from '../../../../services/saved-cohorts-patient-list.service';
+import { ErrorHelper } from '../../../../utilities/error-helper';
+import { savePatientListToCSVFile } from '../../../../utilities/files/csv';
 
 @Component({
   selector: 'gb-cohorts',
@@ -36,13 +35,13 @@ export class GbCohortsComponent implements AfterViewInit, OnInit {
   file: File; // holds the uploaded cohort file
   OperationStatus = OperationStatus;
 
+  @Input() displayRestoreButton: boolean = false
+
   @ViewChild('op') deletionRequest: OverlayPanel;
 
 
   constructor(public cohortService: CohortService,
-    private constraintService: ConstraintService,
     private confirmationService: ConfirmationService,
-    private element: ElementRef,
     private savedCohortsPatientListService: SavedCohortsPatientListService) { }
 
   get cohorts(): Array<Cohort> {

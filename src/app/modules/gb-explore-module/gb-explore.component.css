@@ -1,3 +1,13 @@
+
+.title-label {
+  font-size: medium;
+  font-weight: bold;
+}
+
+.analytes-explore-container{
+  margin-bottom: 4em;
+}
+
 .nav-btn:hover {
   background-color: lightgray;
 }
@@ -6,8 +16,6 @@
   font-weight: bolder;
 }
 
-.gb-data-selection-accordion-header {
-}
 
 .gb-data-selection-accordion-sub-header-1 {
   font-size: large;
@@ -16,7 +24,7 @@
 }
 
 .gb-data-selection-accordion-sub-header-2 {
-  background-color: rgba(51, 156, 144, 0.1);
+  background-color: var(--gb-clinical-green-light-light);
   border-left: 1px solid lightgray;
   border-right: 1px solid lightgray;
   border-radius: 6px;
@@ -24,7 +32,6 @@
   padding-right: 2em;
   overflow: hidden;
   min-height: 2em;
-  display: flex;
   align-items: center;
   justify-content: space-between;
 }

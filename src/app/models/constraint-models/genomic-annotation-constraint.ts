@@ -7,6 +7,7 @@
  */
 
 import { Constraint } from './constraint';
+import { ConstraintVisitor } from './constraintVisitor';
 import { GenomicAnnotation } from './genomic-annotation';
 
 export class GenomicAnnotationConstraint extends Constraint {
@@ -27,6 +28,13 @@ export class GenomicAnnotationConstraint extends Constraint {
     this.textRepresentation = 'Genomic Annotation';
     this.annotation = new GenomicAnnotation();
   }
+
+  // visitor pattern https://refactoring.guru/design-patterns/visitor
+  accept<T>(v: ConstraintVisitor<T>): T {
+    return v.visitGenomicAnnotationConstraint(this)
+  }
+
+
   toString(): string {
     return this.annotationValue + ' homozygous ' + (this.zygosityHomozygous ? 'yes ' : 'no ') +
       'heterozygous ' + (this.zygosityHeterozygous ? 'yes ' : 'no ') +

@@ -7,31 +7,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TabMenuModule } from 'primeng';
-import { GbSidePanelComponent } from './gb-side-panel.component';
-import { AccordionModule } from 'primeng';
-import { TreeModule } from 'primeng';
-import { GbTreeNodesComponent } from './accordion-components/gb-tree-nodes/gb-tree-nodes.component';
-import { ConfirmationService, TreeDragDropService } from 'primeng';
-import { OverlayPanelModule } from 'primeng';
-import { DragDropModule } from 'primeng';
+import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { GbSummaryComponent } from './accordion-components/gb-summary/gb-summary.component';
-import { AutoCompleteModule } from 'primeng';
-import { PanelModule } from 'primeng';
-import { ButtonModule } from 'primeng';
-import { InputTextModule } from 'primeng';
-import { TooltipModule } from 'primeng';
-import { ConfirmDialogModule } from 'primeng';
-import { RadioButtonModule } from 'primeng';
+import { BrowserModule } from '@angular/platform-browser';
+import { AccordionModule, AutoCompleteModule, ButtonModule, ConfirmationService, ConfirmDialogModule, DragDropModule, InputTextModule, OverlayPanelModule, PanelModule, RadioButtonModule, TabMenuModule, ToggleButtonModule, TooltipModule, TreeDragDropService, TreeModule } from 'primeng';
+import { ExploreCohortsService } from '../../services/api/medco-node/explore-cohorts.service';
+import { SavedCohortsPatientListService } from '../../services/saved-cohorts-patient-list.service';
+import { SurvivalService } from '../../services/survival-analysis.service';
+import { PathDisplayer } from '../gb-utils-module/gb-utils.component';
+import { GbUtilsModule } from '../gb-utils-module/gb-utils.module';
+import { CombinationConstraintSummaryComponent, SimpleConceptSummaryComponent } from './accordion-components/gb-cohort-definition/constraintVisitor/htmlExportVisitor';
+import { GbCohortDefinitionComponent } from './accordion-components/gb-cohort-definition/gb-cohort-definition.component';
 import { GbCohortsComponent } from './accordion-components/gb-cohorts/gb-cohorts.component';
+import { GbSummaryComponent } from './accordion-components/gb-summary/gb-summary.component';
+import { GbTreeNodesComponent } from './accordion-components/gb-tree-nodes/gb-tree-nodes.component';
+import { GbSidePanelComponent } from './gb-side-panel.component';
 
-import { ToggleButtonModule } from 'primeng'
-import {SurvivalService} from '../../services/survival-analysis.service';
-import {SavedCohortsPatientListService} from '../../services/saved-cohorts-patient-list.service';
-import {ExploreCohortsService} from '../../services/api/medco-node/explore-cohorts.service';
 
 @NgModule({
   imports: [
@@ -49,13 +41,18 @@ import {ExploreCohortsService} from '../../services/api/medco-node/explore-cohor
     TooltipModule,
     ConfirmDialogModule,
     RadioButtonModule,
-    TabMenuModule
+    TabMenuModule,
+    BrowserModule,
+    GbUtilsModule,
   ],
   declarations: [
     GbSidePanelComponent,
     GbTreeNodesComponent,
     GbSummaryComponent,
-    GbCohortsComponent
+    GbCohortsComponent,
+    GbCohortDefinitionComponent,
+    SimpleConceptSummaryComponent,
+    CombinationConstraintSummaryComponent,
   ],
   providers: [TreeDragDropService, ConfirmationService, SurvivalService, ExploreCohortsService, SavedCohortsPatientListService],
   exports: [GbSidePanelComponent]

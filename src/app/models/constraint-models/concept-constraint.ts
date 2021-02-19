@@ -17,6 +17,8 @@ import { NumericalOperator } from './numerical-operator';
 import { TreeNode } from '../tree-models/tree-node';
 import { TextOperator } from './text-operator';
 import { ErrorHelper } from 'src/app/utilities/error-helper';
+import { ValueType } from './value-type';
+import { ConstraintVisitor } from './constraintVisitor';
 
 export class ConceptConstraint extends Constraint {
 
@@ -54,6 +56,11 @@ export class ConceptConstraint extends Constraint {
     this.obsDateConstraint = new TimeConstraint();
     this.obsDateConstraint.isObservationDate = true;
     (this as Constraint).textRepresentation = 'Concept';
+  }
+
+  // visitor pattern https://refactoring.guru/design-patterns/visitor
+  accept<T>(v: ConstraintVisitor<T>): T {
+    return v.visitConceptConstraint(this)
   }
 
   clone(): ConceptConstraint {
@@ -234,6 +241,21 @@ export class ConceptConstraint extends Constraint {
   get textOperatorValue(): string {
     return this._textOperatorValue
   }
+
+  private isAnalyte() {
+    return this.treeNode.valueType === ValueType.NUMERICAL &&
+      !this.applyNumericalOperator && !this.applyObsDateConstraint &&
+      !this.applyTextOperator && !this.applyValDateConstraint;
+  }
+
+  constraintWithoutAnalytes(): Constraint {
+    if (this.isAnalyte()) {
+      return undefined
+    }
+
+    return this
+  }
+
 
   inputValueValidity(): string {
     if (!this.applyNumericalOperator && !this.applyTextOperator) {

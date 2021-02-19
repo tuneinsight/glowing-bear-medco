@@ -9,26 +9,26 @@
  */
 
 import { Injectable } from '@angular/core';
-import { TreeNodeService } from './tree-node.service';
-import { ExploreQuery } from '../models/query-models/explore-query';
-import { ConstraintService } from './constraint.service';
-import { AppConfig } from '../config/app.config';
-import { ExploreQueryType } from '../models/query-models/explore-query-type';
-import { AuthenticationService } from './authentication.service';
+import { Observable, of, ReplaySubject, Subject, throwError } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { ExploreQueryService } from './api/medco-node/explore-query.service';
-import { ApiExploreQueryResult } from '../models/api-response-models/medco-node/api-explore-query-result';
-import { CryptoService } from './crypto.service';
-import { GenomicAnnotationsService } from './api/genomic-annotations.service';
-import { ExploreQueryResult } from '../models/query-models/explore-query-result';
-import { Observable, ReplaySubject, throwError, Subject, of } from 'rxjs';
-import { ErrorHelper } from '../utilities/error-helper';
-import { MessageHelper } from '../utilities/message-helper';
-import { ApiNodeMetadata } from '../models/api-response-models/medco-network/api-node-metadata';
+import { NextObserver } from 'rxjs';
+import { AppConfig } from '../config/app.config';
 import { ApiI2b2Panel } from '../models/api-request-models/medco-node/api-i2b2-panel';
 import { ApiI2b2Timing } from '../models/api-request-models/medco-node/api-i2b2-timing';
+import { ApiNodeMetadata } from '../models/api-response-models/medco-network/api-node-metadata';
+import { ApiExploreQueryResult } from '../models/api-response-models/medco-node/api-explore-query-result';
 import { OperationType } from '../models/operation-models/operation-types';
+import { ExploreQuery } from '../models/query-models/explore-query';
+import { ExploreQueryResult } from '../models/query-models/explore-query-result';
+import { ExploreQueryType } from '../models/query-models/explore-query-type';
+import { ErrorHelper } from '../utilities/error-helper';
+import { MessageHelper } from '../utilities/message-helper';
 import { UserInputError } from '../utilities/user-input-error';
+import { GenomicAnnotationsService } from './api/genomic-annotations.service';
+import { ExploreQueryService } from './api/medco-node/explore-query.service';
+import { AuthenticationService } from './authentication.service';
+import { ConstraintService } from './constraint.service';
+import { CryptoService } from './crypto.service';
 
 /**
  * This service concerns with updating subject counts.
@@ -61,7 +61,6 @@ export class QueryService {
 
 
   constructor(private appConfig: AppConfig,
-    private treeNodeService: TreeNodeService,
     private constraintService: ConstraintService,
     private exploreQueryService: ExploreQueryService,
     private authService: AuthenticationService,
@@ -80,10 +79,12 @@ export class QueryService {
     this.query = new ExploreQuery();
   }
 
+
+
   /**
    * Parse and decrypt results from MedCo nodes.
    */
-  private parseExploreQueryResults(encResults: [ApiNodeMetadata, ApiExploreQueryResult][]): Observable<ExploreQueryResult> {
+  public parseExploreQueryResults(encResults: [ApiNodeMetadata, ApiExploreQueryResult][]): Observable<ExploreQueryResult> {
     if (encResults.length === 0) {
       return throwError(ErrorHelper.handleNewError('Empty results, no processing done'));
     }
@@ -156,7 +157,6 @@ export class QueryService {
   }
 
   public execQuery(): void {
-
     if (!this.constraintService.hasConstraint()) {
       MessageHelper.alert('warn', 'No constraints specified, please correct.');
       return;
@@ -187,25 +187,31 @@ export class QueryService {
       }),
       switchMap(() => this.exploreQueryService.exploreQuery(this.query)),
       switchMap(results => this.parseExploreQueryResults(results))
-    ).subscribe(
-      (parsedResults: ExploreQueryResult) => {
+    ).subscribe(this.getExploreResultObserver());
+  }
+
+  public getExploreResultObserver(): NextObserver<ExploreQueryResult> {
+    const qs = this
+    return new class implements NextObserver<ExploreQueryResult> {
+      next(parsedResults: ExploreQueryResult) {
         if (parsedResults.resultInstanceID) {
-          this._lastSuccessfulSet.next(parsedResults.resultInstanceID)
+          qs._lastSuccessfulSet.next(parsedResults.resultInstanceID)
         }
-        this.queryResults.next(parsedResults);
-        this.isUpdating = false;
-        this.isDirty = this.constraintService.hasConstraint().valueOf();
-      },
-      (err) => {
-        if (err instanceof UserInputError) {
-          console.warn(`[EXPLORE] Interrupted explore query ${this.query.uniqueId} due to user input error.`, err);
-        } else {
-          ErrorHelper.handleError(`Error during explore query ${this.query.uniqueId}.`, err);
-        }
-        this.isUpdating = false;
-        this.isDirty = true;
+        qs.queryResults.next(parsedResults);
+        qs.isUpdating = false;
+        qs.isDirty = qs.constraintService.hasConstraint().valueOf();
       }
-    );
+
+      error(err) {
+        if (err instanceof UserInputError) {
+          console.warn(`[EXPLORE] Interrupted explore query ${qs.query.uniqueId} due to user input error.`, err);
+        } else {
+          ErrorHelper.handleError(`Error during explore query ${qs.query.uniqueId}.`, err);
+        }
+        qs.isUpdating = false;
+        qs.isDirty = true;
+      }
+    }
   }
 
   get query(): ExploreQuery {

@@ -10,6 +10,9 @@
 
 import { Constraint } from './constraint';
 import { CombinationState } from './combination-state';
+import { Concept } from './concept';
+import { TreeNode } from '../tree-models/tree-node';
+import { ConstraintVisitor } from './constraintVisitor';
 
 export class CombinationConstraint extends Constraint {
 
@@ -18,12 +21,19 @@ export class CombinationConstraint extends Constraint {
   private _isRoot: boolean;
 
 
+  public static readonly groupTextRepresentation = 'Group';
+
   constructor() {
     super();
     this._children = [];
     this.combinationState = CombinationState.And;
     this.isRoot = false;
-    this.textRepresentation = 'Group';
+    this.textRepresentation = CombinationConstraint.groupTextRepresentation;
+  }
+
+  // visitor pattern https://refactoring.guru/design-patterns/visitor
+  accept<T>(v: ConstraintVisitor<T>): T {
+    return v.visitCombinationConstraint(this)
   }
 
   get className(): string {
@@ -123,12 +133,14 @@ export class CombinationConstraint extends Constraint {
   }
 
 
+
+
   private updateTextRepresentation() {
     if (this.children.length > 0) {
       this.textRepresentation = (this.excluded ? 'not (' : '(') + this.children.map(({ textRepresentation }) => textRepresentation)
         .join(this.combinationState === CombinationState.And ? ' and ' : ' or ') + ')'
     } else {
-      this.textRepresentation = 'Group';
+      this.textRepresentation = CombinationConstraint.groupTextRepresentation;
     }
   }
 }

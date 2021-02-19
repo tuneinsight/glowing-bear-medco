@@ -12,6 +12,7 @@ import { ConstraintService } from '../../services/constraint.service';
 import { TreeNodeService } from '../../services/tree-node.service';
 import { QueryService } from '../../services/query.service';
 import { AppConfig } from '../../config/app.config';
+import { NavbarService } from 'src/app/services/navbar.service';
 
 @Component({
   selector: 'gb-main',
@@ -33,8 +34,10 @@ export class GbMainComponent implements OnInit {
     private treeNodeService: TreeNodeService,
     private constraintService: ConstraintService,
     private queryService: QueryService,
+    private navbarService: NavbarService,
     private config: AppConfig) {
   }
+
 
   ngOnInit() {
     const parentContainerElm = this.parentContainer.nativeElement;
@@ -101,6 +104,10 @@ export class GbMainComponent implements OnInit {
       navbar.style.width = (percentage * 100) + '%';
     }
   };
+
+  inExploreStatsTab(): boolean {
+    return this.navbarService.isExploreStatistics
+  }
 
   get footerText(): string {
     let footerText = this.config.getConfig('footer-text');

@@ -6,8 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import {Constraint} from './constraint';
-import {FormatHelper} from '../../utilities/format-helper';
+import { Constraint } from './constraint';
+import { FormatHelper } from '../../utilities/format-helper';
+import { ConstraintVisitor } from './constraintVisitor';
 
 export class ValueConstraint extends Constraint {
 
@@ -17,6 +18,11 @@ export class ValueConstraint extends Constraint {
   constructor() {
     super();
     this.textRepresentation = 'Value';
+  }
+
+  // visitor pattern https://refactoring.guru/design-patterns/visitor
+  accept<T>(v: ConstraintVisitor<T>): T {
+    return v.visitValueConstraint(this)
   }
 
   get operator(): string {
