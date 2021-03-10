@@ -12,17 +12,17 @@ import { MedcoNetworkService } from './api/medco-network.service';
 import { ConstraintService } from './constraint.service';
 import { ExploreCohortsService } from './api/medco-node/explore-cohorts.service';
 import { ConstraintReverseMappingService } from './constraint-reverse-mapping.service';
-import {MessageHelper} from '../utilities/message-helper';
-import {ConceptConstraint} from '../models/constraint-models/concept-constraint';
-import {Cohort} from '../models/cohort-models/cohort';
-import {Constraint} from '../models/constraint-models/constraint';
-import {ApiI2b2Timing} from '../models/api-request-models/medco-node/api-i2b2-timing';
-import {ApiCohortResponse} from '../models/api-response-models/medco-node/api-cohort-response';
-import {CombinationState} from '../models/constraint-models/combination-state';
-import {CombinationConstraint} from '../models/constraint-models/combination-constraint';
-import {ApiCohort} from '../models/api-request-models/medco-node/api-cohort';
-import {ErrorHelper} from '../utilities/error-helper';
-import {HttpErrorResponse} from '@angular/common/http';
+import { MessageHelper } from '../utilities/message-helper';
+import { ConceptConstraint } from '../models/constraint-models/concept-constraint';
+import { Cohort } from '../models/cohort-models/cohort';
+import { Constraint } from '../models/constraint-models/constraint';
+import { ApiI2b2Timing } from '../models/api-request-models/medco-node/api-i2b2-timing';
+import { ApiCohortResponse } from '../models/api-response-models/medco-node/api-cohort-response';
+import { CombinationState } from '../models/constraint-models/combination-state';
+import { CombinationConstraint } from '../models/constraint-models/combination-constraint';
+import { ApiCohort } from '../models/api-request-models/medco-node/api-cohort';
+import { ErrorHelper } from '../utilities/error-helper';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable()
 export class CohortService {
@@ -262,8 +262,8 @@ export class CohortService {
 
   getCohorts() {
     this._isRefreshing = true
-    this.exploreCohortsService.getCohortAllNodes().subscribe(
-      (apiCohorts => {
+    this.exploreCohortsService.getCohortAllNodes().subscribe({
+      next: (apiCohorts => {
         try {
           this.updateCohorts(CohortService.apiCohortsToCohort(apiCohorts))
         } catch (err) {
@@ -271,15 +271,16 @@ export class CohortService {
         }
         this._isRefreshing = false
       }).bind(this),
-      (err => {
+      error: (err => {
         MessageHelper.alert('error', 'An error occured while retrieving saved cohorts', (err as HttpErrorResponse).error.message)
         this._isRefreshing = false
 
       }).bind(this),
-      (() => {
+      complete: (() => {
         MessageHelper.alert('success', 'Saved cohorts successfully retrieved')
         this._isRefreshing = false
       }).bind(this)
+    }
     )
   }
 

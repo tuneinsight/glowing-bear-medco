@@ -6,20 +6,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 import { Component } from '@angular/core';
-import {Subject, Observable} from 'rxjs';
-import {AnalysisType} from '../../../../models/analysis-models/analysis-type';
-import {ApiI2b2Panel} from '../../../../models/api-request-models/medco-node/api-i2b2-panel';
-import {MessageHelper} from '../../../../utilities/message-helper';
-import {switchMap, tap} from 'rxjs/operators';
-import {SurvivalAnalysisClear} from '../../../../models/survival-analysis/survival-analysis-clear';
-import {CohortService} from '../../../../services/cohort.service';
-import {NavbarService} from '../../../../services/navbar.service';
-import {ApiI2b2Item} from '../../../../models/api-request-models/medco-node/api-i2b2-item';
-import {OperationStatus} from '../../../../models/operation-status';
-import {SurvivalService} from '../../../../services/survival-analysis.service';
-import {SurvivalResultsService} from '../../../../services/survival-results.service';
-import {AnalysisService} from '../../../../services/analysis.service';
-import {HttpErrorResponse} from '@angular/common/http';
+import { Subject, Observable } from 'rxjs';
+import { AnalysisType } from '../../../../models/analysis-models/analysis-type';
+import { ApiI2b2Panel } from '../../../../models/api-request-models/medco-node/api-i2b2-panel';
+import { MessageHelper } from '../../../../utilities/message-helper';
+import { switchMap, tap } from 'rxjs/operators';
+import { SurvivalAnalysisClear } from '../../../../models/survival-analysis/survival-analysis-clear';
+import { CohortService } from '../../../../services/cohort.service';
+import { NavbarService } from '../../../../services/navbar.service';
+import { ApiI2b2Item } from '../../../../models/api-request-models/medco-node/api-i2b2-item';
+import { OperationStatus } from '../../../../models/operation-status';
+import { SurvivalService } from '../../../../services/survival-analysis.service';
+import { SurvivalResultsService } from '../../../../services/survival-results.service';
+import { AnalysisService } from '../../../../services/analysis.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'gb-top',
@@ -42,10 +42,10 @@ export class GbTopComponent {
     let ret = new SurvivalAnalysisClear();
     ret.results = [];
     for (const result of res.results) {
-      if (result.groupResults.filter(({timepoint})=> timepoint <= 0).length > 0){
+      if (result.groupResults.filter(({ timepoint }) => timepoint <= 0).length > 0) {
         MessageHelper.alert('warn', `Group ${result.groupId} returns negative or zero relative times, this should not happen, and concerned data points will be discarded`);
       }
-      if (result.groupResults.filter(({timepoint})=> timepoint >0).length > 0) {
+      if (result.groupResults.filter(({ timepoint }) => timepoint > 0).length > 0) {
         ret.results.push(result);
       } else {
         MessageHelper.alert('warn', `No observation available for group ${result.groupId} within the given time limit`);
@@ -120,10 +120,10 @@ export class GbTopComponent {
           tap(() => { this.operationStatus = OperationStatus.decryption },
             err => {
               this.operationStatus = OperationStatus.error
-                  MessageHelper.alert('error', (err instanceof HttpErrorResponse) ?
-                    (err as HttpErrorResponse).error.message :
-                    (err as Error).message)
-          }),
+              MessageHelper.alert('error', (err instanceof HttpErrorResponse) ?
+                (err as HttpErrorResponse).error.message :
+                (err as Error).message)
+            }),
           switchMap(encryptedResult => this.survivalAnalysisService.survivalAnalysisDecrypt(encryptedResult[0]))
         )
         .subscribe(clearResult => {
