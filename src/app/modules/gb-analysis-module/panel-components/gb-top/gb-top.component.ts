@@ -42,7 +42,10 @@ export class GbTopComponent {
     let ret = new SurvivalAnalysisClear();
     ret.results = [];
     for (const result of res.results) {
-      if (result.groupResults.length > 0) {
+      if (result.groupResults.filter(({timepoint})=> timepoint <= 0).length > 0){
+        MessageHelper.alert('warn', `Group ${result.groupId} returns negative or zero relative times, this should not happen, and concerned data points will be discarded`);
+      }
+      if (result.groupResults.filter(({timepoint})=> timepoint >0).length > 0) {
         ret.results.push(result);
       } else {
         MessageHelper.alert('warn', `No observation available for group ${result.groupId} within the given time limit`);
