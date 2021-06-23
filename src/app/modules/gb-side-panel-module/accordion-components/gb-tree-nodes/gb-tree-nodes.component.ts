@@ -141,7 +141,12 @@ export class GbTreeNodesComponent implements AfterViewInit, AfterViewChecked {
       }
       */
 
-      treeNodeContent.addEventListener('click', onClickTreeNodeContent, true);
+      const openable = new Set([
+        TreeNodeType.MODIFIER_CONTAINER, TreeNodeType.MODIFIER_FOLDER,
+        TreeNodeType.CONCEPT_FOLDER, TreeNodeType.CONCEPT_CONTAINER])
+      if (openable.has(dataObject.nodeType)) {
+        treeNodeContent.addEventListener('click', onClickTreeNodeContent, true);
+      }
 
       // if the data object type is known, it is considered queryable
       if (dataObject.nodeType !== TreeNodeType.UNKNOWN) {
