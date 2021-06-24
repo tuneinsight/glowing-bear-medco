@@ -9,15 +9,15 @@
  */
 
 import { ValueType } from '../../../models/constraint-models/value-type';
-import {ApiValueMetadata, DataType} from '../../../models/api-response-models/medco-node/api-value-metadata';
-import {MessageHelper} from '../../../utilities/message-helper';
-import {Injectable, Injector} from '@angular/core';
-import {AppConfig} from '../../../config/app.config';
-import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators'
-import {TreeNode} from '../../../models/tree-models/tree-node';
-import {TreeNodeType} from '../../../models/tree-models/tree-node-type';
+import { ApiValueMetadata, DataType } from '../../../models/api-response-models/medco-node/api-value-metadata';
+import { MessageHelper } from '../../../utilities/message-helper';
+import { Injectable, Injector } from '@angular/core';
+import { AppConfig } from '../../../config/app.config';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators'
+import { TreeNode } from '../../../models/tree-models/tree-node';
+import { TreeNodeType } from '../../../models/tree-models/tree-node-type';
 import { MedcoNetworkService } from '../medco-network.service';
 import { ApiEndpointService } from '../../api-endpoint.service';
 
@@ -43,15 +43,16 @@ export class ExploreSearchService {
    * Perform search concept in ontology.
    *
    * @param {string} root - the path to the specific tree node, must include the first slash
-   * @param {string} publicKey the public key that will be used in order by the medco to encrypt the subject counts of the concepts and modifiers.
+   * @param {string} publicKey the public key that will be used in order by
+   *   the medco to encrypt the subject counts of the concepts and modifiers.
    * @param {string} queryID an ID used to identify the query by the backend in order to perform aggregation of subjectCounts.
    * @returns {Observable<Object>}
    */
   exploreSearchConcept(operation: string, root: string, apiURL?: string, publicKey?: string, queryID?: string): Observable<TreeNode[]> {
 
-    const queryParams: object = { type: 'children', path: root, operation: operation}
+    const queryParams: object = { type: 'children', path: root, operation: operation }
     if (queryID && publicKey) {
-      queryParams["subjectCountQueryInfo"] = {userPublicKey: publicKey, queryID: queryID}
+      queryParams['subjectCountQueryInfo'] = { userPublicKey: publicKey, queryID: queryID }
     }
 
     return this.apiEndpointService.postCall(
@@ -110,7 +111,7 @@ export class ExploreSearchService {
 
     const jsonSubjectCount = treeNodeObj['subjectCount'];
     if (jsonSubjectCount) {
-      treeNode.subjectCount = parseInt(jsonSubjectCount);
+      treeNode.subjectCount = parseInt(jsonSubjectCount, 10);
     }
     treeNode.subjectCountEncrypted = treeNodeObj['subjectCountEncrypted'];
 
@@ -126,7 +127,7 @@ export class ExploreSearchService {
 
     const queryParams: object = { path: root, appliedPath: appliedPath, appliedConcept: appliedConcept, operation: operation }
     if (queryID && publicKey) {
-      queryParams["subjectCountQueryInfo"] = {userPublicKey: publicKey, queryID: queryID}
+      queryParams['subjectCountQueryInfo'] = { userPublicKey: publicKey, queryID: queryID }
     }
 
     return this.apiEndpointService.postCall(
@@ -232,7 +233,8 @@ export class ExploreSearchService {
    *
    * @returns {Observable<Object>}
    */
-  exploreSearchModifierChildren(root: string, appliedPath: string, appliedConcept: string, medcoNodeUrl?: string, publicKey?: string, queryID?: string): Observable<TreeNode[]> {
+  exploreSearchModifierChildren(root: string, appliedPath: string, appliedConcept: string,
+    medcoNodeUrl?: string, publicKey?: string, queryID?: string): Observable<TreeNode[]> {
     return this.exploreSearchModifier('children', root, appliedPath, appliedConcept, medcoNodeUrl, publicKey, queryID);
   }
 
@@ -243,7 +245,8 @@ export class ExploreSearchService {
    *
    * @returns {Observable<Object>}
    */
-  exploreSearchModifierInfo(root: string, appliedPath: string, appliedConcept: string, medcoNodeUrl?: string, publicKey?: string, queryID?: string): Observable<TreeNode[]> {
+  exploreSearchModifierInfo(root: string, appliedPath: string, appliedConcept: string,
+      medcoNodeUrl?: string, publicKey?: string, queryID?: string): Observable<TreeNode[]> {
     return this.exploreSearchModifier('info', root, appliedPath, appliedConcept, medcoNodeUrl, publicKey, queryID)
   }
 }

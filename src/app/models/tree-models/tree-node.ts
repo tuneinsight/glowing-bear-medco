@@ -49,8 +49,8 @@ export class TreeNode implements PrimeNgTreeNode {
   parent: TreeNode;
   partialSelected: boolean;
 
-  //An indicator saying whether or not the process of loading the children of this node started.
-  childrenLoadingStarted: boolean = false;
+  // An indicator saying whether or not the process of loading the children of this node started.
+  childrenLoadingStarted = false;
 
   clone(): TreeNode {
     let copy: TreeNode = new TreeNode();
@@ -124,19 +124,19 @@ export class TreeNode implements PrimeNgTreeNode {
       || (this.nodeType === TreeNodeType.MODIFIER_CONTAINER)
       || (this.nodeType === TreeNodeType.MODIFIER_FOLDER))
   }
-  
+
   /*
    * This method refresh this parent's children subject counts with the subject count of @param updatedChildren
    * @param {TreeNode[]} updateChildren contains the children with updated subjects counts
    */
   refreshChildrenSubjectsCounts(updatedChildren: TreeNode[]) {
     if (!this.hasChildren()) {
-      console.error("could not update children counts of this node, it does not have any children")
+      console.error('could not update children counts of this node, it does not have any children')
       return;
     }
-    
+
     updatedChildren.forEach(updatedChild => {
-      const matchingChild = this.children.find(child => child.path == updatedChild.path)
+      const matchingChild = this.children.find(child => child.path === updatedChild.path)
       matchingChild.subjectCount = updatedChild.subjectCount;
     })
   }

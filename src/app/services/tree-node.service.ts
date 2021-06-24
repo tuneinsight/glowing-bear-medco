@@ -31,6 +31,11 @@ import { ApiNodeMetadata } from '../models/api-response-models/medco-network/api
 @Injectable()
 export class TreeNodeService {
 
+  /**
+   * Query timeout: 1 minutes.
+   */
+  private static QUERY_TIMEOUT_MS = 1000 * 60 * 1;
+
   // the variable that holds the entire tree structure, used by the tree on the left side bar
   private _rootTreeNodes: TreeNode[] = [];
   // the selected tree node in the side-panel by dragging
@@ -45,11 +50,6 @@ export class TreeNodeService {
   private cryptoService: CryptoService;
   private queryService: QueryService;
 
-
-  /**
-   * Query timeout: 1 minutes.
-   */
-  private static QUERY_TIMEOUT_MS = 1000 * 60 * 1;
 
   constructor(private injector: Injector) { }
 
@@ -106,7 +106,7 @@ export class TreeNodeService {
   private decryptSubjectCount(node: TreeNode): Observable<number> {
 
     if (!node.subjectCountEncrypted) {
-      console.warn("undefined encrypted subject count for node", node.displayName)
+      console.warn('undefined encrypted subject count for node', node.displayName)
       return;
     }
 
@@ -127,11 +127,14 @@ export class TreeNodeService {
 
   private getChildrenSearchObservable(parentNode: TreeNode, medcoNodeUrl?: string, publicKey?: string, queryID?: string) {
     return parentNode.isModifier() ?
-      this.exploreSearchService.exploreSearchModifierChildren(parentNode.path, parentNode.appliedPath, parentNode.appliedConcept.path, medcoNodeUrl, publicKey, queryID) :
+      this.exploreSearchService.exploreSearchModifierChildren(parentNode.path, parentNode.appliedPath,
+        parentNode.appliedConcept.path, medcoNodeUrl, publicKey, queryID) :
       this.exploreSearchService.exploreSearchConceptChildren(parentNode.path, medcoNodeUrl, publicKey, queryID);
   }
 
-  //Request only the children names to have the children concepts names displayed ASAP. This wont request the subjects counts for each child.
+  /* Request only the children names to have the children concepts names displayed ASAP.
+  * This wont request the subjects counts for each child.
+  */
   private loadChildrenNodesNames(parentNode: TreeNode, constraintService: ConstraintService): Promise<void> {
     if (parentNode.leaf || parentNode.childrenAttached) {
       return
@@ -184,17 +187,17 @@ export class TreeNodeService {
       return
     }
     parentNode.childrenLoadingStarted = true;
-    //first we request only the children names to have the children concepts names displayed ASAP.
+    // first we request only the children names to have the children concepts names displayed ASAP.
     const namesProcessingComplete: Promise<void> = this.loadChildrenNodesNames(parentNode, constraintService)
 
     if (!this.canLaunchTotalnumAggregation()) {
-      console.log("no rights to launch aggregations")
+      console.log('no rights to launch aggregations')
       this._isLoading = false;
       return
     }
 
 
-    var childrenProcessingStarted = false
+    let childrenProcessingStarted = false
     const processChildrenWithSubjectCount = (children: TreeNode[]) => {
 
       if (!children || children.length <= 0) {
@@ -207,7 +210,7 @@ export class TreeNodeService {
       * Hence the subscription to conceptNamesProcessedObservable.
       */
       namesProcessingComplete.then(_ => {
-        //Refresh treeNodes subject counts only once.
+        // Refresh treeNodes subject counts only once.
         if (childrenProcessingStarted) {
           return
         }
@@ -215,14 +218,14 @@ export class TreeNodeService {
         childrenProcessingStarted = true
         forkJoin(children.map(child => this.decryptSubjectCount(child))).subscribe(
           counts => {
-            //all observable operations that deal with the decryption of subject counts have resolved
+            // all observable operations that deal with the decryption of subject counts have resolved
             parentNode.refreshChildrenSubjectsCounts(children);
             this.processTreeNodes(parentNode.children, constraintService, false);
 
             this._isLoading = false;
 
           },
-          err => { this._isLoading = false; ErrorHelper.handleError("Error during loading of subject counts", err) }
+          err => { this._isLoading = false; ErrorHelper.handleError('Error during loading of subject counts', err) }
         )
 
       })
@@ -239,7 +242,7 @@ export class TreeNodeService {
     const publicKey = this.cryptoService.ephemeralPublicKey;
     const queryID = this.generateUniqueId();
 
-    //The following requests will execute homomorphic aggregation on all medco nodes of the totalnum column of each concept.
+    // The following requests will execute homomorphic aggregation on all medco nodes of the totalnum column of each concept.
     const aggregationsObservables = this.medcoNetworkService.nodes.map((node: ApiNodeMetadata) => {
       return this.getChildrenSearchObservable(parentNode, node.url, publicKey, queryID).pipe(
         map(processChildrenWithSubjectCount),
@@ -253,11 +256,12 @@ export class TreeNodeService {
 
     return forkObservable.pipe(
       map((treeNodesArrays: TreeNode[][]) => {
-        if (treeNodesArrays && treeNodesArrays.length > 0)
+        if (treeNodesArrays && treeNodesArrays.length > 0) {
           return treeNodesArrays[0]
+        }
 
         return []
-      }) //pick the treeNodes returned by one of the medco nodes
+      }) // pick the treeNodes returned by one of the medco nodes
     );
 
   }
@@ -301,10 +305,10 @@ export class TreeNodeService {
     if (displayCountLoadingIcon) {
       node.label = node.label + loadIcon;
     } else {
-      node.label = node.label.replace(loadIcon, "")
+      node.label = node.label.replace(loadIcon, '')
     }
     if (node.subjectCount) {
-      node.label = node.label.replace(loadIcon, "")
+      node.label = node.label.replace(loadIcon, '')
       node.label = node.label + ` (${node.subjectCount})`;
     }
 
