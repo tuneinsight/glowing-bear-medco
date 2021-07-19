@@ -19,6 +19,7 @@ import {SurvivalService} from '../../../../services/survival-analysis.service';
 import {UIHelper} from '../../../../utilities/ui-helper';
 import {AnalysisService} from '../../../../services/analysis.service';
 import {TreeNodeType} from '../../../../models/tree-models/tree-node-type';
+import {CensoringFrom} from 'src/app/models/survival-analysis/censoring-from-type';
 
 @Component({
   selector: 'gb-survival-settings',
@@ -38,6 +39,11 @@ export class GbSurvivalSettingsComponent implements OnInit {
   _temporalBoundaries: SelectItem[] = [
     { label: 'Earliest observation', value: When.earliest },
     { label: 'Latest observation', value: When.latest }
+  ]
+
+  _censoringSources: SelectItem[] = [
+    { label: 'observations', value: CensoringFrom.observations },
+    { label: 'encounters', value: CensoringFrom.encounters }
   ]
 
 
@@ -172,6 +178,10 @@ export class GbSurvivalSettingsComponent implements OnInit {
     return this._temporalBoundaries
   }
 
+  get censoringSources() {
+    return this._censoringSources
+  }
+
   get selectedStartsWhen(): When {
     return this.survivalService.startsWhen
   }
@@ -194,6 +204,14 @@ export class GbSurvivalSettingsComponent implements OnInit {
 
   set selectedGranularity(gran: Granularity) {
     this.survivalService.granularity = gran
+  }
+
+  get selectedCensoringFrom(): CensoringFrom {
+    return this.survivalService.censoringFrom
+  }
+
+  set selectedCensoringFrom(censoringfrom: CensoringFrom) {
+    this.survivalService.censoringFrom = censoringfrom
   }
 
   get limit(): number {
@@ -241,5 +259,6 @@ export class GbSurvivalSettingsComponent implements OnInit {
     this.selectedStartsWhen = When.earliest
     this.endConcept = undefined
     this.selectedEndsWhen = When.earliest
+    this.selectedCensoringFrom = CensoringFrom.observations
   }
 }

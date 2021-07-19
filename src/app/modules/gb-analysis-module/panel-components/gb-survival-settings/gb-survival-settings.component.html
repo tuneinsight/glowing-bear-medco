@@ -70,5 +70,16 @@
         </span>
       </div>
     </div>
+
+    <div class="input-label-wrapper">
+        <div>
+            <label>
+              Right-censoring event from:&nbsp;
+            </label>
+          </div>
+          <span class="input-field-margin">
+            <p-dropdown dropdownIcon="pi pi-caret-down white-color" [options]="censoringSources" [(ngModel)]="selectedCensoringFrom"></p-dropdown>
+          </span>
+    </div>
   </div>
 </p-accordionTab>
