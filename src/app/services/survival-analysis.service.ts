@@ -117,6 +117,7 @@ export class SurvivalService {
   set censoringFrom(censoringFrom: CensoringFrom) {
     this._censoringFrom = censoringFrom
   }
+
   get censoringFrom(): CensoringFrom {
     return this._censoringFrom
   }
