@@ -20,6 +20,7 @@ import { CohortService } from '../../../services/cohort.service';
 import { ApiI2b2Timing } from '../../../models/api-request-models/medco-node/api-i2b2-timing';
 import { CombinationConstraint } from '../../../models/constraint-models/combination-constraint';
 import { OperationType } from '../../../models/operation-models/operation-types';
+import { QueryTemporalSetting } from 'src/app/models/query-models/query-temporal-setting';
 
 type LoadingState = 'loading' | 'complete';
 
@@ -43,8 +44,9 @@ type LoadingState = 'loading' | 'complete';
 export class GbSelectionComponent {
 
   _timings: SelectItem[] = [
-    { label: 'Treat groups independently', value: false },
-    { label: 'Selected groups occur in the same instance', value: true }]
+    { label: 'Treat groups independently', value: QueryTemporalSetting.independent },
+    { label: 'Selected groups occur in the same instance', value: QueryTemporalSetting.sameinstance },
+    { label: 'Selected groups occur in a temporal sequence', value: QueryTemporalSetting.sequential }]
 
   @ViewChild('rootInclusionConstraintComponent', { static: true }) rootInclusionConstraintComponent: GbConstraintComponent;
   @ViewChild('rootExclusionConstraintComponent', { static: true }) rootExclusionConstraintComponent: GbConstraintComponent;

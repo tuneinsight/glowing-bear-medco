@@ -10,10 +10,12 @@
 
 import { Constraint } from './constraint';
 import { CombinationState } from './combination-state';
+import { ApiI2b2TimingSequenceInfo } from '../api-request-models/medco-node/api-sequence-of-events/api-i2b2-timing-sequence-info';
 
 export class CombinationConstraint extends Constraint {
 
   private _children: Constraint[];
+  private _temporalSequence: ApiI2b2TimingSequenceInfo[];
   private _combinationState: CombinationState;
   private _isRoot: boolean;
 
@@ -56,6 +58,7 @@ export class CombinationConstraint extends Constraint {
     res.parentConstraint = (this.parentConstraint) ? this.parentConstraint : null;
     res.isRoot = this.isRoot;
     res.combinationState = this.combinationState;
+    res._temporalSequence = this._temporalSequence.map(sequenceInfo => sequenceInfo.clone());
     res.panelTimingSameInstance = this.panelTimingSameInstance;
     res.children = this._children.map(constr => constr.clone());
     return res;
@@ -87,6 +90,7 @@ export class CombinationConstraint extends Constraint {
 
   set children(value: Constraint[]) {
     this._children = value;
+    this.updateSequences();
     this.updateTextRepresentation();
   }
 
@@ -96,7 +100,14 @@ export class CombinationConstraint extends Constraint {
 
   set combinationState(value: CombinationState) {
     this._combinationState = value;
+    if (this._combinationState === CombinationState.TemporalSequence) {
+      this.updateSequences()
+    }
     this.updateTextRepresentation();
+  }
+
+  get temporalSequence():ApiI2b2TimingSequenceInfo[]{
+    return this._temporalSequence
   }
 
   switchCombinationState() {
@@ -108,9 +119,33 @@ export class CombinationConstraint extends Constraint {
   removeChildConstraint(child: Constraint) {
     let index = this.children.indexOf(child);
     if (index > -1) {
+      if (this.children.length > 1) {
+        this._temporalSequence.splice(Math.max(index - 1, 0), 1)
+        this.updateSequences()
+      }
       this.children.splice(index, 1);
     }
     this.updateTextRepresentation();
+  }
+
+  updateSequences() {
+    if (!!(this._temporalSequence)) {
+      if ((this._children)) {
+        this._temporalSequence = Array<ApiI2b2TimingSequenceInfo>(this._children.length)
+        this._temporalSequence.fill(new ApiI2b2TimingSequenceInfo())
+      }
+    } else {
+      if ((this._children)) {
+        if (this._children.length > this._temporalSequence.length) {
+          let newSequences = Array<ApiI2b2TimingSequenceInfo>(this._children.length - this._temporalSequence.length)
+          newSequences.fill(new ApiI2b2TimingSequenceInfo())
+          this._temporalSequence = this._temporalSequence.concat(newSequences)
+        } else if (this._children.length < this._temporalSequence.length) {
+          // this is not expected as this situation can be handled by removeChildren
+          this._temporalSequence.splice(this._children.length - 1, this._temporalSequence.length - this._children.length)
+        }
+      }
+    }
   }
 
   get isRoot(): boolean {
@@ -124,8 +159,30 @@ export class CombinationConstraint extends Constraint {
 
   private updateTextRepresentation() {
     if (this.children.length > 0) {
-      this.textRepresentation = '(' + this.children.map(({ textRepresentation }) => textRepresentation)
-        .join(this.combinationState === CombinationState.And ? ' and ' : ' or ') + ')'
+      let newRepresentation = ''
+      for (let index = 0; index < this.children.length; index++) {
+
+        let representation = this.children[index].textRepresentation
+        if (index > 0) {
+          let combinationRepresentation: string
+          switch (this.combinationState) {
+            case CombinationState.And:
+              combinationRepresentation = 'and'
+              break;
+            case CombinationState.Or:
+              combinationRepresentation = 'or'
+              break;
+            case CombinationState.TemporalSequence:
+              combinationRepresentation = this._temporalSequence[index - 1].textRepresentation
+            default:
+              break;
+          }
+          representation = ` ${combinationRepresentation} ${representation}`
+        }
+        newRepresentation = `${newRepresentation}${representation}`
+      }
+
+      this.textRepresentation = `(${newRepresentation})`
     } else {
       this.textRepresentation = 'Group';
     }

@@ -15,4 +15,26 @@ export class ApiI2b2TimingSequenceInfo {
     When: ApiI2b2SequentialOperator;
     WhichDateSecond: ApiI2b2WhichDate;
     WhichObservationSecond: ApiI2b2WhichObservation;
+
+    constructor() {
+        this.WhichDateFirst = ApiI2b2WhichDate.startdate;
+        this.WhichObservationFirst = ApiI2b2WhichObservation.first;
+        this.When = ApiI2b2SequentialOperator.less;
+        this.WhichDateSecond = ApiI2b2WhichDate.startdate;
+        this.WhichObservationSecond = ApiI2b2WhichObservation.first;
+    }
+
+    get textRepresentation(): string {
+        return `temporal sequence: (which date first: ${this.WhichDateFirst}; which observation first: ${this.WhichObservationFirst}; when: ${this.When}; which date second: ${this.WhichDateSecond}; which observation second: ${this.WhichObservationSecond})`;
+    }
+
+    clone(): ApiI2b2TimingSequenceInfo {
+        let val = new ApiI2b2TimingSequenceInfo()
+        val.WhichDateFirst = this.WhichDateFirst
+        val.WhichObservationFirst = this.WhichObservationFirst
+        val.When = this.When
+        val.WhichDateSecond = this.WhichDateSecond
+        val.WhichObservationSecond= this.WhichObservationSecond
+        return val
+    }
 }
