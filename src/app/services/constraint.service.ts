@@ -24,6 +24,7 @@ import { GenomicAnnotation } from '../models/constraint-models/genomic-annotatio
 import { ErrorHelper } from '../utilities/error-helper';
 import { OperationType } from '../models/operation-models/operation-types';
 import { MessageHelper } from '../utilities/message-helper';
+import { QueryTemporalSetting } from '../models/query-models/query-temporal-setting';
 
 /**
  * This service concerns with
@@ -237,6 +238,17 @@ export class ConstraintService {
     }
 
     return constraint;
+  }
+
+  // changes first-level children form And to temporal-sequence operator and reverse
+  public checkSequential(val: QueryTemporalSetting) {
+    if (val === QueryTemporalSetting.sequential) {
+      this.rootInclusionConstraint.combinationState = CombinationState.TemporalSequence
+      this.rootExclusionConstraint.combinationState = CombinationState.TemporalSequence
+    } else {
+      this.rootInclusionConstraint.combinationState = CombinationState.And
+      this.rootExclusionConstraint.combinationState = CombinationState.And
+    }
   }
 
   set operationType(opType: OperationType) {

@@ -59,7 +59,9 @@ export class GbSelectionComponent {
     this.isUploadListenerNotAdded = true;
     // changes coming from cohrot restoration
     this.cohortService.queryTiming.subscribe(timing => {
-      this.queryService.queryTimingSameInstance = timing === ApiI2b2Timing.sameInstanceNum
+      this.queryService.queryTiming = timing === ApiI2b2Timing.sameInstanceNum ?
+        QueryTemporalSetting.sameinstance :
+        QueryTemporalSetting.independent
     })
   }
 
@@ -76,12 +78,12 @@ export class GbSelectionComponent {
     return this._timings
   }
 
-  set queryTiming(val: boolean) {
-    this.queryService.queryTimingSameInstance = val
+  set queryTiming(val: QueryTemporalSetting) {
+    this.queryService.queryTiming = val
   }
 
-  get queryTiming(): boolean {
-    return this.queryService.queryTimingSameInstance
+  get queryTiming(): QueryTemporalSetting {
+    return this.queryService.queryTiming
   }
 
   get globalCount(): Observable<string> {

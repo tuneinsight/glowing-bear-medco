@@ -34,7 +34,7 @@ export class ApiI2b2TimingSequenceInfo {
         val.WhichObservationFirst = this.WhichObservationFirst
         val.When = this.When
         val.WhichDateSecond = this.WhichDateSecond
-        val.WhichObservationSecond= this.WhichObservationSecond
+        val.WhichObservationSecond = this.WhichObservationSecond
         return val
     }
 }

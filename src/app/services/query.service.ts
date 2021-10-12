@@ -8,7 +8,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, Query } from '@angular/core';
 import { TreeNodeService } from './tree-node.service';
 import { ExploreQuery } from '../models/query-models/explore-query';
 import { ConstraintService } from './constraint.service';
@@ -29,6 +29,7 @@ import { ApiI2b2Panel } from '../models/api-request-models/medco-node/api-i2b2-p
 import { ApiI2b2Timing } from '../models/api-request-models/medco-node/api-i2b2-timing';
 import { OperationType } from '../models/operation-models/operation-types';
 import { UserInputError } from '../utilities/user-input-error';
+import { QueryTemporalSetting } from '../models/query-models/query-temporal-setting';
 
 /**
  * This service concerns with updating subject counts.
@@ -54,10 +55,10 @@ export class QueryService {
   private _lastSuccessfulSet = new Subject<number[]>()
 
   // i2b2 query-level timing policy
-  private _queryTimingSameInstance = false;
+  private _queryTiming = QueryTemporalSetting.independent;
 
   // keep track queryTiming when switching tab
-  private _exploreQueryTimingSameInstance: boolean;
+  private _exploreQueryTiming: QueryTemporalSetting;
 
 
   constructor(private appConfig: AppConfig,
@@ -75,7 +76,7 @@ export class QueryService {
     this.queryResults.next();
     this.isUpdating = false;
     this.isDirty = false;
-    this.queryTimingSameInstance = false
+    this.queryTiming = QueryTemporalSetting.independent;
     this.constraintService.clearConstraint();
     this.query = new ExploreQuery();
   }
@@ -178,7 +179,7 @@ export class QueryService {
     // prepare and execute query
     this.query.generateUniqueId();
     this.query.constraint = this.constraintService.generateConstraint();
-    this.query.queryTimingSameInstanceNum = this.queryTimingSameInstance
+    this.query.queryTimingSameInstanceNum = this.queryTiming === QueryTemporalSetting.sameinstance
 
     this.genomicAnnotationsService.addVariantIdsToConstraints(this.query.constraint).pipe(
       catchError((err) => {
@@ -302,12 +303,13 @@ export class QueryService {
   get lastSuccessfulSet(): Observable<number[]> {
     return this._lastSuccessfulSet.asObservable()
   }
-  get queryTimingSameInstance(): boolean {
-    return this._queryTimingSameInstance
+  get queryTiming(): QueryTemporalSetting {
+    return this._queryTiming
   }
 
-  set queryTimingSameInstance(val: boolean) {
-    this._queryTimingSameInstance = val
+  set queryTiming(val: QueryTemporalSetting) {
+    this.constraintService.checkSequential(val)
+    this._queryTiming = val
   }
 
   get lastDefinition(): ApiI2b2Panel[] {
@@ -324,8 +326,8 @@ export class QueryService {
 
         // reload previous selection
         if (this.operationType === OperationType.ANALYSIS) {
-          if (this._exploreQueryTimingSameInstance !== null) {
-            this.queryTimingSameInstance = this._exploreQueryTimingSameInstance
+          if (this._exploreQueryTiming !== null) {
+            this.queryTiming = this._exploreQueryTiming
           }
         }
 
@@ -335,7 +337,7 @@ export class QueryService {
 
         // save current selection
         if (this.operationType === OperationType.EXPLORE) {
-          this._exploreQueryTimingSameInstance = this.queryTimingSameInstance
+          this._exploreQueryTiming = this.queryTiming
         }
         this.constraintService.operationType = opType
         break;

@@ -106,7 +106,7 @@ export class CombinationConstraint extends Constraint {
     this.updateTextRepresentation();
   }
 
-  get temporalSequence():ApiI2b2TimingSequenceInfo[]{
+  get temporalSequence(): ApiI2b2TimingSequenceInfo[] {
     return this._temporalSequence
   }
 
@@ -129,7 +129,7 @@ export class CombinationConstraint extends Constraint {
   }
 
   updateSequences() {
-    if (!!(this._temporalSequence)) {
+    if (this._temporalSequence !== null) {
       if ((this._children)) {
         this._temporalSequence = Array<ApiI2b2TimingSequenceInfo>(this._children.length)
         this._temporalSequence.fill(new ApiI2b2TimingSequenceInfo())
@@ -174,6 +174,7 @@ export class CombinationConstraint extends Constraint {
               break;
             case CombinationState.TemporalSequence:
               combinationRepresentation = this._temporalSequence[index - 1].textRepresentation
+              break;
             default:
               break;
           }
