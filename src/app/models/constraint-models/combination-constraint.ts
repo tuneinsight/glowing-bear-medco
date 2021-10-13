@@ -39,6 +39,7 @@ export class CombinationConstraint extends Constraint {
       constraint.parentConstraint = this;
     }
     this.children.push(constraint);
+    this.updateSequences()
     this.updateTextRepresentation();
     return;
   }
@@ -120,7 +121,7 @@ export class CombinationConstraint extends Constraint {
     let index = this.children.indexOf(child);
     if (index > -1) {
       if (this.children.length > 1) {
-        this._temporalSequence.splice(Math.max(index - 1, 0), 1)
+        this._temporalSequence.splice(index, 1)
         this.updateSequences()
       }
       this.children.splice(index, 1);
@@ -173,7 +174,7 @@ export class CombinationConstraint extends Constraint {
               combinationRepresentation = 'or'
               break;
             case CombinationState.TemporalSequence:
-              combinationRepresentation = this._temporalSequence[index - 1].textRepresentation
+              combinationRepresentation = this._temporalSequence[index].textRepresentation
               break;
             default:
               break;

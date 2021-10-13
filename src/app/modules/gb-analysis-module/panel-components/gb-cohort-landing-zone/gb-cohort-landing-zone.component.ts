@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 CHUV
+ * Copyright 2020 - 2021 CHUV
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -109,9 +109,12 @@ export class GbCohortLandingZoneComponent implements OnInit {
       throw ErrorHelper.handleNewUserInputError(`in definition of subgroup ${this.name} : ` + inputValueValidation)
     }
 
+    // TODO timing sequences
+
     let newSubGroup: SubGroup = {
       name: this.name,
-      timing: this.queryService.queryTimingSameInstance ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any,
+      timingSequence: null,
+      timing: this.queryService.queryTiming ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any,
       rootInclusionConstraint: this.constraintService.rootInclusionConstraint.clone(),
       rootExclusionConstraint: this.constraintService.rootExclusionConstraint.clone()
     }
@@ -134,7 +137,8 @@ export class GbCohortLandingZoneComponent implements OnInit {
 
   loadSubGroup(event: Event) {
     this.name = this.selectedSubGroup.name
-    this.queryService.queryTimingSameInstance = (this.selectedSubGroup.timing === ApiI2b2Timing.sameInstanceNum) ? true : false
+    // TODO
+    this.queryService.queryTiming = null
     this.constraintService.rootInclusionConstraint = this.selectedSubGroup.rootInclusionConstraint.clone()
     this.constraintService.rootExclusionConstraint = this.selectedSubGroup.rootExclusionConstraint.clone()
   }

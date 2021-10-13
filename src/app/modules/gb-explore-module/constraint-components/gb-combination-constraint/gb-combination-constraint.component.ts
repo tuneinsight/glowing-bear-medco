@@ -14,7 +14,7 @@ import { AutoComplete } from 'primeng';
 import { CombinationState } from '../../../../models/constraint-models/combination-state';
 import { TreeNode } from '../../../../models/tree-models/tree-node';
 import { UIHelper } from '../../../../utilities/ui-helper';
-import {MessageHelper} from '../../../../utilities/message-helper';
+import { MessageHelper } from '../../../../utilities/message-helper';
 import { Cohort } from 'src/app/models/cohort-models/cohort';
 import { Cohort as ConstraintCohort } from 'src/app/models/constraint-models/cohort';
 import { CohortConstraint } from 'src/app/models/constraint-models/cohort-constraint';
@@ -130,6 +130,10 @@ export class GbCombinationConstraintComponent extends GbConstraintComponent impl
 
   get combinationState() {
     return (<CombinationConstraint>this.constraint).combinationState;
+  }
+
+  get temporalSequence() {
+    return (<CombinationConstraint>this.constraint).temporalSequence;
   }
 
   get childContainerClass(): string {

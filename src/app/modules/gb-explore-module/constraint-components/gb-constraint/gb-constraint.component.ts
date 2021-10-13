@@ -133,4 +133,8 @@ export class GbConstraintComponent implements OnInit {
     return this.queryService.queryTiming
   }
 
+  get queryTimingSameInstance(): boolean {
+    return this.queryTiming === QueryTemporalSetting.sameinstance
+  }
+
 }

@@ -16,12 +16,14 @@ import { CalendarModule } from 'primeng';
 import { PanelModule } from 'primeng';
 import { MultiSelectModule } from 'primeng';
 import { GbTooltipComponent } from '../constraint-components/gb-concept-constraint/gb-tooltip/gb-tooltip.component';
+import { GbTemporalSequenceComponent } from '../constraint-components/gb-combination-constraint/gb-temporal-sequence/gb-temporal-sequence.component';
 
 
 
 @NgModule({
   declarations: [
     GbCombinationConstraintComponent,
+    GbTemporalSequenceComponent,
     GbConstraintComponent,
     GbConceptConstraintComponent,
     GbTooltipComponent,
