@@ -25,6 +25,7 @@ import { ErrorHelper } from '../utilities/error-helper';
 import { OperationType } from '../models/operation-models/operation-types';
 import { MessageHelper } from '../utilities/message-helper';
 import { QueryTemporalSetting } from '../models/query-models/query-temporal-setting';
+import { ApiI2b2TimingSequenceInfo } from '../models/api-request-models/medco-node/api-sequence-of-events/api-i2b2-timing-sequence-info';
 
 /**
  * This service concerns with
@@ -249,6 +250,11 @@ export class ConstraintService {
       this.rootInclusionConstraint.combinationState = CombinationState.And
       this.rootExclusionConstraint.combinationState = CombinationState.And
     }
+  }
+
+  public getSequentialInfo(): ApiI2b2TimingSequenceInfo[] {
+    return this.rootInclusionConstraint.temporalSequence.slice(0, this.rootInclusionConstraint.temporalSequence.length - 1)
+
   }
 
   set operationType(opType: OperationType) {

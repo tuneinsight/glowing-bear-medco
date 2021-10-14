@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import { ApiI2b2TimingSequenceInfo } from '../api-request-models/medco-node/api-sequence-of-events/api-i2b2-timing-sequence-info';
 import { Constraint } from '../constraint-models/constraint';
 
 export class ExploreQuery {
@@ -18,6 +19,9 @@ export class ExploreQuery {
 
   // the query-level i2b2 timing policy
   private _queryTimingSameInstanceNum: boolean;
+
+  // the list of sequential operators
+  private _timingSequenceInfo: ApiI2b2TimingSequenceInfo[];
 
   constructor(name?: string) {
     this.name = name;
@@ -79,5 +83,13 @@ export class ExploreQuery {
 
   get queryTimingSameInstanceNum(): boolean {
     return this._queryTimingSameInstanceNum
+  }
+
+  set timingSequenceInfo(sequenceInfo: ApiI2b2TimingSequenceInfo[]) {
+    this._timingSequenceInfo = sequenceInfo
+  }
+
+  get timingSequenceInfo(): ApiI2b2TimingSequenceInfo[] {
+    return this._timingSequenceInfo
   }
 }

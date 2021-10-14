@@ -10,7 +10,6 @@ import { SelectItem } from 'primeng';
 import { SubGroup, SurvivalService } from '../../../../services/survival-analysis.service';
 import { AnalysisService } from '../../../../services/analysis.service';
 import { ConstraintService } from '../../../../services/constraint.service';
-import { MessageHelper } from '../../../../utilities/message-helper';
 import { OperationType } from '../../../../models/operation-models/operation-types';
 import { CohortService } from '../../../../services/cohort.service';
 import { ApiI2b2Timing } from '../../../../models/api-request-models/medco-node/api-i2b2-timing';
@@ -109,11 +108,10 @@ export class GbCohortLandingZoneComponent implements OnInit {
       throw ErrorHelper.handleNewUserInputError(`in definition of subgroup ${this.name} : ` + inputValueValidation)
     }
 
-    // TODO timing sequences
 
     let newSubGroup: SubGroup = {
       name: this.name,
-      timingSequence: null,
+      queryTemporalSetting: this.queryService.queryTiming,
       timing: this.queryService.queryTiming ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any,
       rootInclusionConstraint: this.constraintService.rootInclusionConstraint.clone(),
       rootExclusionConstraint: this.constraintService.rootExclusionConstraint.clone()
@@ -137,8 +135,7 @@ export class GbCohortLandingZoneComponent implements OnInit {
 
   loadSubGroup(event: Event) {
     this.name = this.selectedSubGroup.name
-    // TODO
-    this.queryService.queryTiming = null
+    this.queryService.queryTiming = this.selectedSubGroup.queryTemporalSetting
     this.constraintService.rootInclusionConstraint = this.selectedSubGroup.rootInclusionConstraint.clone()
     this.constraintService.rootExclusionConstraint = this.selectedSubGroup.rootExclusionConstraint.clone()
   }

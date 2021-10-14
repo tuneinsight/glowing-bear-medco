@@ -29,12 +29,12 @@ import { ApiSurvivalAnalysis } from '../models/api-request-models/survival-analy
 import { CombinationConstraint } from '../models/constraint-models/combination-constraint';
 import { map } from 'rxjs/operators';
 import { ApiI2b2Timing } from '../models/api-request-models/medco-node/api-i2b2-timing';
-import { ApiI2b2TimingSequenceInfo } from '../models/api-request-models/medco-node/api-sequence-of-events/api-i2b2-timing-sequence-info';
+import { QueryTemporalSetting } from '../models/query-models/query-temporal-setting';
 
 export class SubGroup {
   name: string
   timing: ApiI2b2Timing
-  timingSequence: ApiI2b2TimingSequenceInfo[]
+  queryTemporalSetting: QueryTemporalSetting
   rootInclusionConstraint: CombinationConstraint
   rootExclusionConstraint: CombinationConstraint
 }
@@ -202,8 +202,8 @@ export class SurvivalService {
         return {
           groupName: sg.name,
           subGroupTiming: sg.timing,
-          panels: this.generatePanels(sg),
-          queryTimingSequence: sg.timingSequence
+          queryTimingSequence: sg.rootInclusionConstraint.temporalSequence,
+          panels: this.generatePanels(sg)
         }
       }
     )

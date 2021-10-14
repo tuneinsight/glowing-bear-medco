@@ -25,6 +25,7 @@ export class CombinationConstraint extends Constraint {
     this._children = [];
     this.combinationState = CombinationState.And;
     this.isRoot = false;
+    this._temporalSequence = [];
     this.textRepresentation = 'Group';
   }
 
@@ -54,14 +55,14 @@ export class CombinationConstraint extends Constraint {
   }
 
   clone(): CombinationConstraint {
-    let res = new CombinationConstraint;
+    let res = new CombinationConstraint();
     res.textRepresentation = this.textRepresentation;
     res.parentConstraint = (this.parentConstraint) ? this.parentConstraint : null;
     res.isRoot = this.isRoot;
     res.combinationState = this.combinationState;
-    res._temporalSequence = this._temporalSequence.map(sequenceInfo => sequenceInfo.clone());
+    res.temporalSequence = this.temporalSequence.map(sequenceInfo => sequenceInfo.clone());
     res.panelTimingSameInstance = this.panelTimingSameInstance;
-    res.children = this._children.map(constr => constr.clone());
+    res.children = this.children.map(constr => constr.clone());
     return res;
   }
 
@@ -111,6 +112,10 @@ export class CombinationConstraint extends Constraint {
     return this._temporalSequence
   }
 
+  set temporalSequence(sequenceInfo: ApiI2b2TimingSequenceInfo[]) {
+    this._temporalSequence = sequenceInfo
+  }
+
   switchCombinationState() {
     this.combinationState = (this.combinationState === CombinationState.And) ?
       CombinationState.Or : CombinationState.And;
@@ -130,7 +135,7 @@ export class CombinationConstraint extends Constraint {
   }
 
   updateSequences() {
-    if (this._temporalSequence !== null) {
+    if ((this._temporalSequence === null) || (this._temporalSequence.length === 0)) {
       if ((this._children)) {
         this._temporalSequence = Array<ApiI2b2TimingSequenceInfo>(this._children.length)
         this._temporalSequence.fill(new ApiI2b2TimingSequenceInfo())

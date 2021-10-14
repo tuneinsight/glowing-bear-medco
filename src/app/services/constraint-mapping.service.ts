@@ -28,7 +28,6 @@ export class ConstraintMappingService {
   }
 
   private mapCombinationConstraint(panels: ApiI2b2Panel[], constraint: Constraint, negated: boolean) {
-
     switch (constraint.className) {
       case 'NegationConstraint':
         ((constraint as NegationConstraint).constraint as CombinationConstraint).children.forEach((childConstraint) =>
@@ -40,7 +39,8 @@ export class ConstraintMappingService {
           return;
         } else if ((constraint as CombinationConstraint).combinationState === CombinationState.Or) {
           panels.push(this.generateI2b2Panel(constraint, negated));
-        } else if ((constraint as CombinationConstraint).combinationState === CombinationState.And) {
+        } else if (((constraint as CombinationConstraint).combinationState === CombinationState.And) ||
+        ((constraint as CombinationConstraint).combinationState === CombinationState.TemporalSequence)) {
           (constraint as CombinationConstraint).children.forEach((childConstraint) =>
             this.mapCombinationConstraint(panels, childConstraint as CombinationConstraint, negated))
         }
