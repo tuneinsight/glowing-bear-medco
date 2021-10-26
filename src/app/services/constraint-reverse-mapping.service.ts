@@ -45,7 +45,6 @@ export class ConstraintReverseMappingService {
 
 
     if (panels.length === 1 && panels[0].conceptItems.length === 1) {
-
       return this.mapItem(panels[0].conceptItems[0]).pipe(map(constraint => {
         constraint.panelTimingSameInstance = panels[0].panelTiming === ApiI2b2Timing.sameInstanceNum
         return constraint

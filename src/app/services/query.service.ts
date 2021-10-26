@@ -30,6 +30,7 @@ import { ApiI2b2Timing } from '../models/api-request-models/medco-node/api-i2b2-
 import { OperationType } from '../models/operation-models/operation-types';
 import { UserInputError } from '../utilities/user-input-error';
 import { QueryTemporalSetting } from '../models/query-models/query-temporal-setting';
+import { ApiI2b2TimingSequenceInfo } from '../models/api-request-models/medco-node/api-sequence-of-events/api-i2b2-timing-sequence-info';
 
 /**
  * This service concerns with updating subject counts.
@@ -180,7 +181,7 @@ export class QueryService {
     this.query.generateUniqueId();
     this.query.constraint = this.constraintService.generateConstraint();
     this.query.queryTimingSameInstanceNum = this.queryTiming === QueryTemporalSetting.sameinstance
-    this.query.timingSequenceInfo = this.queryTiming === QueryTemporalSetting.sequential ? this.constraintService.getSequentialInfo() : null
+    this.query.timingSequenceInfo = this.queryTiming === QueryTemporalSetting.sequential ? this.constraintService.sequentialInfo : null
 
     this.genomicAnnotationsService.addVariantIdsToConstraints(this.query.constraint).pipe(
       catchError((err) => {
@@ -311,6 +312,11 @@ export class QueryService {
   set queryTiming(val: QueryTemporalSetting) {
     this.constraintService.checkSequential(val)
     this._queryTiming = val
+  }
+
+  set sequentialInfo(val: ApiI2b2TimingSequenceInfo[]){
+    this.constraintService.sequentialInfo=val
+    this.constraintService.checkSequential(this.queryTiming)
   }
 
   get lastDefinition(): ApiI2b2Panel[] {

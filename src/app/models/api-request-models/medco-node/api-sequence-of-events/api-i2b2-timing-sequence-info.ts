@@ -10,31 +10,31 @@ import { ApiI2b2WhichDate } from './api-i2b2-which-date';
 import { ApiI2b2WhichObservation } from './api-i2b2-which-observation';
 
 export class ApiI2b2TimingSequenceInfo {
-    WhichDateFirst: ApiI2b2WhichDate;
-    WhichObservationFirst: ApiI2b2WhichObservation;
-    When: ApiI2b2SequentialOperator;
-    WhichDateSecond: ApiI2b2WhichDate;
-    WhichObservationSecond: ApiI2b2WhichObservation;
+    whichDateFirst: ApiI2b2WhichDate;
+    whichObservationFirst: ApiI2b2WhichObservation;
+    when: ApiI2b2SequentialOperator;
+    whichDateSecond: ApiI2b2WhichDate;
+    whichObservationSecond: ApiI2b2WhichObservation;
 
     constructor() {
-        this.WhichDateFirst = ApiI2b2WhichDate.startdate;
-        this.WhichObservationFirst = ApiI2b2WhichObservation.first;
-        this.When = ApiI2b2SequentialOperator.less;
-        this.WhichDateSecond = ApiI2b2WhichDate.startdate;
-        this.WhichObservationSecond = ApiI2b2WhichObservation.first;
+        this.whichDateFirst = ApiI2b2WhichDate.startdate;
+        this.whichObservationFirst = ApiI2b2WhichObservation.first;
+        this.when = ApiI2b2SequentialOperator.less;
+        this.whichDateSecond = ApiI2b2WhichDate.startdate;
+        this.whichObservationSecond = ApiI2b2WhichObservation.first;
     }
 
     get textRepresentation(): string {
-        return `temporal sequence: (which date first: ${this.WhichDateFirst}; which observation first: ${this.WhichObservationFirst}; when: ${this.When}; which date second: ${this.WhichDateSecond}; which observation second: ${this.WhichObservationSecond})`;
+        return `temporal sequence: (which date first: ${this.whichDateFirst}; which observation first: ${this.whichObservationFirst}; when: ${this.when}; which date second: ${this.whichDateSecond}; which observation second: ${this.whichObservationSecond})`;
     }
 
     clone(): ApiI2b2TimingSequenceInfo {
         let val = new ApiI2b2TimingSequenceInfo()
-        val.WhichDateFirst = this.WhichDateFirst
-        val.WhichObservationFirst = this.WhichObservationFirst
-        val.When = this.When
-        val.WhichDateSecond = this.WhichDateSecond
-        val.WhichObservationSecond = this.WhichObservationSecond
+        val.whichDateFirst = this.whichDateFirst
+        val.whichObservationFirst = this.whichObservationFirst
+        val.when = this.when
+        val.whichDateSecond = this.whichDateSecond
+        val.whichObservationSecond = this.whichObservationSecond
         return val
     }
 }

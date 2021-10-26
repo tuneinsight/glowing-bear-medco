@@ -23,6 +23,8 @@ import { CombinationConstraint } from '../models/constraint-models/combination-c
 import { ApiCohort } from '../models/api-request-models/medco-node/api-cohort';
 import { ErrorHelper } from '../utilities/error-helper';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ApiI2b2TimingSequenceInfo } from '../models/api-request-models/medco-node/api-sequence-of-events/api-i2b2-timing-sequence-info';
+import { map, tap } from 'rxjs/operators';
 
 @Injectable()
 export class CohortService {
@@ -40,6 +42,7 @@ export class CohortService {
   // term restoration
   public restoring: Subject<boolean>
   private _queryTiming: Subject<ApiI2b2Timing>
+  private _queryTemporalSequence: Subject<ApiI2b2TimingSequenceInfo[]>
   private _panelTimings: Subject<ApiI2b2Timing[]>
 
   // constraint on cohort name
@@ -194,6 +197,7 @@ export class CohortService {
     private constraintReverseMappingService: ConstraintReverseMappingService) {
     this.restoring = new Subject<boolean>()
     this._queryTiming = new Subject<ApiI2b2Timing>()
+    this._queryTemporalSequence = new Subject<ApiI2b2TimingSequenceInfo[]>()
     this._panelTimings = new Subject<ApiI2b2Timing[]>()
     this._nodeName = new Array<string>(this.medcoNetworkService.nodes.length)
     this.medcoNetworkService.nodes.forEach((apiMetadata => {
@@ -252,6 +256,10 @@ export class CohortService {
     return this._queryTiming.asObservable()
   }
 
+  get queryTemporalSequence(): Observable<ApiI2b2TimingSequenceInfo[]> {
+    return this._queryTemporalSequence.asObservable()
+  }
+
   get panelTimings(): Observable<ApiI2b2Timing[]> {
     return this._panelTimings.asObservable()
   }
@@ -262,7 +270,31 @@ export class CohortService {
 
   getCohorts() {
     this._isRefreshing = true
-    this.exploreCohortsService.getCohortAllNodes().subscribe({
+    this.exploreCohortsService.getCohortAllNodes().pipe(
+      tap((response)=>{console.warn('raw response api cohorts',JSON.stringify(response))}),
+      // else the clone() is undefined
+      map((apiCohortResponses) => apiCohortResponses.map(
+        
+        (a) => a.map((b) => {
+          if (b.queryDefinition !== null) {
+            let seq = b.queryDefinition.queryTimingSequence
+            if (seq !== null) {
+              let seqWithObject = seq.map((seqElm) => {
+                let ret = new ApiI2b2TimingSequenceInfo()
+                ret.when = seqElm.when
+                ret.whichDateFirst = seqElm.whichDateFirst
+                ret.whichDateSecond = seqElm.whichDateSecond
+                ret.whichObservationFirst = seqElm.whichObservationFirst
+                ret.whichObservationSecond = seqElm.whichObservationSecond
+                return ret
+              })
+              b.queryDefinition.queryTimingSequence = seqWithObject
+            }
+          }
+          return b
+        })
+      ))
+    ).subscribe({
       next: (apiCohorts => {
         try {
           this.updateCohorts(CohortService.apiCohortsToCohort(apiCohorts))
@@ -367,7 +399,7 @@ export class CohortService {
     }
     let nots = cohortDefinition.panels.map(({ not }) => not)
     this._queryTiming.next(cohortDefinition.queryTiming)
-
+    this._queryTemporalSequence.next(cohortDefinition.queryTimingSequence)
     this.constraintReverseMappingService.mapPanels(cohortDefinition.panels)
       .subscribe(constraint => {
         let formatedConstraint = {

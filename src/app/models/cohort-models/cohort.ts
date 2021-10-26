@@ -8,7 +8,6 @@
 import { CombinationConstraint } from '../constraint-models/combination-constraint'
 
 import { ApiQueryDefinition } from '../api-request-models/medco-node/api-query-definition'
-import {ErrorHelper} from '../../utilities/error-helper';
 
 export class Cohort {
   private _name: string
@@ -33,7 +32,7 @@ export class Cohort {
     this._name = name
 
     if (rootInclusionConstraint !== null) {
-
+      
       this._rootInclusionConstraint = rootInclusionConstraint.clone()
     }
     if (rootExclusionConstraint !== null) {

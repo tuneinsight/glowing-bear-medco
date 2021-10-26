@@ -252,9 +252,15 @@ export class ConstraintService {
     }
   }
 
-  public getSequentialInfo(): ApiI2b2TimingSequenceInfo[] {
-    return this.rootInclusionConstraint.temporalSequence.slice(0, this.rootInclusionConstraint.temporalSequence.length - 1)
+  get sequentialInfo(): ApiI2b2TimingSequenceInfo[] {
+    return this.rootInclusionConstraint.temporalSequence.map((sequenceInfoElm) => sequenceInfoElm.clone())
 
+  }
+
+  set sequentialInfo(sequenceInfo:ApiI2b2TimingSequenceInfo[]){
+    this.rootInclusionConstraint.temporalSequence=sequenceInfo.map((sequenceInfoElm) => { 
+      let otherElm = new ApiI2b2TimingSequenceInfo()
+      return sequenceInfoElm.clone()})
   }
 
   set operationType(opType: OperationType) {

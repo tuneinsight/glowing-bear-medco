@@ -60,42 +60,42 @@ export class GbTemporalSequenceComponent implements OnInit {
   }
 
   get whichDateFirst(): ApiI2b2WhichDate {
-    return this._sequenceInfo.WhichDateFirst
+    return this._sequenceInfo.whichDateFirst
   }
 
   set whichDateFirst(whichDate: ApiI2b2WhichDate) {
-    this._sequenceInfo.WhichDateFirst = whichDate
+    this._sequenceInfo.whichDateFirst = whichDate
   }
 
   get whichObsverationFirst(): ApiI2b2WhichObservation {
-    return this._sequenceInfo.WhichObservationFirst
+    return this._sequenceInfo.whichObservationFirst
   }
 
   set whichObservationFirst(obs: ApiI2b2WhichObservation) {
-    this._sequenceInfo.WhichObservationFirst = obs
+    this._sequenceInfo.whichObservationFirst = obs
   }
 
   set sequentialOperator(sequentialOperator: ApiI2b2SequentialOperator) {
-    this._sequenceInfo.When = sequentialOperator
+    this._sequenceInfo.when = sequentialOperator
   }
 
   get sequentialOperator(): ApiI2b2SequentialOperator {
-    return this._sequenceInfo.When
+    return this._sequenceInfo.when
   }
 
   set whichDateSecond(whichDate: ApiI2b2WhichDate) {
-    this._sequenceInfo.WhichDateSecond = whichDate
+    this._sequenceInfo.whichDateSecond = whichDate
   }
   get whichDateSecond(): ApiI2b2WhichDate {
-    return this._sequenceInfo.WhichDateSecond
+    return this._sequenceInfo.whichDateSecond
   }
 
   get whichObsverationSecond(): ApiI2b2WhichObservation {
-    return this._sequenceInfo.WhichObservationSecond
+    return this._sequenceInfo.whichObservationSecond
   }
 
   set whichObservationSecond(obs: ApiI2b2WhichObservation) {
-    this._sequenceInfo.WhichObservationSecond = obs
+    this._sequenceInfo.whichObservationSecond = obs
   }
 
 }
