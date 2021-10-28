@@ -61,7 +61,7 @@ export class GbSelectionComponent {
     // changes coming from cohort restoration
     combineLatest([this.cohortService.queryTiming, this.cohortService.queryTemporalSequence])
       .subscribe(([timing, sequenceInfo]: [ApiI2b2Timing, ApiI2b2TimingSequenceInfo[]]) => {
-        if ((sequenceInfo === null) || (sequenceInfo.length === 0)) {
+        if ((sequenceInfo === undefined) || (sequenceInfo === null) || (sequenceInfo.length === 0)) {
           this.queryService.queryTiming = timing === ApiI2b2Timing.sameInstanceNum ?
             QueryTemporalSetting.sameinstance :
             QueryTemporalSetting.independent

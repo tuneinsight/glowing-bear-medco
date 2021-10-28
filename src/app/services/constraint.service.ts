@@ -258,9 +258,7 @@ export class ConstraintService {
   }
 
   set sequentialInfo(sequenceInfo:ApiI2b2TimingSequenceInfo[]){
-    this.rootInclusionConstraint.temporalSequence=sequenceInfo.map((sequenceInfoElm) => { 
-      let otherElm = new ApiI2b2TimingSequenceInfo()
-      return sequenceInfoElm.clone()})
+    this.rootInclusionConstraint.temporalSequence=sequenceInfo.map(sequenceInfoElm =>  sequenceInfoElm.clone())
   }
 
   set operationType(opType: OperationType) {

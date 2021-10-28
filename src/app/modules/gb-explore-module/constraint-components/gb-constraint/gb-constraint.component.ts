@@ -38,6 +38,7 @@ export class GbConstraintComponent implements OnInit {
     protected element: ElementRef,
     protected config: AppConfig) {
   }
+  public foo:boolean
 
   ngOnInit() {
     this.addEventListeners();

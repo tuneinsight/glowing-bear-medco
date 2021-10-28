@@ -271,10 +271,9 @@ export class CohortService {
   getCohorts() {
     this._isRefreshing = true
     this.exploreCohortsService.getCohortAllNodes().pipe(
-      tap((response)=>{console.warn('raw response api cohorts',JSON.stringify(response))}),
       // else the clone() is undefined
       map((apiCohortResponses) => apiCohortResponses.map(
-        
+
         (a) => a.map((b) => {
           if (b.queryDefinition !== null) {
             let seq = b.queryDefinition.queryTimingSequence
@@ -406,8 +405,14 @@ export class CohortService {
           inclusionConstraint: <Constraint>{},
           exclusionConstraint: <Constraint>{}
         }
+        let timingSequence = cohortDefinition.queryTimingSequence
         CohortService.conformConstraints(nots, constraint, formatedConstraint)
-        formatedConstraint.inclusionConstraint = CohortService.unflattenConstraints(formatedConstraint.inclusionConstraint)
+        formatedConstraint.inclusionConstraint = CohortService.unflattenConstraints(formatedConstraint.inclusionConstraint);
+        (formatedConstraint.inclusionConstraint as CombinationConstraint).combinationState = (timingSequence === null || timingSequence === undefined || timingSequence.length === 0) ?
+          CombinationState.And : CombinationState.TemporalSequence
+        if ((formatedConstraint.inclusionConstraint as CombinationConstraint).combinationState === CombinationState.TemporalSequence){
+          (formatedConstraint.inclusionConstraint as CombinationConstraint).temporalSequence = timingSequence
+        }
         formatedConstraint.exclusionConstraint = CohortService.unflattenConstraints(formatedConstraint.exclusionConstraint)
 
         if ((formatedConstraint.inclusionConstraint) || (formatedConstraint.exclusionConstraint)) {
