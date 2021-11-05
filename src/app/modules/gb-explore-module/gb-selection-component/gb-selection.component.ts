@@ -65,7 +65,7 @@ export class GbSelectionComponent {
           this.queryService.queryTiming = timing === ApiI2b2Timing.sameInstanceNum ?
             QueryTemporalSetting.sameinstance :
             QueryTemporalSetting.independent
-        } else{
+        } else {
           this.queryService.queryTiming = QueryTemporalSetting.sequential
           this.queryService.sequentialInfo = sequenceInfo
         }

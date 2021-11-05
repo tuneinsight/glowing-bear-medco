@@ -14,8 +14,13 @@
         <i *ngSwitchCase="CombinationState.Or">
           <button type="button" class="btn btn-outline-primary btn-sm">or</button>
         </i>
-        <gb-temporal-sequence *ngSwitchCase="CombinationState.TemporalSequence" [sequenceInfo]="temporalSequence[i]"></gb-temporal-sequence>
-        
+        <i *ngSwitchCase="CombinationState.TemporalSequence">
+          <button *ngIf="i !== (children.length - 1)" icon="fa fa-cog" type="button" [hidden]="i === (children.length - 1)" (click)="showTemporal(i)" class="btn btn-outline-primary btn-sm">
+            {{temporalStringRepresentation(temporalSequence[i].when)}}
+            <i class="fa fa-cog"></i>
+          </button>
+        </i>
+
       </div>
     </div>
 

@@ -30,6 +30,8 @@ export class GbConstraintComponent implements OnInit {
   // i2b2 panel timing policy
   _panelTimingSameInstance: boolean
 
+  public foo: boolean
+
   constructor(protected treeNodeService: TreeNodeService,
     protected cohortService: CohortService,
     protected constraintService: ConstraintService,
@@ -38,7 +40,7 @@ export class GbConstraintComponent implements OnInit {
     protected element: ElementRef,
     protected config: AppConfig) {
   }
-  public foo:boolean
+
 
   ngOnInit() {
     this.addEventListeners();

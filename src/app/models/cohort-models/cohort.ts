@@ -32,7 +32,7 @@ export class Cohort {
     this._name = name
 
     if (rootInclusionConstraint !== null) {
-      
+
       this._rootInclusionConstraint = rootInclusionConstraint.clone()
     }
     if (rootExclusionConstraint !== null) {

@@ -25,6 +25,7 @@ import { ErrorHelper } from '../utilities/error-helper';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApiI2b2TimingSequenceInfo } from '../models/api-request-models/medco-node/api-sequence-of-events/api-i2b2-timing-sequence-info';
 import { map, tap } from 'rxjs/operators';
+import { ApiI2b2TimingSequenceSpan } from '../models/api-request-models/medco-node/api-sequence-of-events/api-i2b2-span/api-i2b2-timing-sequence-span';
 
 @Injectable()
 export class CohortService {
@@ -279,12 +280,21 @@ export class CohortService {
             let seq = b.queryDefinition.queryTimingSequence
             if (seq !== null) {
               let seqWithObject = seq.map((seqElm) => {
+                // the received seqElm is not a complete object, because it does not have methods
                 let ret = new ApiI2b2TimingSequenceInfo()
                 ret.when = seqElm.when
                 ret.whichDateFirst = seqElm.whichDateFirst
                 ret.whichDateSecond = seqElm.whichDateSecond
                 ret.whichObservationFirst = seqElm.whichObservationFirst
                 ret.whichObservationSecond = seqElm.whichObservationSecond
+                ret.spans = ((seqElm.spans) && (seqElm.spans.length > 0)) ?
+                  seqElm.spans.map(span => {
+                    let retSpan = new ApiI2b2TimingSequenceSpan()
+                    retSpan.operator = span.operator
+                    retSpan.units = span.units
+                    retSpan.value = span.value
+                    return retSpan
+                  }) : null
                 return ret
               })
               b.queryDefinition.queryTimingSequence = seqWithObject
@@ -408,9 +418,10 @@ export class CohortService {
         let timingSequence = cohortDefinition.queryTimingSequence
         CohortService.conformConstraints(nots, constraint, formatedConstraint)
         formatedConstraint.inclusionConstraint = CohortService.unflattenConstraints(formatedConstraint.inclusionConstraint);
-        (formatedConstraint.inclusionConstraint as CombinationConstraint).combinationState = (timingSequence === null || timingSequence === undefined || timingSequence.length === 0) ?
-          CombinationState.And : CombinationState.TemporalSequence
-        if ((formatedConstraint.inclusionConstraint as CombinationConstraint).combinationState === CombinationState.TemporalSequence){
+        (formatedConstraint.inclusionConstraint as CombinationConstraint).combinationState =
+          (!(timingSequence) || timingSequence.length === 0) ?
+            CombinationState.And : CombinationState.TemporalSequence
+        if ((formatedConstraint.inclusionConstraint as CombinationConstraint).combinationState === CombinationState.TemporalSequence) {
           (formatedConstraint.inclusionConstraint as CombinationConstraint).temporalSequence = timingSequence
         }
         formatedConstraint.exclusionConstraint = CohortService.unflattenConstraints(formatedConstraint.exclusionConstraint)

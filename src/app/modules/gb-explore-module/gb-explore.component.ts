@@ -15,16 +15,16 @@ import { ExploreQueryType } from '../../models/query-models/explore-query-type';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ConstraintService } from '../../services/constraint.service';
-import {ApiNodeMetadata} from '../../models/api-response-models/medco-network/api-node-metadata';
-import {CohortService} from '../../services/cohort.service';
-import {SavedCohortsPatientListService} from '../../services/saved-cohorts-patient-list.service';
-import {MessageHelper} from '../../utilities/message-helper';
-import {Cohort} from '../../models/cohort-models/cohort';
-import {OperationStatus} from '../../models/operation-status';
-import {OperationType} from '../../models/operation-models/operation-types';
-import {ApiQueryDefinition} from '../../models/api-request-models/medco-node/api-query-definition';
-import {MedcoNetworkService} from '../../services/api/medco-network.service';
-import {ErrorHelper} from '../../utilities/error-helper';
+import { ApiNodeMetadata } from '../../models/api-response-models/medco-network/api-node-metadata';
+import { CohortService } from '../../services/cohort.service';
+import { SavedCohortsPatientListService } from '../../services/saved-cohorts-patient-list.service';
+import { MessageHelper } from '../../utilities/message-helper';
+import { Cohort } from '../../models/cohort-models/cohort';
+import { OperationStatus } from '../../models/operation-status';
+import { OperationType } from '../../models/operation-models/operation-types';
+import { ApiQueryDefinition } from '../../models/api-request-models/medco-node/api-query-definition';
+import { MedcoNetworkService } from '../../services/api/medco-network.service';
+import { ErrorHelper } from '../../utilities/error-helper';
 
 @Component({
   selector: 'gb-explore',
@@ -87,6 +87,7 @@ export class GbExploreComponent implements AfterViewChecked {
       let definition = new ApiQueryDefinition()
       definition.panels = this.queryService.lastDefinition
       definition.queryTiming = this.queryService.lastTiming
+      definition.queryTimingSequence = this.queryService.lastTimingSequence
       queryDefinitions.push(definition)
     }
 

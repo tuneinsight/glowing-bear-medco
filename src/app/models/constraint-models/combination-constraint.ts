@@ -125,7 +125,7 @@ export class CombinationConstraint extends Constraint {
   removeChildConstraint(child: Constraint) {
     let index = this.children.indexOf(child);
     if (index > -1) {
-      if (this.children.length > 1) {
+      if (index !== this.children.length - 1) {
         this._temporalSequence.splice(index, 1)
         this.updateSequences()
       }
@@ -135,22 +135,28 @@ export class CombinationConstraint extends Constraint {
   }
 
   updateSequences() {
-    if ((this._temporalSequence === null) || (this._temporalSequence.length === 0)) {
-      if ((this._children)) {
-        this._temporalSequence = Array<ApiI2b2TimingSequenceInfo>(this._children.length)
-        this._temporalSequence.fill(new ApiI2b2TimingSequenceInfo())
+    const nOfChildIntervals = this._children.length - 1
+    if (!(this._temporalSequence) || (this._temporalSequence.length === 0)) {
+      if (nOfChildIntervals > -1) {
+        this._temporalSequence = Array<ApiI2b2TimingSequenceInfo>(nOfChildIntervals)
+        for (let i = 0; i < nOfChildIntervals; i++) {
+          this._temporalSequence[i] = new ApiI2b2TimingSequenceInfo;
+        }
+        this._temporalSequence.forEach((_, idx) => { this._temporalSequence[idx] = new ApiI2b2TimingSequenceInfo() })
       }
     } else {
-      if ((this._children)) {
-        if (this._children.length > this._temporalSequence.length) {
-          let newSequences = Array<ApiI2b2TimingSequenceInfo>(this._children.length - this._temporalSequence.length)
-          newSequences.fill(new ApiI2b2TimingSequenceInfo())
-          this._temporalSequence = this._temporalSequence.concat(newSequences)
-        } else if (this._children.length < this._temporalSequence.length) {
-          // this is not expected as this situation can be handled by removeChildren
-          this._temporalSequence.splice(this._children.length - 1, this._temporalSequence.length - this._children.length)
+
+      if (nOfChildIntervals > this._temporalSequence.length) {
+        let newSequences = Array<ApiI2b2TimingSequenceInfo>(this._children.length - nOfChildIntervals)
+        for (let i = 0; i < this._children.length - nOfChildIntervals; i++) {
+          newSequences[i] = new ApiI2b2TimingSequenceInfo;
         }
+        this._temporalSequence = this._temporalSequence.concat(newSequences)
+      } else if (nOfChildIntervals < this._temporalSequence.length) {
+        // this is not expected as this situation can be handled by removeChildren
+        this._temporalSequence.splice(nOfChildIntervals, this._temporalSequence.length - nOfChildIntervals)
       }
+
     }
   }
 
@@ -179,7 +185,9 @@ export class CombinationConstraint extends Constraint {
               combinationRepresentation = 'or'
               break;
             case CombinationState.TemporalSequence:
-              combinationRepresentation = this._temporalSequence[index].textRepresentation
+              combinationRepresentation = (index !== (this.children.length - 1)) ?
+                this._temporalSequence[index - 1].textRepresentation :
+                ''
               break;
             default:
               break;

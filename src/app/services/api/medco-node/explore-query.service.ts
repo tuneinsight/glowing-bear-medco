@@ -1,7 +1,7 @@
 /**
  * Copyright 2020-2021 EPFL LDS
  * Copyright 2021 CHUV
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -39,6 +39,12 @@ export class ExploreQueryService {
    * Last query timing used in query that successed to return anything
    */
   private _lastQueryTiming: ApiI2b2Timing
+
+
+  /**
+   * Last timing sequence used in query that successed to return anything
+   */
+  private _lastTimingSequence: ApiI2b2TimingSequenceInfo[]
 
   constructor(private config: AppConfig,
     private apiEndpointService: ApiEndpointService,
@@ -111,6 +117,7 @@ export class ExploreQueryService {
   exploreQuery(query: ExploreQuery): Observable<[ApiNodeMetadata, ApiExploreQueryResult][]> {
     let currentDefinition = this.constraintMappingService.mapConstraint(query.constraint);
     let currentTiming = query.queryTimingSameInstanceNum ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any;
+    let currentTimingSequence = query.timingSequenceInfo
 
     return this.exploreQueryAllNodes(
       query.uniqueId,
@@ -121,6 +128,7 @@ export class ExploreQueryService {
     ).pipe(tap(() => {
       this._lastDefinition = currentDefinition
       this._lastQueryTiming = currentTiming
+      this._lastTimingSequence = currentTimingSequence
     }));
   }
 
@@ -140,5 +148,9 @@ export class ExploreQueryService {
 
   get lastQueryTiming(): ApiI2b2Timing {
     return this._lastQueryTiming
+  }
+
+  get lastTimingSequence(): ApiI2b2TimingSequenceInfo[] {
+    return this._lastTimingSequence
   }
 }

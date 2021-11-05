@@ -706,3 +706,7 @@ input.input-field {
 .small-font {
   font-size: small;
 }
+
+p-dynamicdialog .ui-dialog .ui-dialog-content {
+  overflow-y: visible;
+}

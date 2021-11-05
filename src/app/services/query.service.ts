@@ -314,8 +314,8 @@ export class QueryService {
     this._queryTiming = val
   }
 
-  set sequentialInfo(val: ApiI2b2TimingSequenceInfo[]){
-    this.constraintService.sequentialInfo=val
+  set sequentialInfo(val: ApiI2b2TimingSequenceInfo[]) {
+    this.constraintService.sequentialInfo = val
     this.constraintService.checkSequential(this.queryTiming)
   }
 
@@ -325,6 +325,10 @@ export class QueryService {
 
   get lastTiming(): ApiI2b2Timing {
     return this.exploreQueryService.lastQueryTiming
+  }
+
+  get lastTimingSequence(): ApiI2b2TimingSequenceInfo[] {
+    return this.exploreQueryService.lastTimingSequence
   }
 
   set operationType(opType: OperationType) {
