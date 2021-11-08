@@ -349,6 +349,7 @@ export class QueryService {
         // save current selection
         if (this.operationType === OperationType.EXPLORE) {
           this._exploreQueryTiming = this.queryTiming
+          this.queryTiming = QueryTemporalSetting.independent
         }
         this.constraintService.operationType = opType
         break;

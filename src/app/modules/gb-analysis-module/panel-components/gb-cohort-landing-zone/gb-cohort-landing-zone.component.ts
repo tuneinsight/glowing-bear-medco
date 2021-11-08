@@ -15,6 +15,7 @@ import { CohortService } from '../../../../services/cohort.service';
 import { ApiI2b2Timing } from '../../../../models/api-request-models/medco-node/api-i2b2-timing';
 import { QueryService } from '../../../../services/query.service';
 import { ErrorHelper } from '../../../../utilities/error-helper';
+import { QueryTemporalSetting } from 'src/app/models/query-models/query-temporal-setting';
 
 const nameMaxLength = 10
 
@@ -118,8 +119,7 @@ export class GbCohortLandingZoneComponent implements OnInit {
     }
     this.subGroups.push({ label: this.name, value: newSubGroup })
     this._usedNames.add(this.name)
-    this.clearName()
-    this.constraintService.clearConstraint()
+    this.reset()
 
     this.survivalService.subGroups = this.subGroups.map(({ value }) => value as SubGroup)
     this.selectedSubGroup = null
@@ -153,14 +153,14 @@ export class GbCohortLandingZoneComponent implements OnInit {
     this._subGroups = new Array()
     this.survivalService.subGroups = new Array()
     this._usedNames = new Set()
-    this.clearName()
-    this.constraintService.clearConstraint()
+    this.reset()
     this.queryService.clearAll()
     this.selectedSubGroup = null
   }
 
   reset() {
     this.clearName()
+    this.queryService.queryTiming = QueryTemporalSetting.independent
     this.constraintService.clearConstraint()
   }
 

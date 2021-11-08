@@ -24,25 +24,24 @@ import { ApiI2b2WhichObservation } from 'src/app/models/api-request-models/medco
 })
 export class GbTemporalSequenceComponent implements OnInit, OnDestroy {
 
-  private _sequenceInfo: ApiI2b2TimingSequenceInfo
-  private _sequenceInfoSubject: Subject<ApiI2b2TimingSequenceInfo>
-  private _whichDate: SelectItem[] = [
+  _sequenceInfoSubject: Subject<ApiI2b2TimingSequenceInfo>
+  _whichDate: SelectItem[] = [
     { label: 'Start date', value: ApiI2b2WhichDate.startdate },
     { label: 'End date', value: ApiI2b2WhichDate.enddate }
   ]
-  private _whichObservation: SelectItem[] = [
+  _whichObservation: SelectItem[] = [
     { label: 'the first ever', value: ApiI2b2WhichObservation.first },
     { label: 'any', value: ApiI2b2WhichObservation.any },
     { label: 'the last ever', value: ApiI2b2WhichObservation.last }
   ]
 
-  private _when: SelectItem[] = [
+  _when: SelectItem[] = [
     { label: 'before', value: ApiI2b2SequentialOperator.less },
     { label: 'before or same time as', value: ApiI2b2SequentialOperator.lessequal },
     { label: 'same time as', value: ApiI2b2SequentialOperator.equal }
   ]
 
-  private _spanOperator: SelectItem[] = [
+  _spanOperator: SelectItem[] = [
     { label: '<', value: ApiI2b2SpanOperator.LESS },
     { label: '≤', value: ApiI2b2SpanOperator.LESSEQUAL },
     { label: '=', value: ApiI2b2SpanOperator.EQUAL },
@@ -50,7 +49,7 @@ export class GbTemporalSequenceComponent implements OnInit, OnDestroy {
     { label: '>', value: ApiI2b2SpanOperator.EQUAL }
   ]
 
-  private _spanUnits: SelectItem[] = [
+  _spanUnits: SelectItem[] = [
     { label: 'hour(s)', value: ApiI2b2SpanUnits.HOUR },
     { label: 'day(s)', value: ApiI2b2SpanUnits.DAY },
     { label: 'month(s)', value: ApiI2b2SpanUnits.MONTH },
@@ -58,40 +57,64 @@ export class GbTemporalSequenceComponent implements OnInit, OnDestroy {
   ]
 
 
-  private _firstSpan: ApiI2b2TimingSequenceSpan
-  private _secondSpan: ApiI2b2TimingSequenceSpan
+  _firstSpan: ApiI2b2TimingSequenceSpan
+  _secondSpan: ApiI2b2TimingSequenceSpan
 
-  private _firstSpanEnabled = false
-  private _secondSpanEnabled = false
+  _firstSpanEnabled = false
+  _secondSpanEnabled = false
 
-  private _whichObsverationFirst2 = ApiI2b2WhichObservation.last
-
+  _whichDateFirst = ApiI2b2WhichDate.startdate
+  _whichObservationFirst = ApiI2b2WhichObservation.first
+  _sequentialOperator = ApiI2b2SequentialOperator.less
+  _whichDateSecond = ApiI2b2WhichDate.startdate
+  _whichObservationSecond = ApiI2b2WhichObservation.first
 
 
   private notify() {
-    this.sequenceInfo.spans = undefined
+    let sequenceInfo = new ApiI2b2TimingSequenceInfo()
+
+    sequenceInfo.spans = undefined
+    sequenceInfo.when = this.sequentialOperator
+    sequenceInfo.whichDateFirst = this.whichDateFirst
+    sequenceInfo.whichObservationFirst = this.whichObservationFirst
+    sequenceInfo.whichDateSecond = this.whichDateSecond
+    sequenceInfo.whichObservationSecond = this.whichObservationSecond
+
     if ((this.firstSpanEnabled) || (this.secondSpanEnabled)) {
-      this.sequenceInfo.spans = new Array<ApiI2b2TimingSequenceSpan>()
+
+      sequenceInfo.spans = new Array<ApiI2b2TimingSequenceSpan>()
       if (this.firstSpanEnabled) {
-        this.sequenceInfo.spans.push(this.firstSpan)
+        sequenceInfo.spans.push(this.firstSpan)
       }
       if (this.secondSpanEnabled) {
-        this.sequenceInfo.spans.push(this.secondSpan)
+        sequenceInfo.spans.push(this.secondSpan)
       }
     }
-    this._sequenceInfoSubject.next(this.sequenceInfo)
+    this._sequenceInfoSubject.next(sequenceInfo)
   }
 
-  constructor(public config: DynamicDialogConfig, public ref: DynamicDialogRef) {
+  validate() {
+    this.notify()
+    this.ref.close()
+  }
+
+  constructor(private config: DynamicDialogConfig, private ref: DynamicDialogRef) {
     this.firstSpan = new ApiI2b2TimingSequenceSpan()
     this.firstSpan.value = 0
     this.secondSpan = new ApiI2b2TimingSequenceSpan()
     this.firstSpan.value = 0
 
     if (!!(config)) {
-      this.sequenceInfo = config.data.sequenceInfo
-      if ((config.data.sequenceInfo.spans) && (config.data.sequenceInfo.spans.length > 0)) {
-        let spans = config.data.sequenceInfo.spans
+      let sequenceInfo = config.data.sequenceInfo
+
+      this.whichDateFirst = sequenceInfo.whichDateFirst
+      this.whichObservationFirst = sequenceInfo.whichObservationFirst
+      this.sequentialOperator = sequenceInfo.when
+      this.whichDateSecond = sequenceInfo.whichDateSecond
+      this.whichObservationSecond = sequenceInfo.whichObservationSecond
+
+      if ((sequenceInfo.spans) && (sequenceInfo.spans.length > 0)) {
+        let spans = sequenceInfo.spans
         this.firstSpan = spans[0]
         this.firstSpanEnabled = true
         if (spans.length === 2) {
@@ -105,8 +128,6 @@ export class GbTemporalSequenceComponent implements OnInit, OnDestroy {
 
 
 
-    } else {
-      this.sequenceInfo = new ApiI2b2TimingSequenceInfo()
     }
     this._sequenceInfoSubject = config.data.sequenceInfoSubject
 
@@ -117,15 +138,6 @@ export class GbTemporalSequenceComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.notify()
-  }
-
-  set sequenceInfo(info: ApiI2b2TimingSequenceInfo) {
-    this._sequenceInfo = info
-  }
-
-  get sequenceInfo(): ApiI2b2TimingSequenceInfo {
-    return this._sequenceInfo
   }
 
 
@@ -186,45 +198,45 @@ export class GbTemporalSequenceComponent implements OnInit, OnDestroy {
   }
 
   get whichDateFirst(): ApiI2b2WhichDate {
-    return this.sequenceInfo.whichDateFirst
+    return this._whichDateFirst
   }
 
   set whichDateFirst(whichDate: ApiI2b2WhichDate) {
-    this.sequenceInfo.whichDateFirst = whichDate
+    this._whichDateFirst = whichDate
   }
 
   get whichObservationFirst(): ApiI2b2WhichObservation {
-    return this.sequenceInfo.whichObservationFirst
+    return this._whichObservationFirst
   }
 
   set whichObservationFirst(obs: ApiI2b2WhichObservation) {
-    this.sequenceInfo.whichObservationFirst = obs
+    this._whichObservationFirst = obs
 
   }
 
   set sequentialOperator(sequentialOperator: ApiI2b2SequentialOperator) {
-    this.sequenceInfo.when = sequentialOperator
+    this._sequentialOperator = sequentialOperator
 
   }
 
   get sequentialOperator(): ApiI2b2SequentialOperator {
-    return this.sequenceInfo.when
+    return this._sequentialOperator
   }
 
   set whichDateSecond(whichDate: ApiI2b2WhichDate) {
-    this.sequenceInfo.whichDateSecond = whichDate
+    this._whichDateSecond = whichDate
 
   }
   get whichDateSecond(): ApiI2b2WhichDate {
-    return this.sequenceInfo.whichDateSecond
+    return this._whichDateSecond
   }
 
   get whichObservationSecond(): ApiI2b2WhichObservation {
-    return this.sequenceInfo.whichObservationSecond
+    return this._whichObservationSecond
   }
 
   set whichObservationSecond(obs: ApiI2b2WhichObservation) {
-    this.sequenceInfo.whichObservationSecond = obs
+    this._whichObservationSecond = obs
 
   }
 

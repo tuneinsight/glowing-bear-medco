@@ -4,7 +4,7 @@
   &nbsp;of&nbsp;<p-dropdown [style]="{'text-align': 'left'}" dropdownIcon="pi pi-caret-down white-color" [(ngModel)]="whichObservationFirst"
     [options]="whichObservation"></p-dropdown> Observation A
   <br>
-  occurs <p-dropdown [style]="{'text-align': 'left'}" dropdownIcon="pi pi-caret-down white-color"
+  occurs <p-dropdown [style]="{'text-align': 'left', 'min-width': '11rem'}" dropdownIcon="pi pi-caret-down white-color"
     [(ngModel)]="sequentialOperator" [options]="when"></p-dropdown>
   <br>
   <p-dropdown [style]="{'text-align': 'left'}" dropdownIcon="pi pi-caret-down white-color" [(ngModel)]="whichDateSecond"
@@ -21,5 +21,8 @@
   <p-checkbox [(ngModel)]="secondSpanEnabled" [binary]="true" [disabled]="!firstSpanEnabled"></p-checkbox> and <p-dropdown [style]="{'text-align': 'left'}"  [options]="spanOperator" [(ngModel)]="secondSpan.operator" [disabled]="!secondSpanEnabled"></p-dropdown>&nbsp;
   <p-inputNumber [(ngModel)]="secondSpan.value" [disabled]="!secondSpanEnabled"></p-inputNumber>&nbsp;
   <p-dropdown [style]="{'text-align': 'left'}" [options]="spanUnits" [(ngModel)]="secondSpan.units" [disabled]="!secondSpanEnabled"></p-dropdown>
-
+  <br>
+  <div style="text-align: right;">
+    <p-button label="OK" icon="fa fa-check" (onClick)="validate()"></p-button>
+  </div>
 </div>
