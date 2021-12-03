@@ -15,7 +15,6 @@ import { AccordionModule, AutoCompleteModule, ButtonModule, ConfirmationService,
 import { ExploreCohortsService } from '../../services/api/medco-node/explore-cohorts.service';
 import { SavedCohortsPatientListService } from '../../services/saved-cohorts-patient-list.service';
 import { SurvivalService } from '../../services/survival-analysis.service';
-import { PathDisplayer } from '../gb-utils-module/gb-utils.component';
 import { GbUtilsModule } from '../gb-utils-module/gb-utils.module';
 import { CombinationConstraintSummaryComponent, SimpleConceptSummaryComponent } from './accordion-components/gb-cohort-definition/constraintVisitor/htmlExportVisitor';
 import { GbCohortDefinitionComponent } from './accordion-components/gb-cohort-definition/gb-cohort-definition.component';

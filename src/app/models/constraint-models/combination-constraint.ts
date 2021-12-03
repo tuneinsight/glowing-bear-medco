@@ -8,10 +8,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Constraint } from './constraint';
 import { CombinationState } from './combination-state';
-import { Concept } from './concept';
-import { TreeNode } from '../tree-models/tree-node';
+import { Constraint } from './constraint';
 import { ConstraintVisitor } from './constraintVisitor';
 
 export class CombinationConstraint extends Constraint {

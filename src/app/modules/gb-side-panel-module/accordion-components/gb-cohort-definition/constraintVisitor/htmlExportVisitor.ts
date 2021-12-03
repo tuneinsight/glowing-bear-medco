@@ -80,10 +80,15 @@ export class OperatorComponent {
         .combinationConstraint:hover {
             border-left: rgba(255, 160, 71, 0.6) solid;
         }
+        .excluded {
+            margin-right: 1em;
+            border-bottom: #ff0909 solid .1em;
+        }
         `
     ],
     template: `
     <div class="combinationConstraint">
+        <span class="excluded" *ngIf="excluded">Not:</span>
         <ng-template #childrenContainer>
         </ng-template>
     </div>
@@ -94,6 +99,9 @@ export class CombinationConstraintSummaryComponent implements OnDestroy, AfterVi
 
     @Input()
     children: ComponentRef<any>[] = []
+
+    @Input()
+    excluded: boolean = false
 
     _state: CombinationState
 
@@ -155,7 +163,7 @@ export class HTMLExportVisitor implements ConstraintVisitor<ComponentRef<any>> {
     // build a component which will wrap the simple text representation of the constraint.
     private buildSimpleTextComponent(c: Constraint): ComponentRef<any> {
         const componentRef = this.buildNewComponent(SimpleConceptSummaryComponent)
-        componentRef.instance.textRepresentation = c.textRepresentation
+        componentRef.instance.textRepresentation = (c.excluded ? 'Not ': '') + c.textRepresentation
         return componentRef
     }
 
@@ -169,6 +177,7 @@ export class HTMLExportVisitor implements ConstraintVisitor<ComponentRef<any>> {
         componentInstance.state = cc.combinationState
 
         componentInstance.children = []
+        componentInstance.excluded = cc.excluded
 
         componentInstance.containerRef.subscribe(containerRef => {
 
@@ -197,6 +206,7 @@ export class HTMLExportVisitor implements ConstraintVisitor<ComponentRef<any>> {
     visitConceptConstraint(c: ConceptConstraint): ComponentRef<any> {
         const componentRef = this.buildNewComponent(PathDisplayer)
         const componentInstance = componentRef.instance
+        componentInstance.excluded = c.excluded
         componentInstance.path = Utils.extractDisplayablePath(c.treeNode)
         return componentRef
     }
