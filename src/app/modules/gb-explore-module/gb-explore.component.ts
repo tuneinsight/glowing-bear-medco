@@ -117,7 +117,7 @@ export class GbExploreComponent implements AfterViewChecked {
           MessageHelper.alert('error', 'There is no patient list cached from previous Explore Query. You may have to download the list again.')
           break;
         default:
-          //In this case no patient list is available in the return type of the explore query anyway.
+          // In this case no patient list is available in the return type of the explore query anyway.
           break;
       }
     }
