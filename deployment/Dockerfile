@@ -35,10 +35,10 @@ COPY deployment/write-gb-config.sh /
 RUN chmod +x /write-gb-config.sh
 
 # run-time env
-ENV GB_MEDCO_NODE_URL="http://localhost/local-3nodes/medco-0" \
-    GB_KEYCLOAK_URL="http://localhost/auth" \
-    GB_KEYCLOAK_REALM="master" \
-    GB_KEYCLOAK_CLIENT_ID="medco" \
+ENV GB_MEDCO_NODE_URL="http://localhost:3100" \
+    GB_KEYCLOAK_URL="http://localhost:8080/auth" \
+    GB_KEYCLOAK_REALM="geco" \
+    GB_KEYCLOAK_CLIENT_ID="glowing-bear" \
     GB_FOOTER_TEXT=""
 
 ENTRYPOINT /bin/bash -c "/write-gb-config.sh && exec nginx -g 'daemon off;'"

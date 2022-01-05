@@ -90,8 +90,8 @@ export class ExploreSearchService {
 
   private exploreSearchConcept(operation: string, root: string): Observable<TreeNode[]> {
     return this.apiEndpointService.postCall(
-      'node/explore/search/concept',
-      { operation: operation, path: root }
+      'datasources/i2b2-medco/query',
+      { projectId: "projectId", operation: "searchConcept", parameters: { operation: operation, path: root } }
     ).pipe(
       map(this.mapSearchResults.bind(this))
     );

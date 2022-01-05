@@ -15,10 +15,8 @@ import {KeycloakService} from 'keycloak-angular';
 @Injectable()
 export class AuthenticationService {
 
-  static readonly MEDCO_NETWORK_ROLE = 'medco-network';
-  static readonly MEDCO_EXPLORE_ROLE = 'medco-explore';
-  static readonly MEDCO_GEN_ANNOTATIONS_ROLE = 'medco-genomic-annotations';
-  static readonly MEDCO_SURVIVAL_ANALYSIS_ROLE = 'medco-survival-analysis';
+  static readonly GECO_PROJECT_CREATOR_ROLE = 'project_creator';
+  static readonly GECO_SURVIVAL_ANALYSIS_ROLE = 'project_creator';
 
   constructor(private config: AppConfig,
               private keycloakService: KeycloakService) { }
@@ -57,23 +55,21 @@ export class AuthenticationService {
    * Returns true if the user has the minimum set of roles needed for the basic operation of MedCo.
    */
   public hasMinimumRoles(): boolean {
-    return this.userRoles.includes(AuthenticationService.MEDCO_NETWORK_ROLE) &&
-      this.userRoles.includes(AuthenticationService.MEDCO_EXPLORE_ROLE) &&
-      this.userRoles.includes(AuthenticationService.MEDCO_GEN_ANNOTATIONS_ROLE);
+    return this.userRoles.includes(AuthenticationService.GECO_PROJECT_CREATOR_ROLE);
   }
 
   /**
    * Returns true if the user has the authorization for analysis.
    */
   get hasAnalysisAuth(): boolean {
-    return this.userRoles.includes(AuthenticationService.MEDCO_SURVIVAL_ANALYSIS_ROLE);
+    return this.userRoles.includes(AuthenticationService.GECO_SURVIVAL_ANALYSIS_ROLE);
   }
 
   /**
    * Get user roles.
    */
   get userRoles(): string[] {
-    return this.keycloakService.getUserRoles(false);
+    return this.keycloakService.getUserRoles(true);
   }
 
   /**
