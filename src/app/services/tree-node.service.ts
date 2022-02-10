@@ -18,6 +18,7 @@ import {TreeNodeType} from '../models/tree-models/tree-node-type';
 import {AppConfig} from '../config/app.config';
 import {GenomicAnnotation} from '../models/constraint-models/genomic-annotation';
 import {ExploreSearchService} from './api/medco-node/explore-search.service';
+import {ApiEndpointService} from './api-endpoint.service';
 import {Observable} from 'rxjs';
 import {ApiValueMetadata, DataType} from '../models/api-response-models/medco-node/api-value-metadata';
 import {Modifier} from '../models/constraint-models/modifier';
@@ -35,6 +36,7 @@ export class TreeNodeService {
   private config: AppConfig;
   private exploreSearchService: ExploreSearchService;
   private constraintService: ConstraintService;
+  private apiEndpointService: ApiEndpointService;
 
   constructor(private injector: Injector) { }
 
@@ -46,28 +48,39 @@ export class TreeNodeService {
       this.config = this.injector.get(AppConfig);
       this.exploreSearchService = this.injector.get(ExploreSearchService);
       this.constraintService = this.injector.get(ConstraintService);
+      this.apiEndpointService = this.injector.get(ApiEndpointService);
 
       this.constraintService.conceptLabels = [];
 
       // retrieve root tree nodes and extract the concepts
       this._isLoading = true;
-      this.exploreSearchService.exploreSearchConceptChildren('/').subscribe(
-        (treeNodes: TreeNode[]) => {
 
-          // reset concepts and concept constraints
-          this.constraintService.concepts = [];
-          this.constraintService.conceptConstraints = [];
-
-          this.processTreeNodes(treeNodes, this.constraintService);
-          treeNodes.forEach((node) => this.rootTreeNodes.push(node));
-          this._isLoading = false;
-          resolve();
-        },
-        (err) => {
-          ErrorHelper.handleError('Error during initial tree loading', err);
-          this._isLoading = false;
-          reject(err);
-        });
+      this.apiEndpointService.getCall('datasources').subscribe((dataSourceList) => {
+        const i2b2Datasource = dataSourceList.find((dataSource) => dataSource.name.indexOf('i2b2') !== -1);
+        if (i2b2Datasource) {
+          console.log('Found i2b2 datasource', i2b2Datasource);
+          this.exploreSearchService.dataSourceId = i2b2Datasource.uniqueId;
+          this.exploreSearchService.exploreSearchConceptChildren('/').subscribe(
+            (treeNodes: TreeNode[]) => {
+    
+              // reset concepts and concept constraints
+              this.constraintService.concepts = [];
+              this.constraintService.conceptConstraints = [];
+    
+              this.processTreeNodes(treeNodes, this.constraintService);
+              treeNodes.forEach((node) => this.rootTreeNodes.push(node));
+              this._isLoading = false;
+              resolve();
+            },
+            (err) => {
+              ErrorHelper.handleError('Error during initial tree loading', err);
+              this._isLoading = false;
+              reject(err);
+            });
+        } else {
+          console.log('Cannot find i2b2 datasource, please create one with a name containing \"i2b2\" first')
+        }
+      })
     });
   }
 

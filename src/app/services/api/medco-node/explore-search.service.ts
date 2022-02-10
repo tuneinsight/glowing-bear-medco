@@ -24,6 +24,8 @@ import {MessageHelper} from '../../../utilities/message-helper';
 @Injectable()
 export class ExploreSearchService {
 
+  private _dataSourceId: string;
+
   /**
    * If the configuration key `medco-cothority-key-url` is present, the file will be fetched and the service enabled.
    * @param {AppConfig} config
@@ -39,7 +41,7 @@ export class ExploreSearchService {
     private injector: Injector) { }
 
     private mapSearchResults(searchResp) {
-      return searchResp.results.map((treeNodeObj) => {
+      return searchResp.results.SearchResults.map((treeNodeObj) => {
         let treeNode = new TreeNode();
         treeNode.path = treeNodeObj['path'];
         treeNode.appliedPath = treeNodeObj['appliedPath'];
@@ -63,6 +65,8 @@ export class ExploreSearchService {
         treeNode.depth = treeNode.path.split('/').length - 2;
         treeNode.children = [];
         treeNode.childrenAttached = false;
+
+        console.log(treeNode);
 
         return treeNode;
       });
@@ -90,8 +94,14 @@ export class ExploreSearchService {
 
   private exploreSearchConcept(operation: string, root: string): Observable<TreeNode[]> {
     return this.apiEndpointService.postCall(
-      'datasources/i2b2-medco/query',
-      { projectId: "projectId", operation: "searchConcept", parameters: { operation: operation, path: root } }
+      `datasources/${this.dataSourceId}/query`,
+      {
+        operation: "searchConcept",
+        parameters: {
+          operation: operation,
+          path: root
+        }
+      }
     ).pipe(
       map(this.mapSearchResults.bind(this))
     );
@@ -207,5 +217,13 @@ export class ExploreSearchService {
    */
   exploreSearchModifierInfo(root: string, appliedPath: string, appliedConcept: string): Observable<TreeNode[]> {
     return this.exploreSearchModifier('info', root, appliedPath, appliedConcept)
+  }
+
+  get dataSourceId(): string {
+    return this._dataSourceId;
+  }
+
+  set dataSourceId(value: string) {
+    this._dataSourceId = value;
   }
 }

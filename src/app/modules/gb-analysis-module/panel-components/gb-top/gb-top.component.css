@@ -2,7 +2,7 @@
     margin-left: 0.2em;
 }
 .selected{
-    background-color: var(--gb-clinical-green-dark);
+    background-color: var(--gb-ti-main-color);
 }
 .loading-blink{
   padding-top: 0.4em;

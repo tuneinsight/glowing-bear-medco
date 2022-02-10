@@ -78,7 +78,7 @@
 }
 
 .gb-top-panel {
-  background-color: var(--gb-clinical-green-dark);
+  background-color: var(--gb-ti-main-color);
   position: fixed;
   top: 0;
   width: 100%;
@@ -108,7 +108,7 @@
 }
 
 .gb-bottom-panel {
-  background-color: var(--gb-clinical-green-dark);
+  background-color: var(--gb-ti-main-color);
   position: fixed;
   bottom: 0;
   width: 100%;

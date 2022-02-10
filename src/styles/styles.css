@@ -9,14 +9,11 @@
   custom variables
 */
 :root {
-  --gb-loading-bg-color: #28AA9D;
+  --gb-ti-main-color: #222831;
   --gb-navbar-bg-color: #fdfdfd;
-  --gb-orange-light: #ffa27f;
+  --gb-orange-light: #FFDD56;
   --gb-orange-light-light: #ffd9cb;
-  --gb-clinical-green: #339C90;
-  --gb-clinical-green-light: #84c3bc;
-  --gb-clinical-green-light-light: #c8eae6;
-  --gb-clinical-green-dark: #2d8c81;
+  --gb-ti-main-color-light-light: rgba(34, 40, 49, 0.2);
   --gb-top-panel-height: 26px;
 }
 
@@ -46,7 +43,7 @@ button {
 }
 
 .loading-message {
-  background-color: var(--gb-loading-bg-color);
+  background-color: var(--gb-ti-main-color);
   color: white;
   font-family: 'Roboto', sans-serif;
   font-size: 300%;
@@ -76,7 +73,7 @@ body .gb-spinner.loading {
 }
 
 body .hline {
-  border-bottom: solid 1px var(--gb-clinical-green-dark);
+  border-bottom: solid 1px var(--gb-ti-main-color);
   margin-top: 5px;
   margin-bottom: 5px;
 }
@@ -255,13 +252,17 @@ body .hline {
   color: hsl(0, 0%, 30%);
 }
 
+.ui-state-active .ui-menuitem-text {
+  color: white;
+}
+
 /*
  * ------------------------------ Styles for gb-data-selection component -------------------------------
  */
 /*Change the color theme of the accordion in data-selection to clinical green*/
 gb-data-selection md2-accordion-tab.md2-accordion-tab-active > .md2-accordion-header {
-  border-color: var(--gb-clinical-green) !important;
-  box-shadow: 0 1px 0 var(--gb-clinical-green) !important;
+  border-color: var(--gb-ti-main-color) !important;
+  box-shadow: 0 1px 0 var(--gb-ti-main-color) !important;
 }
 
 gb-data-selection .v-align-center {
@@ -451,12 +452,12 @@ form.term-search .ui-accordion-content {
 }
 
 form.term-search .ui-togglebutton {
-  background-color: var(--gb-clinical-green);
+  background-color: var(--gb-ti-main-color);
   padding: 0em;
 }
 
 form.term-search .ui-togglebutton:not(.ui-state-disabled).ui-state-active {
-  background-color: var(--gb-clinical-green);
+  background-color: var(--gb-ti-main-color);
 }
 
 form.term-search
@@ -487,7 +488,7 @@ form.term-search .ui-dialog-footer button {
 }
 
 form.term-search .ui-dialog-footer button:hover {
-  background-color: var(--gb-clinical-green);
+  background-color: var(--gb-ti-main-color);
   color: white;
 }
 
@@ -639,7 +640,7 @@ gb-data-table-dimensions .ui-picklist-droppoint {
 }
 
 gb-data-table-dimensions .ui-picklist-droppoint-highlight {
-  background: var(--gb-clinical-green-dark);
+  background: var(--gb-ti-main-color);
   height: 2em !important;
 }
 

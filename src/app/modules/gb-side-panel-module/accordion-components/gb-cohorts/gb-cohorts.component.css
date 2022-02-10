@@ -43,12 +43,12 @@
   border:none;
 }
 #cohorts-component .ui-togglebutton{
-  background-color: var(--gb-clinical-green);
+  background-color: var(--gb-ti-main-color);
   padding: 0em;
 }
 
 #cohorts-component .ui-togglebutton:not(.ui-state-disabled).ui-state-active {
-  background-color: var(--gb-clinical-green);
+  background-color: var(--gb-ti-main-color);
 }
 
 #cohorts-component .ui-togglebutton:not(.ui-state-disabled):not(.ui-state-active) {
@@ -75,7 +75,7 @@
 }
 
 #cohorts-component .ui-dialog-footer button:hover{
-  background-color: var(--gb-clinical-green);
+  background-color: var(--gb-ti-main-color);
   color:white;
 }
 

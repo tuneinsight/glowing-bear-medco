@@ -45,7 +45,7 @@ p-scrollpanel p.indented{
 
 
 .smallbutton{
-  color: var(--gb-clinical-green-light);
+  color: var(--gb-ti-main-color);
   cursor: pointer;
   background-color: white;
   border:none;
@@ -56,7 +56,7 @@ p-scrollpanel p.indented{
 }
 
 .smallbutton:hover{
-  color: var(--gb-clinical-green-dark);
+  color: var(--gb-ti-main-color);
 
 }
 
