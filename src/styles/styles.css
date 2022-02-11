@@ -10,6 +10,7 @@
 */
 :root {
   --gb-ti-main-color: #222831;
+  --gb-ti-main-color-light: rgba(34, 40, 49, 0.1);
   --gb-navbar-bg-color: #fdfdfd;
   --gb-orange-light: #FFDD56;
   --gb-orange-light-light: #ffd9cb;

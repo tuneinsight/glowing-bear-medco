@@ -17,7 +17,7 @@
  * shadow option: text-shadow: 1px 1px 3px black;
  */
 .gb-data-selection-overview-panel {
-  background-color: rgba(34, 40, 49, 0.1);
+  background-color: var(--gb-ti-main-color-light);
   border-radius: 3px;
   border: 1px solid lightgray;
   padding: 0.5em 1em 0.5em 1em;

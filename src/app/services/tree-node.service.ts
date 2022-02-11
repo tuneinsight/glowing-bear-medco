@@ -32,6 +32,7 @@ export class TreeNodeService {
   private _selectedTreeNode: TreeNode = null;
   // true if a call is currently being executed
   private _isLoading = false;
+  private _isNoi2b2Datasource = false;
 
   private config: AppConfig;
   private exploreSearchService: ExploreSearchService;
@@ -60,25 +61,30 @@ export class TreeNodeService {
         if (i2b2Datasource) {
           console.log('Found i2b2 datasource', i2b2Datasource);
           this.exploreSearchService.dataSourceId = i2b2Datasource.uniqueId;
-          this.exploreSearchService.exploreSearchConceptChildren('/').subscribe(
-            (treeNodes: TreeNode[]) => {
-    
-              // reset concepts and concept constraints
-              this.constraintService.concepts = [];
-              this.constraintService.conceptConstraints = [];
-    
-              this.processTreeNodes(treeNodes, this.constraintService);
-              treeNodes.forEach((node) => this.rootTreeNodes.push(node));
-              this._isLoading = false;
-              resolve();
-            },
-            (err) => {
-              ErrorHelper.handleError('Error during initial tree loading', err);
-              this._isLoading = false;
-              reject(err);
-            });
+          this.apiEndpointService.getCall('init-session').subscribe(() => {
+            this.exploreSearchService.exploreSearchConceptChildren('/').subscribe(
+              (treeNodes: TreeNode[]) => {
+      
+                // reset concepts and concept constraints
+                this.constraintService.concepts = [];
+                this.constraintService.conceptConstraints = [];
+      
+                this.processTreeNodes(treeNodes, this.constraintService);
+                treeNodes.forEach((node) => this.rootTreeNodes.push(node));
+                this._isLoading = false;
+                resolve();
+              },
+              (err) => {
+                ErrorHelper.handleError('Error during initial tree loading', err);
+                this._isLoading = false;
+                reject(err);
+              });
+            }
+          );
         } else {
-          console.log('Cannot find i2b2 datasource, please create one with a name containing \"i2b2\" first')
+          this._isNoi2b2Datasource = true;
+          throw ErrorHelper.handleNewError('Cannot find i2b2 datasource, please create one with a name containing \"i2b2\" first')
+//          console.log('Cannot find i2b2 datasource, please create one with a name containing \"i2b2\" first')
         }
       })
     });
@@ -582,5 +588,9 @@ export class TreeNodeService {
 
   get isLoading(): boolean {
     return this._isLoading;
+  }
+
+  get isNoi2b2Datasource(): boolean {
+    return this._isNoi2b2Datasource;
   }
 }

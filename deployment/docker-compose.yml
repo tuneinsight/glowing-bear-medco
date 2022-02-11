@@ -7,7 +7,7 @@ services:
       dockerfile: ./deployment/Dockerfile
       target: dev
     ports:
-      - "4200:4200"
+      - "4300:4200"
     volumes:
       - ..:/glowing-bear-src
     user: ${USER_GROUP:?}
