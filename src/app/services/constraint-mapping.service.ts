@@ -116,7 +116,7 @@ export class ConstraintMappingService {
     }
 
     let item = new ApiI2b2Item();
-    if (constraint.concept.encryptionDescriptor.encrypted) {
+    if (constraint.concept.encryptionDescriptor && constraint.concept.encryptionDescriptor.encrypted) {
       // todo: children IDs implementation
       item.encrypted = true;
       item.queryTerm = this.cryptoService.encryptIntegerWithCothorityKey(constraint.concept.encryptionDescriptor.id);

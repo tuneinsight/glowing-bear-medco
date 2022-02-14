@@ -41,7 +41,7 @@ export class ExploreSearchService {
     private injector: Injector) { }
 
     private mapSearchResults(searchResp) {
-      return searchResp.results.SearchResults.map((treeNodeObj) => {
+      return (searchResp.results.searchResults || []).map((treeNodeObj) => {
         let treeNode = new TreeNode();
         treeNode.path = treeNodeObj['path'];
         treeNode.appliedPath = treeNodeObj['appliedPath'];
@@ -65,8 +65,6 @@ export class ExploreSearchService {
         treeNode.depth = treeNode.path.split('/').length - 2;
         treeNode.children = [];
         treeNode.childrenAttached = false;
-
-        console.log(treeNode);
 
         return treeNode;
       });

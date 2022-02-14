@@ -31,6 +31,7 @@ export class GbSummaryComponent {
   }
 
   get hasPerSiteCounts(): boolean {
+    return false;
     return this.queryService.queryType.hasPerSiteCounts;
   }
 

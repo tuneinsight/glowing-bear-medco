@@ -57,7 +57,7 @@ export class TreeNodeService {
       this._isLoading = true;
 
       this.apiEndpointService.getCall('datasources').subscribe((dataSourceList) => {
-        const i2b2Datasource = dataSourceList.find((dataSource) => dataSource.name.indexOf('i2b2') !== -1);
+        const i2b2Datasource = dataSourceList.reverse().find((dataSource) => dataSource.name.indexOf('i2b2') !== -1);
         if (i2b2Datasource) {
           console.log('Found i2b2 datasource', i2b2Datasource);
           this.exploreSearchService.dataSourceId = i2b2Datasource.uniqueId;
@@ -226,32 +226,34 @@ export class TreeNodeService {
   }
 
   private processMetadata(target: Concept, metadata: ApiValueMetadata) {
-    if (metadata.ValueMetadata.UnitValues) {
-      target.unit = metadata.ValueMetadata.UnitValues.NormalUnits
-    }
-    if (metadata.ValueMetadata.DataType) {
-      switch (metadata.ValueMetadata.DataType) {
-        case DataType.POS_INTEGER:
-          target.isInteger = true;
-          target.isPositive = true;
-          break;
-        case DataType.POS_FLOAT:
-          target.isInteger = false;
-          target.isPositive = true;
-          break;
-        case DataType.INTEGER:
-          target.isInteger = true;
-          target.isPositive = false;
-          break;
-        case DataType.FLOAT:
-          target.isInteger = false;
-          target.isPositive = false;
-          break;
-        case DataType.STRING:
-          target.isText = true;
-          break;
-        default:
-          break;
+    if (metadata.ValueMetadata) {
+      if (metadata.ValueMetadata.UnitValues) {
+        target.unit = metadata.ValueMetadata.UnitValues.NormalUnits
+      }
+      if (metadata.ValueMetadata.DataType) {
+        switch (metadata.ValueMetadata.DataType) {
+          case DataType.POS_INTEGER:
+            target.isInteger = true;
+            target.isPositive = true;
+            break;
+          case DataType.POS_FLOAT:
+            target.isInteger = false;
+            target.isPositive = true;
+            break;
+          case DataType.INTEGER:
+            target.isInteger = true;
+            target.isPositive = false;
+            break;
+          case DataType.FLOAT:
+            target.isInteger = false;
+            target.isPositive = false;
+            break;
+          case DataType.STRING:
+            target.isText = true;
+            break;
+          default:
+            break;
+        }
       }
     }
 
