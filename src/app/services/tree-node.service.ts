@@ -78,31 +78,29 @@ export class TreeNodeService {
       // retrieve root tree nodes and extract the concepts
       this._isLoading = true;
 
-      this.apiEndpointService.getCall('datasources').subscribe((dataSourceList) => {
-        const i2b2Datasource = dataSourceList.reverse().find((dataSource) => dataSource.name.indexOf('i2b2') !== -1);
-        if (i2b2Datasource) {
-          console.log('Found i2b2 datasource', i2b2Datasource);
-          this.exploreSearchService.dataSourceId = i2b2Datasource.uniqueId;
-          this.apiEndpointService.getCall('init-session').subscribe(() => {
-            this.exploreSearchService.exploreSearchConceptChildren('/').subscribe(
-              (treeNodes: TreeNode[]) => {
-      
-                // reset concepts and concept constraints
-                this.constraintService.concepts = [];
-                this.constraintService.conceptConstraints = [];
-      
-                this.processTreeNodes(treeNodes, this.constraintService);
-                treeNodes.forEach((node) => this.rootTreeNodes.push(node));
-                this._isLoading = false;
-                resolve();
-              },
-              (err) => {
-                ErrorHelper.handleError('Error during initial tree loading', err);
-                this._isLoading = false;
-                reject(err);
-              });
-            }
-          );
+      this.apiEndpointService.getCall('projects').subscribe((projectsList) => {
+        const i2b2Project = projectsList.reverse().find((project) => project.name.indexOf('i2b2') !== -1);
+        if (i2b2Project && i2b2Project.dataSourceId) {
+          console.log('Found datasource on project', i2b2Project.uniqueId);
+          this.exploreSearchService.projectId = i2b2Project.uniqueId;
+          this.exploreQueryService.projectId = i2b2Project.uniqueId;
+          this.exploreSearchService.exploreSearchConceptChildren('/').subscribe(
+            (treeNodes: TreeNode[]) => {
+    
+              // reset concepts and concept constraints
+              this.constraintService.concepts = [];
+              this.constraintService.conceptConstraints = [];
+    
+              this.processTreeNodes(treeNodes, this.constraintService);
+              treeNodes.forEach((node) => this.rootTreeNodes.push(node));
+              this._isLoading = false;
+              resolve();
+            },
+            (err) => {
+              ErrorHelper.handleError('Error during initial tree loading', err);
+              this._isLoading = false;
+              reject(err);
+            });
         } else {
           this._isNoi2b2Datasource = true;
           throw ErrorHelper.handleNewError('Cannot find i2b2 datasource, please create one with a name containing \"i2b2\" first')

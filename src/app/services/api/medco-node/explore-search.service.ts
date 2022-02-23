@@ -24,7 +24,6 @@ import {MessageHelper} from '../../../utilities/message-helper';
 @Injectable()
 export class ExploreSearchService {
 
-  private _dataSourceId: string;
   private _projectId: string;
 
   /**
@@ -133,7 +132,7 @@ export class ExploreSearchService {
 
   private exploreSearchModifier(operation: 'concept' | 'children' | 'info', path: string, appliedPath: string, appliedConcept: string): Observable<TreeNode[]> {
     return this.apiEndpointService.postCall(
-      `datasources/${this.dataSourceId}/query`,
+      `projects/${this.projectId}/datasource/query`,
       {
         operation: 'searchModifier',
         parameters: {
@@ -227,14 +226,6 @@ export class ExploreSearchService {
    */
   exploreSearchModifierInfo(root: string, appliedPath: string, appliedConcept: string): Observable<TreeNode[]> {
     return this.exploreSearchModifier('info', root, appliedPath, appliedConcept)
-  }
-
-  get dataSourceId(): string {
-    return this._dataSourceId;
-  }
-
-  set dataSourceId(value: string) {
-    this._dataSourceId = value;
   }
 
   get projectId(): string {
