@@ -25,6 +25,7 @@ import {MessageHelper} from '../../../utilities/message-helper';
 export class ExploreSearchService {
 
   private _dataSourceId: string;
+  private _projectId: string;
 
   /**
    * If the configuration key `medco-cothority-key-url` is present, the file will be fetched and the service enabled.
@@ -41,7 +42,7 @@ export class ExploreSearchService {
     private injector: Injector) { }
 
     private mapSearchResults(searchResp) {
-      return (searchResp.results.searchResults || []).map((treeNodeObj) => {
+      return (searchResp.results.searchResult || []).map((treeNodeObj) => {
         let treeNode = new TreeNode();
         treeNode.path = treeNodeObj['path'];
         treeNode.appliedPath = treeNodeObj['appliedPath'];
@@ -66,6 +67,9 @@ export class ExploreSearchService {
         treeNode.children = [];
         treeNode.childrenAttached = false;
 
+        // TODO: geco-i2b2-initial-implementation-test
+        // treeNode.valueType = ValueType.TEXT;
+
         return treeNode;
       });
     }
@@ -89,12 +93,12 @@ export class ExploreSearchService {
       return this.exploreSearch(searchString, limit);
     }
 
-
   private exploreSearchConcept(operation: string, root: string): Observable<TreeNode[]> {
     return this.apiEndpointService.postCall(
-      `datasources/${this.dataSourceId}/query`,
+      `projects/${this.projectId}/datasource/query`,
       {
         operation: "searchConcept",
+        aggregationType: "aggregated",
         parameters: {
           operation: operation,
           path: root
@@ -127,10 +131,18 @@ export class ExploreSearchService {
   }
 
 
-  private exploreSearchModifier(operation: string, root: string, appliedPath: string, appliedConcept: string): Observable<TreeNode[]> {
+  private exploreSearchModifier(operation: 'concept' | 'children' | 'info', path: string, appliedPath: string, appliedConcept: string): Observable<TreeNode[]> {
     return this.apiEndpointService.postCall(
-      'node/explore/search/modifier',
-      { operation: operation, path: root, appliedPath: appliedPath, appliedConcept: appliedConcept }
+      `datasources/${this.dataSourceId}/query`,
+      {
+        operation: 'searchModifier',
+        parameters: {
+          operation: operation,
+          path: path,
+          appliedPath: appliedPath,
+          appliedConcept: appliedConcept
+        }
+      }
     ).pipe(
       map(this.mapSearchResults.bind(this))
     );
@@ -223,5 +235,13 @@ export class ExploreSearchService {
 
   set dataSourceId(value: string) {
     this._dataSourceId = value;
+  }
+
+  get projectId(): string {
+    return this._projectId;
+  }
+
+  set projectId(value: string) {
+    this._projectId = value;
   }
 }

@@ -5,6 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+import { v4 as uuidv4 } from 'uuid';
 import {Injectable} from '@angular/core';
 import {AppConfig} from '../../../config/app.config';
 import {Observable, forkJoin} from 'rxjs';
@@ -22,6 +23,8 @@ import {ApiI2b2Timing} from '../../../models/api-request-models/medco-node/api-i
 
 @Injectable()
 export class ExploreQueryService {
+  private _dataSourceId: string;
+  private _projectId: string;
 
   /**
    * Query timeout: 10 minutes.
@@ -70,6 +73,52 @@ export class ExploreQueryService {
       },
       node.url
     ).pipe(map((expQueryResp) => [node, expQueryResp['result']]));
+  }
+
+  public exploreQuerySingleCall(queryId: string, query: ExploreQuery): Observable<[ApiNodeMetadata, ApiExploreQueryResult]> {
+    const panels = this.constraintMappingService.mapConstraint(query.constraint);
+
+    const countSharedId = uuidv4();
+    const patientSharedId = uuidv4();
+
+    return this.apiEndpointService.postCall(
+      `projects/${this.projectId}/datasource/query`,
+      {
+        aggregationType: "aggregated",
+        operation: "exploreQuery",
+        parameters: {
+          id: queryId,
+          definition: {
+            panels: panels
+          }
+        },
+        outputDataObjectsSharedIDs: {
+          count: countSharedId,
+          patientList: patientSharedId
+        }
+      }
+    ).pipe(map((expQueryResp) => {
+      expQueryResp.result
+      if (expQueryResp.status === "success") {
+        this.getDataobjectData(patientSharedId);
+      } else {
+        console.log('error on querying datasource with', panels);
+      }
+      console.log('expQueryResp', expQueryResp);
+      return undefined;
+    }));
+  }
+
+  public getDataobjectData(dataObjectSharedId: string) {
+    return this.apiEndpointService.getCall(`shared-dataobjects/${dataObjectSharedId}/data`, {
+      headers: {
+        Accept: '*/*'
+      }
+    }).subscribe(
+        (sharedDataObjectData) => {
+        console.log('sharedDataObjectData', sharedDataObjectData);
+      return undefined;
+    });
   }
 
   // -------------------------------------- helper calls --------------------------------------
@@ -128,5 +177,21 @@ export class ExploreQueryService {
 
   get lastQueryTiming(): ApiI2b2Timing {
     return this._lastQueryTiming
+  }
+
+  get dataSourceId(): string {
+    return this._dataSourceId;
+  }
+
+  set dataSourceId(value: string) {
+    this._dataSourceId = value;
+  }
+
+  get projectId(): string {
+    return this._projectId;
+  }
+
+  set projectId(value: string) {
+    this._projectId = value;
   }
 }

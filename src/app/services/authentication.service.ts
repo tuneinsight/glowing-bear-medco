@@ -16,6 +16,8 @@ import {KeycloakService} from 'keycloak-angular';
 export class AuthenticationService {
 
   static readonly GECO_PROJECT_CREATOR_ROLE = 'project_creator';
+  static readonly GECO_PATIENT_LIST_ROLE = 'patient_list';
+  static readonly GECO_GLOBAL_COUNT_ROLE = 'global_count';
   static readonly GECO_SURVIVAL_ANALYSIS_ROLE = 'project_creator';
 
   constructor(private config: AppConfig,
@@ -33,8 +35,7 @@ export class AuthenticationService {
       },
       initOptions: {
         onLoad: 'login-required',
-        checkLoginIframe: false,
-
+        checkLoginIframe: false
       },
       enableBearerInterceptor: true,
       bearerPrefix: 'Bearer',
@@ -55,9 +56,11 @@ export class AuthenticationService {
    * Returns true if the user has the minimum set of roles needed for the basic operation of MedCo.
    */
   public hasMinimumRoles(): boolean {
-    return this.userRoles.includes(AuthenticationService.GECO_PROJECT_CREATOR_ROLE);
+    return  this.userRoles.includes(AuthenticationService.GECO_PROJECT_CREATOR_ROLE) ||
+            this.userRoles.includes(AuthenticationService.GECO_PATIENT_LIST_ROLE) ||
+            this.userRoles.includes(AuthenticationService.GECO_GLOBAL_COUNT_ROLE);
   }
-
+ 
   /**
    * Returns true if the user has the authorization for analysis.
    */

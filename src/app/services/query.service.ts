@@ -8,6 +8,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import { v4 as uuidv4 } from 'uuid';
 import { Injectable } from '@angular/core';
 import { TreeNodeService } from './tree-node.service';
 import { ExploreQuery } from '../models/query-models/explore-query';
@@ -156,11 +157,12 @@ export class QueryService {
   }
 
   public execQuery(): void {
+    const isLocal = true;
 
     if (!this.constraintService.hasConstraint()) {
       MessageHelper.alert('warn', 'No constraints specified, please correct.');
       return;
-    } else if (!this.queryType) {
+    } else if (!this.queryType && !isLocal) {
       MessageHelper.alert('warn', 'No authorized query type.');
       return;
     }
@@ -185,8 +187,12 @@ export class QueryService {
         MessageHelper.alert('warn', 'Invalid genomic annotation in query, please correct.');
         return throwError(err);
       }),
-      switchMap(() => this.exploreQueryService.exploreQuery(this.query)),
-      switchMap(results => this.parseExploreQueryResults(results))
+      switchMap(() => this.exploreQueryService.exploreQuerySingleCall(uuidv4(), this.query)),
+      switchMap(results => {
+        console.log('results ici', results);
+        return undefined;
+        //return this.parseExploreQueryResults(results);
+      })
     ).subscribe(
       (parsedResults: ExploreQueryResult) => {
         if (parsedResults.resultInstanceID) {
@@ -273,7 +279,7 @@ export class QueryService {
     }).filter((role) => role !== null);
 
     if (authorizedTypes.length === 0) {
-      console.log(`User ${this.authService.username} has no explore query types available.`);
+//      console.log(`User ${this.authService.username} has no explore query types available.`);
       return undefined;
     }
 

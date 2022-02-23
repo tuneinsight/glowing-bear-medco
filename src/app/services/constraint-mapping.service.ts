@@ -55,8 +55,10 @@ export class ConstraintMappingService {
    */
   private generateI2b2Panel(constraint: Constraint): ApiI2b2Panel {
     let panel = new ApiI2b2Panel();
-    panel.panelTiming = constraint.panelTimingSameInstance ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any
-    panel.not = constraint.excluded;
+    
+    // TODO: geco-i2b2-initial-implementation-test    
+    // panel.panelTiming = constraint.panelTimingSameInstance ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any
+    // panel.not = constraint.excluded;
 
     switch (constraint.className) {
       case 'ConceptConstraint':
@@ -116,6 +118,24 @@ export class ConstraintMappingService {
     }
 
     let item = new ApiI2b2Item();
+
+    console.log('constraint', constraint);
+
+    // TODO: geco-i2b2-initial-implementation-test
+    if (constraint.treeNode.path.startsWith('/TEST')) {
+      if (constraint.concept.modifier) {
+        // constraint.applyTextOperator = true;
+        // constraint.textOperator = TextOperator.LIKE_CONTAINS;
+        // constraint.textOperatorValue = 'cd';
+      } else {
+        // constraint.concept.type = ValueType.NUMERICAL;
+        // constraint.numericalOperator = NumericalOperator.EQUAL;
+        // constraint.applyNumericalOperator = true;
+        // constraint.numValue = Number.parseInt(constraint.textOperatorValue);
+      }
+    }
+
+
     if (constraint.concept.encryptionDescriptor && constraint.concept.encryptionDescriptor.encrypted) {
       // todo: children IDs implementation
       item.encrypted = true;
@@ -127,8 +147,11 @@ export class ConstraintMappingService {
       if (constraint.concept.modifier) {
         item.modifier = new ApiI2B2Modifier()
         item.queryTerm = constraint.concept.modifier.appliedConceptPath;
-        item.modifier.modifierKey = constraint.concept.modifier.path
-        item.modifier.appliedPath = constraint.concept.modifier.appliedPath
+
+        // TODO: geco-i2b2-initial-implementation-test
+        // @ts-ignore
+        item.modifier.key = constraint.concept.modifier.path;
+        item.modifier.appliedPath = constraint.concept.modifier.appliedPath;
       }
 
       switch (constraint.concept.type) {

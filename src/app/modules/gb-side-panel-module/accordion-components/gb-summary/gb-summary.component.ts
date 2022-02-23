@@ -31,6 +31,8 @@ export class GbSummaryComponent {
   }
 
   get hasPerSiteCounts(): boolean {
+    
+    // TODO: geco-i2b2-initial-implementation-test
     return false;
     return this.queryService.queryType.hasPerSiteCounts;
   }
