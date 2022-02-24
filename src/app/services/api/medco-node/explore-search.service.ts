@@ -97,7 +97,7 @@ export class ExploreSearchService {
       `projects/${this.projectId}/datasource/query`,
       {
         operation: "searchConcept",
-        aggregationType: "aggregated",
+        aggregationType: "per_node",
         parameters: {
           operation: operation,
           path: root
