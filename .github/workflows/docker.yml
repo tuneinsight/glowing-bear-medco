@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - 'dev'
-      - 'fix-ci-packages'
+      - 'use-geco-api'
     tags:
       - '*'
   pull_request:
