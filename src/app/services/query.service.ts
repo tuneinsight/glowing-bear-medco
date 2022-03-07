@@ -90,18 +90,15 @@ export class QueryService {
     }
 
     let queryResult: Observable<ExploreQueryResult>;
-    console.log('check queryType', this.queryType);
     switch (this.queryType) {
       case ExploreQueryType.COUNT_GLOBAL:
       case ExploreQueryType.COUNT_GLOBAL_OBFUSCATED:
-        console.log('GLOBAL_COUNT case 1');
         queryResult = this.cryptoService.decryptIntegersWithEphemeralKey([encResults[0][1].encryptedCount]).pipe(
           map(decrypted => {
             let parsedResults = new ExploreQueryResult();
             parsedResults.nodes = encResults.map(res => res[0]);
             parsedResults.globalCount = decrypted[0];
             parsedResults.resultInstanceID = encResults.map(result => result[1].queryID)
-            console.log('GLOBAL_COUNT case 2');
             return parsedResults;
           })
         );
@@ -112,7 +109,6 @@ export class QueryService {
       case ExploreQueryType.COUNT_PER_SITE_SHUFFLED:
       case ExploreQueryType.COUNT_PER_SITE_SHUFFLED_OBFUSCATED:
       case ExploreQueryType.PATIENT_LIST:
-        console.log('PATIENT_LIST case');
         queryResult = this.cryptoService.decryptIntegersWithEphemeralKey(encResults.map(result => result[1].encryptedCount))
           .pipe(
             map(decrypted => {

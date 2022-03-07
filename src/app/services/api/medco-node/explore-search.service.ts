@@ -96,6 +96,9 @@ export class ExploreSearchService {
     }
 
   private exploreSearchConcept(operation: string, root: string): Observable<TreeNode[]> {
+    const countSharedId = uuidv4();
+    const patientSharedId = uuidv4();
+
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
     return this.apiEndpointService.postCall(
@@ -103,6 +106,10 @@ export class ExploreSearchService {
       {
         operation: "searchConcept",
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
+        outputDataObjectsSharedIDs: {
+          count: countSharedId,
+          patientList: patientSharedId
+        },
         parameters: {
           operation: operation,
           path: root
