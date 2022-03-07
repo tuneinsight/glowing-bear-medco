@@ -100,6 +100,7 @@ export class QueryService {
             let parsedResults = new ExploreQueryResult();
             parsedResults.nodes = encResults.map(res => res[0]);
             parsedResults.globalCount = decrypted[0];
+            parsedResults.resultInstanceID = encResults.map(result => result[1].queryID)
             console.log('GLOBAL_COUNT case 2');
             return parsedResults;
           })
