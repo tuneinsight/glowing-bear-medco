@@ -8,8 +8,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import {Injectable} from '@angular/core';
 import {AppConfig} from '../../../config/app.config';
-import {Observable, forkJoin} from 'rxjs';
-import {timeout, map, tap} from 'rxjs/operators';
+import {Observable, forkJoin, throwError} from 'rxjs';
+import {timeout, map, tap, switchMap, concatAll, switchAll, exhaust, catchError} from 'rxjs/operators';
 import {ApiI2b2Panel} from '../../../models/api-request-models/medco-node/api-i2b2-panel';
 import {ConstraintMappingService} from '../../constraint-mapping.service';
 import {ApiEndpointService} from '../../api-endpoint.service';
@@ -20,6 +20,14 @@ import {ExploreQuery} from '../../../models/query-models/explore-query';
 import {CryptoService} from '../../crypto.service';
 import {ApiNodeMetadata} from '../../../models/api-response-models/medco-network/api-node-metadata';
 import {ApiI2b2Timing} from '../../../models/api-request-models/medco-node/api-i2b2-timing';
+import { KeycloakService } from 'keycloak-angular';
+import { ExploreQueryResult } from 'src/app/models/query-models/explore-query-result';
+import { MessageHelper } from 'src/app/utilities/message-helper';
+
+type CountPatientSharedIds = {
+  countSharedId: string;
+  patientSharedId: string;
+}
 
 @Injectable()
 export class ExploreQueryService {
@@ -46,7 +54,8 @@ export class ExploreQueryService {
     private medcoNetworkService: MedcoNetworkService,
     private genomicAnnotationsService: GenomicAnnotationsService,
     private constraintMappingService: ConstraintMappingService,
-    private cryptoService: CryptoService) { }
+    private cryptoService: CryptoService,
+    private keycloakService: KeycloakService) { }
 
   //  ------------------- api calls ----------------------
 
@@ -59,32 +68,31 @@ export class ExploreQueryService {
    * @param node
    * @param sync
    */
-  private exploreQuerySingleNode(queryId: string, userPublicKey: string, panels: ApiI2b2Panel[],
-    queryTiming: ApiI2b2Timing, node: ApiNodeMetadata, sync: boolean = true): Observable<[ApiNodeMetadata, ApiExploreQueryResult]> {
-    return this.apiEndpointService.postCall(
-      'node/explore/query?sync=' + sync,
-      {
-        id: queryId,
-        query: {
-          queryTiming: queryTiming,
-          userPublicKey: userPublicKey,
-          panels: panels
-        }
-      },
-      node.url
-    ).pipe(map((expQueryResp) => [node, expQueryResp['result']]));
-  }
+  // private exploreQuerySingleNode(queryId: string, panels: ApiI2b2Panel[],
+  //   queryTiming: ApiI2b2Timing, node: ApiNodeMetadata, sync: boolean = true): Observable<[ApiNodeMetadata, ApiExploreQueryResult]> {
+  //   return this.apiEndpointService.postCall(
+  //     'node/explore/query?sync=' + sync,
+  //     {
+  //       id: queryId,
+  //       query: {
+  //         queryTiming: queryTiming,
+  //         panels: panels
+  //       }
+  //     },
+  //     node.url
+  //   ).pipe(map((expQueryResp) => [node, expQueryResp['result']]));
+  // }
 
-  public exploreQuerySingleCall(queryId: string, query: ExploreQuery): Observable<[ApiNodeMetadata, ApiExploreQueryResult]> {
-    const panels = this.constraintMappingService.mapConstraint(query.constraint);
-
+  public exploreQuerySingleNode(queryId: string, panels: ApiI2b2Panel[], queryTiming: ApiI2b2Timing, node: ApiNodeMetadata, sync: boolean = true): Observable<ExploreQueryResult> {
     const countSharedId = uuidv4();
     const patientSharedId = uuidv4();
+
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
     return this.apiEndpointService.postCall(
       `projects/${this.projectId}/datasource/query`,
       {
-        aggregationType: "aggregated",
+        aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         operation: "exploreQuery",
         parameters: {
           id: queryId,
@@ -97,28 +105,36 @@ export class ExploreQueryService {
           patientList: patientSharedId
         }
       }
-    ).pipe(map((expQueryResp) => {
-      expQueryResp.result
-      if (expQueryResp.status === "success") {
-        this.getDataobjectData(patientSharedId);
-      } else {
-        console.log('error on querying datasource with', panels);
-      }
-      console.log('expQueryResp', expQueryResp);
-      return undefined;
-    }));
+    ).pipe(
+        catchError((err) => {
+          MessageHelper.alert('error', 'Error while querying datasource.');
+          return throwError(err);
+        }),
+        map(async (expQueryResp) => {
+        // if (expQueryResp.status === "success" ) {
+          const exploreResult = new ExploreQueryResult();
+          const globalCount = await this.getDataobjectData(countSharedId).toPromise();
+          exploreResult.globalCount = globalCount[0][0];
+          exploreResult.nodes = [node];
+          if (haveRightsForPatientList) {
+            const patientLists = await this.getDataobjectData(patientSharedId).toPromise();
+            exploreResult.patientLists = patientLists;
+          }
+          return exploreResult;
+        // } else {
+        //   return null;
+        // }
+      }),
+      exhaust()
+    ) as Observable<ExploreQueryResult>;
   }
 
-  public getDataobjectData(dataObjectSharedId: string) {
+  public getDataobjectData(dataObjectSharedId: string): Observable<any> {
     return this.apiEndpointService.getCall(`shared-dataobjects/${dataObjectSharedId}/data`, {
       headers: {
         Accept: '*/*'
       }
-    }).subscribe(
-        (sharedDataObjectData) => {
-        console.log('sharedDataObjectData', sharedDataObjectData);
-      return undefined;
-    });
+    }).pipe(map((sharedDataObjectData) => sharedDataObjectData));
   }
 
   // -------------------------------------- helper calls --------------------------------------
@@ -132,21 +148,59 @@ export class ExploreQueryService {
    * @param userPublicKey
    * @param panels
    */
-  private exploreQueryAllNodes(queryId: string, userPublicKey: string,
-    panels: ApiI2b2Panel[], queryTiming: ApiI2b2Timing): Observable<[ApiNodeMetadata, ApiExploreQueryResult][]> {
+  private exploreQueryLocalNode(queryId: string, userPublicKey: string,
+    panels: ApiI2b2Panel[], queryTiming: ApiI2b2Timing) {
 
     this.preparePanelTimings(panels, queryTiming)
 
-    return forkJoin(this.medcoNetworkService.nodes.map(
-      (node) => this.exploreQuerySingleNode(queryId, userPublicKey, panels, queryTiming, node)
-    )).pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
+    return forkJoin([
+      this.exploreQuerySingleNode(queryId, panels, queryTiming, this.medcoNetworkService.nodes[0])
+    ]).pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
+  }
+
+    /**
+   * Execute simultaneously the specified MedCo query on all the nodes.
+   * Ensures before execute that the token is still valid.
+   *
+   * @param queryId
+   * @param queryTiming
+   * @param userPublicKey
+   * @param panels
+   */
+     private exploreQueryAllNodes(queryId: string, userPublicKey: string,
+      panels: ApiI2b2Panel[], queryTiming: ApiI2b2Timing) {
+  
+      this.preparePanelTimings(panels, queryTiming)
+  
+      return forkJoin(this.medcoNetworkService.nodes.map(
+        (node) => this.exploreQuerySingleNode(queryId, /* userPublicKey,*/ panels, queryTiming, node)
+      )).pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
+    }
+
+  /**
+   *
+   * @param query
+   */
+  exploreLocalQuery(query: ExploreQuery) {
+    let currentDefinition = this.constraintMappingService.mapConstraint(query.constraint);
+    let currentTiming = query.queryTimingSameInstanceNum ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any;
+
+    return this.exploreQueryLocalNode(
+      query.uniqueId,
+      this.cryptoService.ephemeralPublicKey,
+      currentDefinition,
+      currentTiming,
+    ).pipe(tap(() => {
+      this._lastDefinition = currentDefinition
+      this._lastQueryTiming = currentTiming
+    }));
   }
 
   /**
    *
    * @param query
    */
-  exploreQuery(query: ExploreQuery): Observable<[ApiNodeMetadata, ApiExploreQueryResult][]> {
+  exploreQuery(query: ExploreQuery) {
     let currentDefinition = this.constraintMappingService.mapConstraint(query.constraint);
     let currentTiming = query.queryTimingSameInstanceNum ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any;
 

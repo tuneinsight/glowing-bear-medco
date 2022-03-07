@@ -90,14 +90,17 @@ export class QueryService {
     }
 
     let queryResult: Observable<ExploreQueryResult>;
+    console.log('check queryType', this.queryType);
     switch (this.queryType) {
       case ExploreQueryType.COUNT_GLOBAL:
       case ExploreQueryType.COUNT_GLOBAL_OBFUSCATED:
+        console.log('GLOBAL_COUNT case 1');
         queryResult = this.cryptoService.decryptIntegersWithEphemeralKey([encResults[0][1].encryptedCount]).pipe(
           map(decrypted => {
             let parsedResults = new ExploreQueryResult();
             parsedResults.nodes = encResults.map(res => res[0]);
             parsedResults.globalCount = decrypted[0];
+            console.log('GLOBAL_COUNT case 2');
             return parsedResults;
           })
         );
@@ -108,6 +111,7 @@ export class QueryService {
       case ExploreQueryType.COUNT_PER_SITE_SHUFFLED:
       case ExploreQueryType.COUNT_PER_SITE_SHUFFLED_OBFUSCATED:
       case ExploreQueryType.PATIENT_LIST:
+        console.log('PATIENT_LIST case');
         queryResult = this.cryptoService.decryptIntegersWithEphemeralKey(encResults.map(result => result[1].encryptedCount))
           .pipe(
             map(decrypted => {
@@ -159,6 +163,8 @@ export class QueryService {
   public execQuery(): void {
     const isLocal = true;
 
+    console.log('this.queryType', this.queryType);
+
     if (!this.constraintService.hasConstraint()) {
       MessageHelper.alert('warn', 'No constraints specified, please correct.');
       return;
@@ -180,25 +186,20 @@ export class QueryService {
     // prepare and execute query
     this.query.generateUniqueId();
     this.query.constraint = this.constraintService.generateConstraint();
-    this.query.queryTimingSameInstanceNum = this.queryTimingSameInstance
+    this.query.queryTimingSameInstanceNum = this.queryTimingSameInstance;
 
     this.genomicAnnotationsService.addVariantIdsToConstraints(this.query.constraint).pipe(
       catchError((err) => {
         MessageHelper.alert('warn', 'Invalid genomic annotation in query, please correct.');
         return throwError(err);
       }),
-      switchMap(() => this.exploreQueryService.exploreQuerySingleCall(uuidv4(), this.query)),
-      switchMap(results => {
-        console.log('results ici', results);
-        return undefined;
-        //return this.parseExploreQueryResults(results);
-      })
+      switchMap(() => this.exploreQueryService.exploreLocalQuery(this.query))
     ).subscribe(
-      (parsedResults: ExploreQueryResult) => {
-        if (parsedResults.resultInstanceID) {
-          this._lastSuccessfulSet.next(parsedResults.resultInstanceID)
-        }
-        this.queryResults.next(parsedResults);
+      async (parsedResults) => {
+        // if (parsedResults.resultInstanceID) {
+        //    this._lastSuccessfulSet.next(parsedResults.resultInstanceID)
+        // }
+        this.queryResults.next(parsedResults[0]);
         this.isUpdating = false;
         this.isDirty = this.constraintService.hasConstraint().valueOf();
       },

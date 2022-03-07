@@ -8,22 +8,25 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import {Injectable, Injector} from '@angular/core';
-import { v4 as uuidv4 } from 'uuid';
-import {Concept} from '../models/constraint-models/concept';
-import {ConceptConstraint} from '../models/constraint-models/concept-constraint';
-import {TreeNode} from '../models/tree-models/tree-node';
-import {ConstraintService} from './constraint.service';
-import {ErrorHelper} from '../utilities/error-helper';
-import {TreeNodeType} from '../models/tree-models/tree-node-type';
-import {AppConfig} from '../config/app.config';
-import {GenomicAnnotation} from '../models/constraint-models/genomic-annotation';
-import {ExploreSearchService} from './api/medco-node/explore-search.service';
-import {ApiEndpointService} from './api-endpoint.service';
-import {Observable} from 'rxjs';
-import {ApiValueMetadata, DataType} from '../models/api-response-models/medco-node/api-value-metadata';
-import {Modifier} from '../models/constraint-models/modifier';
-import { ExploreQueryService } from './api/medco-node/explore-query.service';
+import { Injectable, Injector } from "@angular/core";
+import { v4 as uuidv4 } from "uuid";
+import { Concept } from "../models/constraint-models/concept";
+import { ConceptConstraint } from "../models/constraint-models/concept-constraint";
+import { TreeNode } from "../models/tree-models/tree-node";
+import { ConstraintService } from "./constraint.service";
+import { ErrorHelper } from "../utilities/error-helper";
+import { TreeNodeType } from "../models/tree-models/tree-node-type";
+import { AppConfig } from "../config/app.config";
+import { GenomicAnnotation } from "../models/constraint-models/genomic-annotation";
+import { ExploreSearchService } from "./api/medco-node/explore-search.service";
+import { ApiEndpointService } from "./api-endpoint.service";
+import { Observable } from "rxjs";
+import {
+  ApiValueMetadata,
+  DataType,
+} from "../models/api-response-models/medco-node/api-value-metadata";
+import { Modifier } from "../models/constraint-models/modifier";
+import { ExploreQueryService } from "./api/medco-node/explore-query.service";
 
 const defaultI2b2DatasourceParams = {
   "db.db-name": "i2b2",
@@ -39,13 +42,12 @@ const defaultI2b2DatasourceParams = {
   "i2b2.api.url": "http://i2b2:8080/i2b2/services",
   "i2b2.api.username": "demo",
   "i2b2.api.wait-time": "10s",
-  "name": `i2b2-${uuidv4()}`,
-  "type": "i2b2-geco"
+  name: `i2b2-${uuidv4()}`,
+  type: "i2b2-geco",
 };
 
 @Injectable()
 export class TreeNodeService {
-
   // the variable that holds the entire tree structure, used by the tree on the left side bar
   private _rootTreeNodes: TreeNode[] = [];
   // the selected tree node in the side-panel by dragging
@@ -60,7 +62,7 @@ export class TreeNodeService {
   private constraintService: ConstraintService;
   private apiEndpointService: ApiEndpointService;
 
-  constructor(private injector: Injector) { }
+  constructor(private injector: Injector) {}
 
   /**
    * Reset and load the root tree nodes for rendering the tree on the left side panel.
@@ -78,34 +80,38 @@ export class TreeNodeService {
       // retrieve root tree nodes and extract the concepts
       this._isLoading = true;
 
-      this.apiEndpointService.getCall('projects').subscribe((projectsList) => {
-        const i2b2Project = projectsList.reverse().find((project) => project.name.indexOf('i2b2') !== -1);
+      this.apiEndpointService.getCall("projects").subscribe((projectsList) => {
+        const i2b2Project = projectsList
+          .reverse()
+          .find((project) => project.name === "Main Project");
         if (i2b2Project && i2b2Project.dataSourceId) {
-          console.log('Found datasource on project', i2b2Project.uniqueId);
+          console.log("Found datasource on project", i2b2Project.uniqueId);
           this.exploreSearchService.projectId = i2b2Project.uniqueId;
           this.exploreQueryService.projectId = i2b2Project.uniqueId;
-          this.exploreSearchService.exploreSearchConceptChildren('/').subscribe(
+          this.exploreSearchService.exploreSearchConceptChildren("/").subscribe(
             (treeNodes: TreeNode[]) => {
-    
               // reset concepts and concept constraints
               this.constraintService.concepts = [];
               this.constraintService.conceptConstraints = [];
-    
+
               this.processTreeNodes(treeNodes, this.constraintService);
               treeNodes.forEach((node) => this.rootTreeNodes.push(node));
               this._isLoading = false;
               resolve();
             },
             (err) => {
-              ErrorHelper.handleError('Error during initial tree loading', err);
+              ErrorHelper.handleError("Error during initial tree loading", err);
               this._isLoading = false;
               reject(err);
-            });
+            }
+          );
         } else {
           this._isNoi2b2Datasource = true;
-          throw ErrorHelper.handleNewError('Cannot find i2b2 datasource, please create one with a name containing \"i2b2\" first')
+          throw ErrorHelper.handleNewError(
+            'Cannot find i2b2 project, please create one with the name "Main Project" first'
+          );
         }
-      })
+      });
     });
   }
 
@@ -115,15 +121,22 @@ export class TreeNodeService {
    * @param {TreeNode} parentNode
    * @param {ConstraintService} constraintService
    */
-  public loadChildrenNodes(parentNode: TreeNode, constraintService: ConstraintService) {
+  public loadChildrenNodes(
+    parentNode: TreeNode,
+    constraintService: ConstraintService
+  ) {
     if (parentNode.leaf || parentNode.childrenAttached) {
-      return
+      return;
     }
 
     this._isLoading = true;
-    let resultObservable: Observable<TreeNode[]> = parentNode.isModifier() ?
-      this.exploreSearchService.exploreSearchModifierChildren(parentNode.path, parentNode.appliedPath, parentNode.appliedConcept.path) :
-      this.exploreSearchService.exploreSearchConceptChildren(parentNode.path)
+    let resultObservable: Observable<TreeNode[]> = parentNode.isModifier()
+      ? this.exploreSearchService.exploreSearchModifierChildren(
+          parentNode.path,
+          parentNode.appliedPath,
+          parentNode.appliedConcept.path
+        )
+      : this.exploreSearchService.exploreSearchConceptChildren(parentNode.path);
 
     resultObservable.subscribe(
       (treeNodes: TreeNode[]) => {
@@ -132,15 +145,14 @@ export class TreeNodeService {
         this.processTreeNodes(parentNode.children, constraintService);
         this._isLoading = false;
         if (treeNodes.length === 0) {
-          parentNode.leaf = true
+          parentNode.leaf = true;
         }
       },
       (err) => {
-        ErrorHelper.handleError('Error during tree children loading', err);
+        ErrorHelper.handleError("Error during tree children loading", err);
         this._isLoading = false;
       }
     );
-
   }
 
   /**
@@ -150,7 +162,10 @@ export class TreeNodeService {
    * @param treeNodes
    * @param constraintService
    */
-  processTreeNodes(treeNodes: TreeNode[], constraintService: ConstraintService) {
+  processTreeNodes(
+    treeNodes: TreeNode[],
+    constraintService: ConstraintService
+  ) {
     if (!treeNodes) {
       return;
     }
@@ -170,17 +185,15 @@ export class TreeNodeService {
    * @param {ConstraintService} constraintService
    */
   processTreeNode(node: TreeNode, constraintService: ConstraintService) {
-
     // generate label
     node.label = node.displayName;
     if (node.subjectCount) {
       node.label = node.label + ` (${node.subjectCount})`;
     }
 
-
-    node.icon = '';
-    node.expandedIcon = 'fa fa-folder-open';
-    node.collapsedIcon = 'fa fa-folder';
+    node.icon = "";
+    node.expandedIcon = "fa fa-folder-open";
+    node.collapsedIcon = "fa fa-folder";
 
     // extract concept
     switch (node.nodeType) {
@@ -197,9 +210,14 @@ export class TreeNodeService {
         }
         break;
       case TreeNodeType.GENOMIC_ANNOTATION:
-        if (constraintService.genomicAnnotations.filter(
-          (annotation: GenomicAnnotation) => annotation.name === node.name).length === 0) {
-          constraintService.genomicAnnotations.push(new GenomicAnnotation(node.name, node.displayName, node.path));
+        if (
+          constraintService.genomicAnnotations.filter(
+            (annotation: GenomicAnnotation) => annotation.name === node.name
+          ).length === 0
+        ) {
+          constraintService.genomicAnnotations.push(
+            new GenomicAnnotation(node.name, node.displayName, node.path)
+          );
         }
         break;
       case TreeNodeType.MODIFIER_FOLDER:
@@ -212,13 +230,16 @@ export class TreeNodeService {
         constraintService.allConstraints.push(constraintFromModifier);
         if (node.nodeType === TreeNodeType.MODIFIER) {
           node.leaf = true;
-          node.icon = 'fa fa-file';
+          node.icon = "fa fa-file";
         }
         break;
       default:
         break;
     }
-    console.log(`Processed tree node ${node.name} of type ${node.nodeType}`, node)
+    console.log(
+      `Processed tree node ${node.name} of type ${node.nodeType}`,
+      node
+    );
   }
 
   /**
@@ -232,9 +253,8 @@ export class TreeNodeService {
     concept.path = treeNode.path;
     concept.type = treeNode.valueType;
     if (treeNode.metadata) {
-      this.processMetadata(concept, treeNode.metadata)
+      this.processMetadata(concept, treeNode.metadata);
     }
-
 
     concept.code = treeNode.conceptCode;
     concept.fullName = treeNode.path;
@@ -247,7 +267,7 @@ export class TreeNodeService {
   private processMetadata(target: Concept, metadata: ApiValueMetadata) {
     if (metadata.ValueMetadata) {
       if (metadata.ValueMetadata.UnitValues) {
-        target.unit = metadata.ValueMetadata.UnitValues.NormalUnits
+        target.unit = metadata.ValueMetadata.UnitValues.NormalUnits;
       }
       if (metadata.ValueMetadata.DataType) {
         switch (metadata.ValueMetadata.DataType) {
@@ -275,10 +295,7 @@ export class TreeNodeService {
         }
       }
     }
-
   }
-
-
 
   /**
    * Parse a tree node and create the corresponding concept with a modifier.
@@ -290,30 +307,37 @@ export class TreeNodeService {
    */
   public getConceptFromModifierTreeNode(treeNode: TreeNode): Concept {
     if (!treeNode.isModifier()) {
-      throw ErrorHelper.handleNewError('Unexpected error. A tree node that is not a modifier cannot be passed ' +
-        'to getConceptModifierTreeNode')
+      throw ErrorHelper.handleNewError(
+        "Unexpected error. A tree node that is not a modifier cannot be passed " +
+          "to getConceptModifierTreeNode"
+      );
     }
     // this is not the same object of the node if it happens to be here, so it is safe
     // to modify its fields
-    let concept = this.getConceptFromTreeNode(treeNode.appliedConcept)
+    let concept = this.getConceptFromTreeNode(treeNode.appliedConcept);
 
-    let modifier = new Modifier(treeNode.path, treeNode.appliedPath, treeNode.appliedConcept.path)
-    let modifierPathSplit = (modifier.path.length > 0 && modifier.path.startsWith('/')) ?
-      modifier.path.substring(1).split('/') :
-      modifier.path.split('/')
-    modifierPathSplit.shift()
-    let modifierPath = modifierPathSplit.join('/')
+    let modifier = new Modifier(
+      treeNode.path,
+      treeNode.appliedPath,
+      treeNode.appliedConcept.path
+    );
+    let modifierPathSplit =
+      modifier.path.length > 0 && modifier.path.startsWith("/")
+        ? modifier.path.substring(1).split("/")
+        : modifier.path.split("/");
+    modifierPathSplit.shift();
+    let modifierPath = modifierPathSplit.join("/");
 
     // override the fields
 
-    concept.path = `${concept.path}${modifierPath}`
-    concept.label = `${treeNode.displayName} (${concept.path})`
-    concept.modifier = modifier
-    concept.type = treeNode.valueType
+    concept.path = `${concept.path}${modifierPath}`;
+    concept.label = `${treeNode.displayName} (${concept.path})`;
+    concept.modifier = modifier;
+    concept.type = treeNode.valueType;
     if (treeNode.metadata) {
-      this.processMetadata(concept, treeNode.metadata)
+      this.processMetadata(concept, treeNode.metadata);
     }
-    return concept
+    return concept;
   }
 
   /**
@@ -322,9 +346,11 @@ export class TreeNodeService {
    * @param {number} depth
    * @param {TreeNode[]} descendants
    */
-  public getTreeNodeDescendantsWithDepth(treeNode: TreeNode,
+  public getTreeNodeDescendantsWithDepth(
+    treeNode: TreeNode,
     depth: number,
-    descendants: TreeNode[]) {
+    descendants: TreeNode[]
+  ) {
     if (treeNode) {
       if (depth === 2 && treeNode.hasChildren()) {
         for (let child of treeNode.children) {
@@ -346,15 +372,21 @@ export class TreeNodeService {
    * @param {string[]} excludedTypes
    * @param {TreeNode[]} descendants
    */
-  public getTreeNodeDescendantsWithExcludedTypes(treeNode: TreeNode,
+  public getTreeNodeDescendantsWithExcludedTypes(
+    treeNode: TreeNode,
     excludedTypes: TreeNodeType[],
-    descendants: TreeNode[]) {
+    descendants: TreeNode[]
+  ) {
     if (treeNode) {
       // If the tree node has children
       if (treeNode.children) {
         for (let child of treeNode.children) {
           if (child.children) {
-            this.getTreeNodeDescendantsWithExcludedTypes(child, excludedTypes, descendants);
+            this.getTreeNodeDescendantsWithExcludedTypes(
+              child,
+              excludedTypes,
+              descendants
+            );
           } else if (excludedTypes.indexOf(child.nodeType) === -1) {
             descendants.push(child);
           }
@@ -483,11 +515,11 @@ export class TreeNodeService {
    */
   public getParentTreeNodePaths(path: string): string[] {
     let paths: string[] = [];
-    const parts = path.split('\\');
+    const parts = path.split("\\");
     if (parts.length - 2 > 1) {
-      let parentPath = '\\';
+      let parentPath = "\\";
       for (let i = 1; i < parts.length - 2; i++) {
-        parentPath += parts[i] + '\\';
+        parentPath += parts[i] + "\\";
         paths.push(parentPath);
       }
     }

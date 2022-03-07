@@ -8,6 +8,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import { v4 as uuidv4 } from 'uuid';
 import { Injectable, Injector } from '@angular/core';
 import { AppConfig } from '../../../config/app.config';
 import { HttpClient } from '@angular/common/http';
@@ -20,6 +21,7 @@ import { MedcoNetworkService } from '../medco-network.service';
 import { ApiEndpointService } from '../../api-endpoint.service';
 import {ApiValueMetadata, DataType} from '../../../models/api-response-models/medco-node/api-value-metadata';
 import {MessageHelper} from '../../../utilities/message-helper';
+import { KeycloakService } from 'keycloak-angular';
 
 @Injectable()
 export class ExploreSearchService {
@@ -38,7 +40,8 @@ export class ExploreSearchService {
     private http: HttpClient,
     private medcoNetworkService: MedcoNetworkService,
     private apiEndpointService: ApiEndpointService,
-    private injector: Injector) { }
+    private injector: Injector,
+    private keycloakService: KeycloakService) { }
 
     private mapSearchResults(searchResp) {
       return (searchResp.results.searchResult || []).map((treeNodeObj) => {
@@ -93,11 +96,13 @@ export class ExploreSearchService {
     }
 
   private exploreSearchConcept(operation: string, root: string): Observable<TreeNode[]> {
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
+
     return this.apiEndpointService.postCall(
       `projects/${this.projectId}/datasource/query`,
       {
         operation: "searchConcept",
-        aggregationType: "per_node",
+        aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         parameters: {
           operation: operation,
           path: root
