@@ -49,6 +49,11 @@ export class ExploreQueryService {
    */
   private _lastQueryTiming: ApiI2b2Timing
 
+  /**
+   * Last query ID used in query that successed to return anything
+   */
+   private _lastQueryId: string
+
   constructor(private config: AppConfig,
     private apiEndpointService: ApiEndpointService,
     private medcoNetworkService: MedcoNetworkService,
@@ -112,13 +117,16 @@ export class ExploreQueryService {
         }),
         map(async (expQueryResp) => {
         // if (expQueryResp.status === "success" ) {
+          this.lastQueryId = queryId;
           const exploreResult = new ExploreQueryResult();
-          const globalCount = await this.getDataobjectData(countSharedId).toPromise();
-          exploreResult.globalCount = globalCount[0][0];
+          exploreResult.queryId = queryId;
+          exploreResult.resultInstanceID = [1];
+          const globalCountResponse = await this.getDataobjectData(countSharedId).toPromise();
+          exploreResult.globalCount = globalCountResponse.data[0][0];
           exploreResult.nodes = [node];
           if (haveRightsForPatientList) {
-            const patientLists = await this.getDataobjectData(patientSharedId).toPromise();
-            exploreResult.patientLists = patientLists;
+            const patientListResult = await this.getDataobjectData(patientSharedId).toPromise();
+            exploreResult.patientLists = patientListResult.data;
           }
           return exploreResult;
         // } else {
@@ -247,5 +255,13 @@ export class ExploreQueryService {
 
   set projectId(value: string) {
     this._projectId = value;
+  }
+
+  get lastQueryId(): string {
+    return this._lastQueryId;
+  }
+
+  set lastQueryId(value: string) {
+    this._lastQueryId = value;
   }
 }

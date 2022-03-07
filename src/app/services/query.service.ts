@@ -193,9 +193,9 @@ export class QueryService {
       switchMap(() => this.exploreQueryService.exploreLocalQuery(this.query))
     ).subscribe(
       async (parsedResults) => {
-        // if (parsedResults.resultInstanceID) {
-        //    this._lastSuccessfulSet.next(parsedResults.resultInstanceID)
-        // }
+        if (parsedResults[0].resultInstanceID) {
+          this._lastSuccessfulSet.next(parsedResults[0].resultInstanceID);
+        }
         this.queryResults.next(parsedResults[0]);
         this.isUpdating = false;
         this.isDirty = this.constraintService.hasConstraint().valueOf();

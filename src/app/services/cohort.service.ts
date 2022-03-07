@@ -46,51 +46,24 @@ export class CohortService {
   _patternValidation: RegExp
 
 
-  private static apiCohortsToCohort(apiCohorts: ApiCohortResponse[][]): Cohort[] {
+  private static apiCohortsToCohort(apiCohorts: ApiCohortResponse[]): Cohort[] {
 
-    const cohortNumber = apiCohorts[0].length
-    apiCohorts
-      .forEach(apiCohort => {
-        if (apiCohort.length !== cohortNumber) {
-          throw ErrorHelper.handleNewError('cohort numbers are not the same across nodes')
-        }
-      })
+    const cohortNumber = apiCohorts.length;
 
-    let cohortName: string
-    let creationDate: string
-    let updateDate: string
+    let cohortName: string;
 
     let res = new Array<Cohort>()
     for (let i = 0; i < cohortNumber; i++) {
-      let creationDates = new Array<Date>()
-      let updateDates = new Array<Date>()
+      let cohort = new Cohort(
+        cohortName = apiCohorts[i].name,
+        null,
+        [new Date(apiCohorts[i].CreationDate)],
+        [new Date(apiCohorts[i].CreationDate)]
+      );
 
-      cohortName = apiCohorts[0][i].cohortName
-      apiCohorts.forEach(apiCohort => {
-        if (apiCohort[i].cohortName !== cohortName) {
-          throw ErrorHelper.handleNewError('Cohort names are not the same across nodes')
-        }
-      })
-      creationDate = apiCohorts[0][i].creationDate
-      apiCohorts.forEach(apiCohort => {
-        if (apiCohort[i].creationDate !== creationDate) {
-          MessageHelper.alert('warn', 'Cohort creation dates are not the same across nodes')
-        }
-        creationDates.push(new Date(apiCohort[i].creationDate))
-      })
-      updateDate = apiCohorts[0][i].updateDate
-      apiCohorts.forEach(apiCohort => {
-        if (apiCohort[i].updateDate !== updateDate) {
-          MessageHelper.alert('warn', 'cohort update dates are not the same across nodes')
-        }
-        updateDates.push(new Date(apiCohort[i].updateDate))
-      })
-
-      let cohort = new Cohort(cohortName, null, creationDates, updateDates)
-
-      cohort.patient_set_id = apiCohorts.map(apiCohort => apiCohort[i].queryID)
-      cohort.queryDefinition = apiCohorts.map(apiCohort => apiCohort[i].queryDefinition)
-      res.push(cohort)
+      cohort.patient_set_id = [1]; // apiCohorts.map(apiCohort => apiCohort.exploreQuery.id)
+      cohort.queryDefinition = apiCohorts.map(apiCohort => apiCohort.exploreQuery.definition);
+      res.push(cohort);
 
     }
     return res
@@ -213,11 +186,12 @@ export class CohortService {
   }
 
   getCohorts() {
-    this._isRefreshing = true
+    this._isRefreshing = true;
     this.exploreCohortsService.getCohortAllNodes().subscribe({
       next: (apiCohorts => {
+        console.log('apiCohorts', apiCohorts);
         try {
-          this.updateCohorts(CohortService.apiCohortsToCohort(apiCohorts))
+          this.updateCohorts(CohortService.apiCohortsToCohort(apiCohorts[0].results.cohorts))
         } catch (err) {
           MessageHelper.alert('error', 'An error occured with received saved cohorts', (err as Error).message)
         }
@@ -248,7 +222,7 @@ export class CohortService {
       apiCohorts.push(apiCohort)
     })
 
-    this.exploreCohortsService.postCohortAllNodes(cohortName, apiCohorts).subscribe(messages => {
+    this.exploreCohortsService.postCohortAllNodes(cohortName, apiCohorts, this.exploreQueryService.lastQueryId).subscribe(messages => {
       messages.forEach(message => console.log('on post cohort, message: ', message)),
         this.updateCohorts([cohort])
       this._isRefreshing = false

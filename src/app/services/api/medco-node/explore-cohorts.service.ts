@@ -6,6 +6,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+import { v4 as uuidv4 } from 'uuid';
 import { Injectable } from '@angular/core';
 import { MedcoNetworkService } from '../medco-network.service';
 import { Observable, forkJoin } from 'rxjs';
@@ -21,6 +22,7 @@ import {HttpParams} from '@angular/common/http';
 
 @Injectable()
 export class ExploreCohortsService {
+  private _projectId: string;
 
   /**
    * Query timeout: 10 minutes.
@@ -30,22 +32,44 @@ export class ExploreCohortsService {
   constructor(private config: AppConfig, private apiEndpointService: ApiEndpointService,
     private medcoNetworkService: MedcoNetworkService) { }
 
-  getCohortSingleNode(node: ApiNodeMetadata): Observable<ApiCohortResponse[]> {
+  getCohortSingleNode(): Observable<ApiCohortResponse[]> {
+    const countSharedId = uuidv4();
+    const patientSharedId = uuidv4();
 
-    const params = new HttpParams().set('limit', '0')
-
-    return this.apiEndpointService.getCall(
-      'node/explore/cohorts',
-      { params },
-      node.url
+    return this.apiEndpointService.postCall(
+      `projects/${this.projectId}/datasource/query`,
+      {
+        aggregationType: "per_node",
+        operation: "getCohorts",
+        parameters: {
+          limit: 10
+        },
+        outputDataObjectsSharedIDs: {
+          count: countSharedId,
+          patientList: patientSharedId
+        }
+      }
     );
   }
 
-  postCohortSingleNode(node: ApiNodeMetadata, cohortName: string, cohort: ApiCohort): Observable<string> {
+  postCohortSingleNode(node: ApiNodeMetadata, cohortName: string, cohort: ApiCohort, exploreQueryID: string): Observable<string> {
+    const countSharedId = uuidv4();
+    const patientSharedId = uuidv4();
+
     return this.apiEndpointService.postCall(
-      `node/explore/cohorts/${cohortName}`,
-      cohort,
-      node.url
+      `projects/${this.projectId}/datasource/query`,
+      {
+        aggregationType: "per_node",
+        operation: "addCohort",
+        parameters: {
+          name: cohortName,
+          exploreQueryID: exploreQueryID
+        },
+        outputDataObjectsSharedIDs: {
+          count: countSharedId,
+          patientList: patientSharedId
+        }
+      }
     );
   }
 
@@ -69,12 +93,12 @@ export class ExploreCohortsService {
 
 
   getCohortAllNodes(): Observable<ApiCohortResponse[][]> {
-    return forkJoin(this.medcoNetworkService.nodes.map(node => this.getCohortSingleNode(node)))
+    return forkJoin(this.medcoNetworkService.nodes.map(() => this.getCohortSingleNode()))
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }
 
-  postCohortAllNodes(cohortName: string, cohort: ApiCohort[]): Observable<string[]> {
-    return forkJoin(this.medcoNetworkService.nodes.map((node, index) => this.postCohortSingleNode(node, cohortName, cohort[index])))
+  postCohortAllNodes(cohortName: string, cohort: ApiCohort[], exploreQueryID: string): Observable<string[]> {
+    return forkJoin(this.medcoNetworkService.nodes.map((node, index) => this.postCohortSingleNode(node, cohortName, cohort[index], exploreQueryID)))
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }
 
@@ -88,5 +112,13 @@ export class ExploreCohortsService {
 
     return forkJoin(this.medcoNetworkService.nodes.map(node => this.postCohortsPatientListSingleNode(node, cohortPatientListRequest)))
       .pipe(timeout((ExploreCohortsService.TIMEOUT_MS)))
+  }
+
+  get projectId(): string {
+    return this._projectId;
+  }
+
+  set projectId(value: string) {
+    this._projectId = value;
   }
 }

@@ -27,6 +27,7 @@ import {
 } from "../models/api-response-models/medco-node/api-value-metadata";
 import { Modifier } from "../models/constraint-models/modifier";
 import { ExploreQueryService } from "./api/medco-node/explore-query.service";
+import { ExploreCohortsService } from "./api/medco-node/explore-cohorts.service";
 
 const defaultI2b2DatasourceParams = {
   "db.db-name": "i2b2",
@@ -59,6 +60,7 @@ export class TreeNodeService {
   private config: AppConfig;
   private exploreSearchService: ExploreSearchService;
   private exploreQueryService: ExploreQueryService;
+  private exploreCohortsService: ExploreCohortsService;
   private constraintService: ConstraintService;
   private apiEndpointService: ApiEndpointService;
 
@@ -72,6 +74,7 @@ export class TreeNodeService {
       this.config = this.injector.get(AppConfig);
       this.exploreSearchService = this.injector.get(ExploreSearchService);
       this.exploreQueryService = this.injector.get(ExploreQueryService);
+      this.exploreCohortsService = this.injector.get(ExploreCohortsService);
       this.constraintService = this.injector.get(ConstraintService);
       this.apiEndpointService = this.injector.get(ApiEndpointService);
 
@@ -83,11 +86,12 @@ export class TreeNodeService {
       this.apiEndpointService.getCall("projects").subscribe((projectsList) => {
         const i2b2Project = projectsList
           .reverse()
-          .find((project) => project.name === "Main Project");
+          .find((project) => project.name === "i2b2");
         if (i2b2Project && i2b2Project.dataSourceId) {
-          console.log("Found datasource on project", i2b2Project.uniqueId);
+          console.log("Found project id", i2b2Project.uniqueId);
           this.exploreSearchService.projectId = i2b2Project.uniqueId;
           this.exploreQueryService.projectId = i2b2Project.uniqueId;
+          this.exploreCohortsService.projectId = i2b2Project.uniqueId;
           this.exploreSearchService.exploreSearchConceptChildren("/").subscribe(
             (treeNodes: TreeNode[]) => {
               // reset concepts and concept constraints
