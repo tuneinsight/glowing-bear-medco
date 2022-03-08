@@ -106,10 +106,8 @@ export class ExploreSearchService {
       {
         operation: "searchConcept",
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
-        outputDataObjectsSharedIDs: {
-          count: countSharedId,
-          patientList: patientSharedId
-        },
+        broadcast: true,
+        outputDataObjectsNames: ["patient_list", "count"],
         parameters: {
           operation: operation,
           path: root
