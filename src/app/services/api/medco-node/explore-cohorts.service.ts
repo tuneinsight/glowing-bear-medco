@@ -18,7 +18,7 @@ import {ApiCohortsPatientListsResponse} from '../../../models/api-response-model
 import {ApiCohortResponse} from '../../../models/api-response-models/medco-node/api-cohort-response';
 import {ApiEndpointService} from '../../api-endpoint.service';
 import {ApiCohort} from '../../../models/api-request-models/medco-node/api-cohort';
-import {HttpParams} from '@angular/common/http';
+import { KeycloakService } from 'keycloak-angular';
 
 @Injectable()
 export class ExploreCohortsService {
@@ -30,16 +30,19 @@ export class ExploreCohortsService {
   private static TIMEOUT_MS = 1000 * 60 * 10;
 
   constructor(private config: AppConfig, private apiEndpointService: ApiEndpointService,
-    private medcoNetworkService: MedcoNetworkService) { }
+    private medcoNetworkService: MedcoNetworkService,
+    private keycloakService: KeycloakService) { }
 
   getCohortSingleNode(): Observable<ApiCohortResponse[]> {
     const countSharedId = uuidv4();
     const patientSharedId = uuidv4();
 
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
+
     return this.apiEndpointService.postCall(
       `projects/${this.projectId}/datasource/query`,
       {
-        aggregationType: "per_node",
+        aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         operation: "getCohorts",
         parameters: {
           limit: 10
@@ -56,10 +59,12 @@ export class ExploreCohortsService {
     const countSharedId = uuidv4();
     const patientSharedId = uuidv4();
 
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
+
     return this.apiEndpointService.postCall(
       `projects/${this.projectId}/datasource/query`,
       {
-        aggregationType: "per_node",
+        aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         operation: "addCohort",
         parameters: {
           name: cohortName,

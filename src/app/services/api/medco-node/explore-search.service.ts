@@ -44,7 +44,7 @@ export class ExploreSearchService {
     private keycloakService: KeycloakService) { }
 
     private mapSearchResults(searchResp) {
-      return (searchResp.results.searchResult || []).map((treeNodeObj) => {
+      return (searchResp.results['http://nginx:3100'].searchResult || []).map((treeNodeObj) => {
         let treeNode = new TreeNode();
         treeNode.path = treeNodeObj['path'];
         treeNode.appliedPath = treeNodeObj['appliedPath'];
@@ -96,9 +96,6 @@ export class ExploreSearchService {
     }
 
   private exploreSearchConcept(operation: string, root: string): Observable<TreeNode[]> {
-    const countSharedId = uuidv4();
-    const patientSharedId = uuidv4();
-
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
     return this.apiEndpointService.postCall(

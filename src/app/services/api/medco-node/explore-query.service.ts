@@ -116,22 +116,23 @@ export class ExploreQueryService {
           return throwError(err);
         }),
         map(async (expQueryResp) => {
-        // if (expQueryResp.status === "success" ) {
-          this.lastQueryId = queryId;
-          const exploreResult = new ExploreQueryResult();
-          exploreResult.queryId = queryId;
-          exploreResult.resultInstanceID = [1];
-          const globalCountResponse = await this.getDataobjectData(countSharedId).toPromise();
-          exploreResult.globalCount = globalCountResponse.data[0][0];
-          exploreResult.nodes = [node];
-          if (haveRightsForPatientList) {
-            const patientListResult = await this.getDataobjectData(patientSharedId).toPromise();
-            exploreResult.patientLists = patientListResult.data;
+          if (expQueryResp.status === "success" ) {
+            this.lastQueryId = queryId;
+            const exploreResult = new ExploreQueryResult();
+            exploreResult.queryId = queryId;
+            exploreResult.resultInstanceID = [1];
+            const globalCountResponse = await this.getDataobjectData(countSharedId).toPromise();
+            exploreResult.globalCount = globalCountResponse.data[0][0];
+            exploreResult.nodes = [node];
+            if (haveRightsForPatientList) {
+              const patientListResult = await this.getDataobjectData(patientSharedId).toPromise();
+              exploreResult.patientLists = patientListResult.data;
+            }
+            return exploreResult;
+          } else {
+            MessageHelper.alert('error', 'Error while querying datasource.', expQueryResp.error);
+            return throwError(expQueryResp.error);
           }
-          return exploreResult;
-        // } else {
-        //   return null;
-        // }
       }),
       exhaust()
     ) as Observable<ExploreQueryResult>;

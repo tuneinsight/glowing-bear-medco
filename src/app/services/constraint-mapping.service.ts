@@ -5,6 +5,7 @@ import { CombinationConstraint } from '../models/constraint-models/combination-c
 import { CombinationState } from '../models/constraint-models/combination-state';
 import { ApiI2b2Item } from '../models/api-request-models/medco-node/api-i2b2-item';
 import { ConceptConstraint } from '../models/constraint-models/concept-constraint';
+import { CohortConstraint } from '../models/constraint-models/cohort-constraint';
 import { GenomicAnnotationConstraint } from '../models/constraint-models/genomic-annotation-constraint';
 import { ValueType } from '../models/constraint-models/value-type';
 import { CryptoService } from './crypto.service';
@@ -94,7 +95,7 @@ export class ConstraintMappingService {
               break;
 
             case 'CohortConstraint':
-              panel.cohortItems.push(combConstraint.children[i].textRepresentation);
+              panel.cohortItems.push((combConstraint.children[i] as CohortConstraint).cohort.exploreQueryId);
               break;
 
 
@@ -118,23 +119,6 @@ export class ConstraintMappingService {
     }
 
     let item = new ApiI2b2Item();
-
-    console.log('constraint', constraint);
-
-    // TODO: geco-i2b2-initial-implementation-test
-    if (constraint.treeNode.path.startsWith('/TEST')) {
-      if (constraint.concept.modifier) {
-        // constraint.applyTextOperator = true;
-        // constraint.textOperator = TextOperator.LIKE_CONTAINS;
-        // constraint.textOperatorValue = 'cd';
-      } else {
-        // constraint.concept.type = ValueType.NUMERICAL;
-        // constraint.numericalOperator = NumericalOperator.EQUAL;
-        // constraint.applyNumericalOperator = true;
-        // constraint.numValue = Number.parseInt(constraint.textOperatorValue);
-      }
-    }
-
 
     if (constraint.concept.encryptionDescriptor && constraint.concept.encryptionDescriptor.encrypted) {
       // todo: children IDs implementation

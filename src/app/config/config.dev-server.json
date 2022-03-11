@@ -2,7 +2,7 @@
   "medco-node-url": "http://localhost:3100",
 
   "keycloak-url": "http://localhost:8080/auth",
-  "keycloak-realm": "geco",
+  "keycloak-realm": "ti-realm",
   "keycloak-client-id": "glowing-bear",
 
   "footer-text": ""
