@@ -112,7 +112,7 @@ export class TreeNodeService {
         } else {
           this._isNoi2b2Datasource = true;
           throw ErrorHelper.handleNewError(
-            'Cannot find i2b2 project, please create one with the name "Main Project" first'
+            'Cannot find i2b2 project, please create one with the name "i2b2" first'
           );
         }
       });
