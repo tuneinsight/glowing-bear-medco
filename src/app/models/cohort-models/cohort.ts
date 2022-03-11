@@ -18,6 +18,7 @@ export class Cohort {
   public selected: boolean
   private _creationDate: Date[]
   private _updateDate: Date[]
+  private _exploreQueryId: string;
 
   public bookmarked: boolean
   public visible: boolean
@@ -112,6 +113,14 @@ export class Cohort {
 
   get updateDate(): Date[] {
     return this._updateDate
+  }
+
+  get exploreQueryId(): string {
+    return this._exploreQueryId;
+  }
+
+  set exploreQueryId(value: string) {
+    this._exploreQueryId = value;
   }
 
   /**

@@ -63,6 +63,7 @@ export class CohortService {
 
       cohort.patient_set_id = [1]; // apiCohorts.map(apiCohort => apiCohort.exploreQuery.id)
       cohort.queryDefinition = apiCohorts.map(apiCohort => apiCohort.exploreQuery.definition);
+      cohort.exploreQueryId = apiCohorts[i].exploreQuery.id;
       res.push(cohort);
 
     }

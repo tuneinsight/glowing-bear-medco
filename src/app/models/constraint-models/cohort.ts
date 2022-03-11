@@ -9,6 +9,7 @@
 
 export class Cohort {
   private _name: string;
+  private _exploreQueryId: string;
 
   constructor() {
   }
@@ -17,6 +18,7 @@ export class Cohort {
     let ret = new Cohort();
 
     ret.name = this.name;
+    ret.exploreQueryId = this.exploreQueryId;
 
     return ret;
   }
@@ -27,5 +29,13 @@ export class Cohort {
 
   set name(value: string) {
     this._name = value;
+  }
+
+  get exploreQueryId(): string {
+    return this._exploreQueryId;
+  }
+
+  set exploreQueryId(value: string) {
+    this._exploreQueryId = value;
   }
 }
