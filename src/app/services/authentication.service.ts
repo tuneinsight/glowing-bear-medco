@@ -65,6 +65,8 @@ export class AuthenticationService {
    * Returns true if the user has the authorization for analysis.
    */
   get hasAnalysisAuth(): boolean {
+    // TODO: geco-i2b2-initial-implementation-test
+    return true;
     return this.userRoles.includes(AuthenticationService.GECO_SURVIVAL_ANALYSIS_ROLE);
   }
 
