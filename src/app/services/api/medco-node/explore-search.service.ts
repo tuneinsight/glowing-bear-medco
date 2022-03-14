@@ -44,7 +44,7 @@ export class ExploreSearchService {
     private keycloakService: KeycloakService) { }
 
     private mapSearchResults(searchResp) {
-      return (searchResp.results['http://nginx:3100'].searchResult || []).map((treeNodeObj) => {
+      return ((Object.values(searchResp.results)[0] as any).searchResult || []).map((treeNodeObj) => {
         let treeNode = new TreeNode();
         treeNode.path = treeNodeObj['path'];
         treeNode.appliedPath = treeNodeObj['appliedPath'];
