@@ -8,7 +8,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { v4 as uuidv4 } from 'uuid';
 import { Injectable, Injector } from '@angular/core';
 import { AppConfig } from '../../../config/app.config';
 import { HttpClient } from '@angular/common/http';
@@ -25,8 +24,6 @@ import { KeycloakService } from 'keycloak-angular';
 
 @Injectable()
 export class ExploreSearchService {
-
-  private _projectId: string;
 
   /**
    * If the configuration key `medco-cothority-key-url` is present, the file will be fetched and the service enabled.
@@ -99,7 +96,7 @@ export class ExploreSearchService {
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
     return this.apiEndpointService.postCall(
-      `projects/${this.projectId}/datasource/query`,
+      `projects/${this.config.projectId}/datasource/query`,
       {
         operation: "searchConcept",
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
@@ -138,10 +135,15 @@ export class ExploreSearchService {
 
 
   private exploreSearchModifier(operation: 'concept' | 'children' | 'info', path: string, appliedPath: string, appliedConcept: string): Observable<TreeNode[]> {
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
+
     return this.apiEndpointService.postCall(
-      `projects/${this.projectId}/datasource/query`,
+      `projects/${this.config.projectId}/datasource/query`,
       {
         operation: 'searchModifier',
+        aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
+        broadcast: true,
+        outputDataObjectsNames: ["patient_list", "count"],
         parameters: {
           operation: operation,
           path: path,
@@ -233,13 +235,5 @@ export class ExploreSearchService {
    */
   exploreSearchModifierInfo(root: string, appliedPath: string, appliedConcept: string): Observable<TreeNode[]> {
     return this.exploreSearchModifier('info', root, appliedPath, appliedConcept)
-  }
-
-  get projectId(): string {
-    return this._projectId;
-  }
-
-  set projectId(value: string) {
-    this._projectId = value;
   }
 }

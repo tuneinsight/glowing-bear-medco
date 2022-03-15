@@ -9,12 +9,11 @@ import { v4 as uuidv4 } from 'uuid';
 import {Injectable} from '@angular/core';
 import {AppConfig} from '../../../config/app.config';
 import {Observable, forkJoin, throwError} from 'rxjs';
-import {timeout, map, tap, switchMap, concatAll, switchAll, exhaust, catchError} from 'rxjs/operators';
+import {timeout, map, tap, exhaust, catchError} from 'rxjs/operators';
 import {ApiI2b2Panel} from '../../../models/api-request-models/medco-node/api-i2b2-panel';
 import {ConstraintMappingService} from '../../constraint-mapping.service';
 import {ApiEndpointService} from '../../api-endpoint.service';
 import {GenomicAnnotationsService} from '../genomic-annotations.service';
-import {ApiExploreQueryResult} from '../../../models/api-response-models/medco-node/api-explore-query-result';
 import {MedcoNetworkService} from '../medco-network.service';
 import {ExploreQuery} from '../../../models/query-models/explore-query';
 import {CryptoService} from '../../crypto.service';
@@ -24,16 +23,8 @@ import { KeycloakService } from 'keycloak-angular';
 import { ExploreQueryResult } from 'src/app/models/query-models/explore-query-result';
 import { MessageHelper } from 'src/app/utilities/message-helper';
 
-type CountPatientSharedIds = {
-  countSharedId: string;
-  patientSharedId: string;
-}
-
 @Injectable()
 export class ExploreQueryService {
-  private _dataSourceId: string;
-  private _projectId: string;
-
   /**
    * Query timeout: 10 minutes.
    */
@@ -95,7 +86,7 @@ export class ExploreQueryService {
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
     return this.apiEndpointService.postCall(
-      `projects/${this.projectId}/datasource/query`,
+      `projects/${this.config.projectId}/datasource/query`,
       {
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         operation: "exploreQuery",
@@ -240,22 +231,6 @@ export class ExploreQueryService {
 
   get lastQueryTiming(): ApiI2b2Timing {
     return this._lastQueryTiming
-  }
-
-  get dataSourceId(): string {
-    return this._dataSourceId;
-  }
-
-  set dataSourceId(value: string) {
-    this._dataSourceId = value;
-  }
-
-  get projectId(): string {
-    return this._projectId;
-  }
-
-  set projectId(value: string) {
-    this._projectId = value;
   }
 
   get lastQueryId(): string {

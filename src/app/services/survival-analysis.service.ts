@@ -5,6 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+import { v4 as uuidv4 } from 'uuid';
 import { Injectable } from '@angular/core';
 import { AuthenticationService } from './authentication.service';
 import { CryptoService } from './crypto.service';
@@ -147,8 +148,7 @@ export class SurvivalService {
   runSurvivalAnalysis(): Observable<ApiSurvivalAnalysisResponse[]> {
     let apiSurvivalAnalysis = new ApiSurvivalAnalysis()
     let d = new Date()
-    apiSurvivalAnalysis.ID = `MedCo_Survival_Analysis_${d.getUTCFullYear()}${d.getUTCMonth()}${d.getUTCDate()}${d.getUTCHours()}` +
-      `${d.getUTCMinutes()}${d.getUTCSeconds()}${d.getUTCMilliseconds()}`
+    apiSurvivalAnalysis.id = uuidv4();
     if (!this.startConcept) {
       throw ErrorHelper.handleNewError('Start event is undefined')
 

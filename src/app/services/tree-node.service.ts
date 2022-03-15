@@ -9,7 +9,6 @@
  */
 
 import { Injectable, Injector } from "@angular/core";
-import { v4 as uuidv4 } from "uuid";
 import { Concept } from "../models/constraint-models/concept";
 import { ConceptConstraint } from "../models/constraint-models/concept-constraint";
 import { TreeNode } from "../models/tree-models/tree-node";
@@ -26,26 +25,6 @@ import {
   DataType,
 } from "../models/api-response-models/medco-node/api-value-metadata";
 import { Modifier } from "../models/constraint-models/modifier";
-import { ExploreQueryService } from "./api/medco-node/explore-query.service";
-import { ExploreCohortsService } from "./api/medco-node/explore-cohorts.service";
-
-const defaultI2b2DatasourceParams = {
-  "db.db-name": "i2b2",
-  "db.host": "postgresql",
-  "db.password": "postgres",
-  "db.port": "5432",
-  "db.schema-name": "gecodatasourceplugintest",
-  "db.user": "postgres",
-  "i2b2.api.domain": "i2b2demo",
-  "i2b2.api.ont-max-elements": "200",
-  "i2b2.api.password": "changeme",
-  "i2b2.api.project": "Demo",
-  "i2b2.api.url": "http://i2b2:8080/i2b2/services",
-  "i2b2.api.username": "demo",
-  "i2b2.api.wait-time": "10s",
-  name: `i2b2-${uuidv4()}`,
-  type: "i2b2-geco",
-};
 
 @Injectable()
 export class TreeNodeService {
@@ -59,8 +38,6 @@ export class TreeNodeService {
 
   private config: AppConfig;
   private exploreSearchService: ExploreSearchService;
-  private exploreQueryService: ExploreQueryService;
-  private exploreCohortsService: ExploreCohortsService;
   private constraintService: ConstraintService;
   private apiEndpointService: ApiEndpointService;
 
@@ -73,8 +50,6 @@ export class TreeNodeService {
     return new Promise((resolve, reject) => {
       this.config = this.injector.get(AppConfig);
       this.exploreSearchService = this.injector.get(ExploreSearchService);
-      this.exploreQueryService = this.injector.get(ExploreQueryService);
-      this.exploreCohortsService = this.injector.get(ExploreCohortsService);
       this.constraintService = this.injector.get(ConstraintService);
       this.apiEndpointService = this.injector.get(ApiEndpointService);
 
@@ -89,9 +64,7 @@ export class TreeNodeService {
           .find((project) => project.name === "i2b2");
         if (i2b2Project && i2b2Project.dataSourceId) {
           console.log("Found project id", i2b2Project.uniqueId);
-          this.exploreSearchService.projectId = i2b2Project.uniqueId;
-          this.exploreQueryService.projectId = i2b2Project.uniqueId;
-          this.exploreCohortsService.projectId = i2b2Project.uniqueId;
+          this.config.projectId = i2b2Project.uniqueId;
           this.exploreSearchService.exploreSearchConceptChildren("/").subscribe(
             (treeNodes: TreeNode[]) => {
               // reset concepts and concept constraints

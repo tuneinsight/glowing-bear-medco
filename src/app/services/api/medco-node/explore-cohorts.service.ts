@@ -22,7 +22,6 @@ import { KeycloakService } from 'keycloak-angular';
 
 @Injectable()
 export class ExploreCohortsService {
-  private _projectId: string;
 
   /**
    * Query timeout: 10 minutes.
@@ -40,7 +39,7 @@ export class ExploreCohortsService {
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
     return this.apiEndpointService.postCall(
-      `projects/${this.projectId}/datasource/query`,
+      `projects/${this.config.projectId}/datasource/query`,
       {
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         operation: "getCohorts",
@@ -62,7 +61,7 @@ export class ExploreCohortsService {
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
     return this.apiEndpointService.postCall(
-      `projects/${this.projectId}/datasource/query`,
+      `projects/${this.config.projectId}/datasource/query`,
       {
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         operation: "addCohort",
@@ -117,13 +116,5 @@ export class ExploreCohortsService {
 
     return forkJoin(this.medcoNetworkService.nodes.map(node => this.postCohortsPatientListSingleNode(node, cohortPatientListRequest)))
       .pipe(timeout((ExploreCohortsService.TIMEOUT_MS)))
-  }
-
-  get projectId(): string {
-    return this._projectId;
-  }
-
-  set projectId(value: string) {
-    this._projectId = value;
   }
 }
