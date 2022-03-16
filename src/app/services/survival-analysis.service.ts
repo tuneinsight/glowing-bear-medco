@@ -157,8 +157,8 @@ export class SurvivalService {
     if (this.startConcept.modifier) {
       apiSurvivalAnalysis.startConcept = this.startConcept.modifier.appliedConceptPath
       apiSurvivalAnalysis.startModifier = {
-        ModifierKey: this.startConcept.modifier.path,
-        AppliedPath: this.startConcept.modifier.appliedPath
+        modifierKey: this.startConcept.modifier.path,
+        appliedPath: this.startConcept.modifier.appliedPath
       }
     }
 
@@ -169,8 +169,8 @@ export class SurvivalService {
     if (this.endConcept.modifier) {
       apiSurvivalAnalysis.endConcept = this.endConcept.modifier.appliedConceptPath
       apiSurvivalAnalysis.endModifier = {
-        ModifierKey: this.endConcept.modifier.path,
-        AppliedPath: this.endConcept.modifier.appliedPath
+        modifierKey: this.endConcept.modifier.path,
+        appliedPath: this.endConcept.modifier.appliedPath
       }
     }
 
@@ -183,7 +183,7 @@ export class SurvivalService {
     apiSurvivalAnalysis.startsWhen = this.startsWhen
     apiSurvivalAnalysis.endsWhen = this.endsWhen
 
-    apiSurvivalAnalysis.cohortName = this.cohortService.selectedCohort.name
+    apiSurvivalAnalysis.cohortQueryID = this.cohortService.selectedCohort.exploreQueryId;
     apiSurvivalAnalysis.subGroupDefinitions = this.subGroups.map(
       sg => { return { groupName: sg.name, subGroupTiming: sg.timing, panels: this.generatePanels(sg) } }
     )

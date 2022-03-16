@@ -7,16 +7,10 @@
  */
 export class ApiSurvivalAnalysisResponse {
   results: {
-    groupID: string
-    initialCount: string
-    groupResults: {
-      timepoint: number
-      events: {
-        eventofinterest: string
-        censoringevent: string
-
+    [k in string]: {
+      survivalQueryResult: {
+        data: number[][]
       }
-    }[]
-  }[]
-
+    }
+  }
 }

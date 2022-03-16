@@ -44,12 +44,8 @@ export class ApiSurvivalAnalysisService {
         operation: "survivalQuery",
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         broadcast: true,
-        outputDataObjectsNames: ["patient_list", "count"],
+        outputDataObjectsNames: ["survivalQueryResult"],
         parameters: apiSurvivalAnalysis
-        // parameters: {
-        //   operation: operation,
-        //   path: root
-        // }
       }
     )
   }
