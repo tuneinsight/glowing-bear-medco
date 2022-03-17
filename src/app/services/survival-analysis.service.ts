@@ -195,6 +195,7 @@ export class SurvivalService {
   survivalAnalysisDecrypt(survivalAnalysisResponse: ApiSurvivalAnalysisResponse): Observable<SurvivalAnalysisClear> {
     return forkJoin(
       // generate the ClearGroup[]
+      // @ts-ignore
       survivalAnalysisResponse.results.map(group =>
         this.cryptoService.decryptIntegersWithEphemeralKey(
           [group.initialCount]
@@ -241,6 +242,7 @@ export class SurvivalService {
       // package it into SurvivalAnalysisClear
       map(clearGroups => {
         let res = new SurvivalAnalysisClear();
+        // @ts-ignore
         res.results = clearGroups;
         return res;
       })
