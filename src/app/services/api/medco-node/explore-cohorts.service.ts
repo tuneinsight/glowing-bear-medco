@@ -65,13 +65,10 @@ export class ExploreCohortsService {
       {
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         operation: "addCohort",
+        broadcast: true,
         parameters: {
           name: cohortName,
           exploreQueryID: exploreQueryID
-        },
-        outputDataObjectsSharedIDs: {
-          count: countSharedId,
-          patientList: patientSharedId
         }
       }
     );

@@ -90,15 +90,12 @@ export class ExploreQueryService {
       {
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         operation: "exploreQuery",
+        broadcast: true,
+        outputDataObjectsNames: ["patientList", "count"],
         parameters: {
-          id: queryId,
           definition: {
             panels: panels
           }
-        },
-        outputDataObjectsSharedIDs: {
-          count: countSharedId,
-          patientList: patientSharedId
         }
       }
     ).pipe(
