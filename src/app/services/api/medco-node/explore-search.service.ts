@@ -100,7 +100,6 @@ export class ExploreSearchService {
       {
         operation: "searchConcept",
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
-        broadcast: true,
         outputDataObjectsNames: ["patientList", "count"],
         parameters: {
           operation: operation,
