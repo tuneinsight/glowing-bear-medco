@@ -93,6 +93,7 @@ export class ExploreQueryService {
         broadcast: true,
         outputDataObjectsNames: ["patientList", "count"],
         parameters: {
+          id: queryId,
           definition: {
             panels: panels
           }
