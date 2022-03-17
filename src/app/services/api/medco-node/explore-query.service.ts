@@ -90,15 +90,13 @@ export class ExploreQueryService {
       {
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         operation: "exploreQuery",
+        broadcast: true,
+        outputDataObjectsNames: ["patientList", "count"],
         parameters: {
           id: queryId,
           definition: {
             panels: panels
           }
-        },
-        outputDataObjectsSharedIDs: {
-          count: countSharedId,
-          patientList: patientSharedId
         }
       }
     ).pipe(
@@ -107,18 +105,22 @@ export class ExploreQueryService {
           return throwError(err);
         }),
         map(async (expQueryResp) => {
-          if (expQueryResp.status === "success" ) {
+          if (expQueryResp.results) {
             this.lastQueryId = queryId;
             const exploreResult = new ExploreQueryResult();
             exploreResult.queryId = queryId;
             exploreResult.resultInstanceID = [1];
-            const globalCountResponse = await this.getDataobjectData(countSharedId).toPromise();
-            exploreResult.globalCount = globalCountResponse.data[0][0];
+            const globalCountResponse = Object.values(expQueryResp.results).reduce(
+              (result, orgResult: any) => {
+                return result + orgResult.count.data[0][0];
+                },
+              0) as number;
+            exploreResult.globalCount = globalCountResponse;
             exploreResult.nodes = [node];
-            if (haveRightsForPatientList) {
-              const patientListResult = await this.getDataobjectData(patientSharedId).toPromise();
-              exploreResult.patientLists = patientListResult.data;
-            }
+            // if (haveRightsForPatientList) {
+            //   const patientListResult =  //  await this.getDataobjectData(patientSharedId).toPromise();
+            //   exploreResult.patientLists = patientListResult.data;
+            // }
             return exploreResult;
           } else {
             MessageHelper.alert('error', 'Error while querying datasource.', expQueryResp.error);
