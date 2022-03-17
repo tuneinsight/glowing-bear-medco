@@ -100,7 +100,8 @@ export class ExploreSearchService {
       {
         operation: "searchConcept",
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
-        outputDataObjectsNames: ["patientList", "count"],
+        broadcast: true,
+        outputDataObjectsNames: ["patient_list", "count"],
         parameters: {
           operation: operation,
           path: root
@@ -141,7 +142,8 @@ export class ExploreSearchService {
       {
         operation: 'searchModifier',
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
-        outputDataObjectsNames: ["patientList", "count"],
+        broadcast: true,
+        outputDataObjectsNames: ["patient_list", "count"],
         parameters: {
           operation: operation,
           path: path,
