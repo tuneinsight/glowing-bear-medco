@@ -90,6 +90,7 @@ export class GbTopComponent {
 
       for (let i = 0; i < arrList.length; i++) {
         groupResultsList = [];
+        timepointNb = 1;
         for (let n = 3; n < arrList[i].length; n++) {
           if (n % 2 === 1) {
             timepoint.eventOfInterest = arrList[i][n];

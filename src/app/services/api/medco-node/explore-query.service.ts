@@ -80,9 +80,6 @@ export class ExploreQueryService {
   // }
 
   public exploreQuerySingleNode(queryId: string, panels: ApiI2b2Panel[], queryTiming: ApiI2b2Timing, node: ApiNodeMetadata, sync: boolean = true): Observable<ExploreQueryResult> {
-    const countSharedId = uuidv4();
-    const patientSharedId = uuidv4();
-
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
     return this.apiEndpointService.postCall(
