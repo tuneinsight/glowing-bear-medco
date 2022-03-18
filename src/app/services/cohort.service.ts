@@ -224,6 +224,7 @@ export class CohortService {
     })
 
     this.exploreCohortsService.postCohortAllNodes(cohortName, apiCohorts, this.exploreQueryService.lastQueryId).subscribe(messages => {
+      cohort.exploreQueryId = this.exploreQueryService.lastQueryId;
       messages.forEach(message => console.log('on post cohort, message: ', message)),
         this.updateCohorts([cohort])
       this._isRefreshing = false

@@ -7,10 +7,6 @@
  */
 export class ApiSurvivalAnalysisResponse {
   results: {
-    [k in string]: {
-      survivalQueryResult: {
-        data: number[][]
-      }
-    }
+    survivalQueryResult: number[][]
   }
 }

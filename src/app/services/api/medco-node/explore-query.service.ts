@@ -117,10 +117,14 @@ export class ExploreQueryService {
               0) as number;
             exploreResult.globalCount = globalCountResponse;
             exploreResult.nodes = [node];
-            // if (haveRightsForPatientList) {
-            //   const patientListResult =  //  await this.getDataobjectData(patientSharedId).toPromise();
-            //   exploreResult.patientLists = patientListResult.data;
-            // }
+            if (haveRightsForPatientList) {
+              const patientListResult = Object.values(expQueryResp.results).reduce(
+                (result, orgResult: any) => {
+                  return [[ ...result[0], ...orgResult.patientList.data[0]]];
+                  },
+                [[]]) as number[][];
+              exploreResult.patientLists = patientListResult;
+            }
             return exploreResult;
           } else {
             MessageHelper.alert('error', 'Error while querying datasource.', expQueryResp.error);

@@ -23,6 +23,13 @@ import {UserInputError} from '../../../../utilities/user-input-error';
 import {ErrorHelper} from '../../../../utilities/error-helper';
 import { ApiSurvivalAnalysisResponse } from 'src/app/models/api-response-models/survival-analysis/survival-analysis-response';
 
+const splitArrayIntoChunksOfLen = (arr: any[], len: number) => {
+  var chunks = [], i = 0, n = arr.length;
+  while (i < n) {
+    chunks.push(arr.slice(i, i += len));
+  }
+  return chunks;
+}
 
 @Component({
   selector: 'gb-top',
@@ -39,34 +46,73 @@ export class GbTopComponent {
   OperationStatus = OperationStatus
   _operationStatus: OperationStatus
 
-  private static formatResults(res: ApiSurvivalAnalysisResponse[]): SurvivalAnalysisClear {
-    const results = Object.values(res[0].results)[0].survivalQueryResult.data[0];
+  private formatResults(res: ApiSurvivalAnalysisResponse[]): SurvivalAnalysisClear {
+    const results = res[0].results.survivalQueryResult[0];
 
-    const initialCount = results[0];
+    const types = this.survivalAnalysisService.subGroups;
 
-    const groupResultsList = [];
-
+    let groupResultsList = [];
+    let timepointNb = 1;
     let timepoint = {
       censoringEvent: -1,
       eventOfInterest: -1
     }
 
-    for (let i = 3; i < results.length; i++) {
-      if (i % 2 === 1) {
-        timepoint.eventOfInterest = results[i];
-      } else {
-        timepoint.censoringEvent = results[i];
-        groupResultsList.push({ events: { ...timepoint }, timepoint: groupResultsList.length + 1 });
+    if (types.length === 0) {
+
+      const initialCount = results[0];
+
+      for (let i = 3; i < results.length; i++) {
+        if (i % 2 === 1) {
+          timepoint.eventOfInterest = results[i];
+        } else {
+          timepoint.censoringEvent = results[i];
+          if (timepoint.eventOfInterest > 0 || timepoint.censoringEvent > 0) {
+            groupResultsList.push({ events: { ...timepoint }, timepoint: timepointNb });
+          }
+          timepointNb++;
+        }
+      }
+
+      return {
+        results: [{
+          groupId: "Full cohort",
+          initialCount,
+          groupResults: groupResultsList
+        }]
+      };
+
+    } else {
+
+      const resultList = [];
+
+      const arrList = splitArrayIntoChunksOfLen(results, results.length / types.length);
+
+      for (let i = 0; i < arrList.length; i++) {
+        groupResultsList = [];
+        for (let n = 3; n < arrList[i].length; n++) {
+          if (n % 2 === 1) {
+            timepoint.eventOfInterest = arrList[i][n];
+          } else {
+            timepoint.censoringEvent = arrList[i][n];
+            if (timepoint.eventOfInterest > 0 || timepoint.censoringEvent > 0) {
+              groupResultsList.push({ events: { ...timepoint }, timepoint: timepointNb });
+            }
+            timepointNb++;
+          }
+        }
+
+        resultList.push({
+          groupId: types[i].name,
+          initialCount: arrList[i][0],
+          groupResults: [ ...groupResultsList ]
+        });
+      }
+      
+      return {
+        results: resultList
       }
     }
-
-    return {
-      results: [{
-        groupId: "Full cohort",
-        initialCount,
-        groupResults: groupResultsList
-      }]
-    };
   }
 
   constructor(private analysisService: AnalysisService,
@@ -128,7 +174,7 @@ export class GbTopComponent {
 
       this.operationStatus = OperationStatus.done;
       
-      const formattedResults = GbTopComponent.formatResults(clearResult);
+      const formattedResults = this.formatResults(clearResult);
 
       console.log('[ANALYSIS] Decrypted & formatted survival analysis result', formattedResults);
 

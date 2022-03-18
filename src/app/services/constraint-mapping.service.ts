@@ -57,9 +57,8 @@ export class ConstraintMappingService {
   private generateI2b2Panel(constraint: Constraint): ApiI2b2Panel {
     let panel = new ApiI2b2Panel();
     
-    // TODO: geco-i2b2-initial-implementation-test    
-    // panel.panelTiming = constraint.panelTimingSameInstance ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any
-    // panel.not = constraint.excluded;
+    panel.panelTiming = constraint.panelTimingSameInstance ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any
+    panel.not = constraint.excluded;
 
     switch (constraint.className) {
       case 'ConceptConstraint':
