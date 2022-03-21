@@ -3,7 +3,7 @@ import 'jspdf-autotable'
 import canvg from 'canvg'
 import {ErrorHelper} from '../error-helper';
 
-const gbClinicalGreen = [51, 156, 144]
+const ti4HealthBlack = [34, 40, 49]
 const exceptionColor = [245, 223, 181]
 
 export class PDF {
@@ -68,7 +68,7 @@ export class PDF {
         head: headers,
         body: data,
         headStyles: {
-          fillColor: gbClinicalGreen,
+          fillColor: ti4HealthBlack,
         },
         bodyStyles: {
           fillColor: bodyColor,
@@ -87,7 +87,7 @@ export class PDF {
         html: htmlRef,
         startY: this._lastElementY,
         headStyles: {
-          fillColor: gbClinicalGreen,
+          fillColor: ti4HealthBlack,
         },
         bodyStyles: {
           fillColor: bodyColor,
