@@ -47,7 +47,7 @@ export class ExploreSearchService {
         treeNode.appliedPath = treeNodeObj['appliedPath'];
         treeNode.name = treeNodeObj['name'];
         if (treeNodeObj['parent']) {
-          treeNode.parent = this.mapSearchResults({ results: [treeNodeObj['parent']] })[0];
+          treeNode.parent = this.mapSearchResults({ results: { searchResult: [treeNodeObj['parent']] } })[0];
           treeNode.parent.metadata = undefined;
         }
         treeNode.displayName = treeNodeObj['displayName'];
@@ -66,17 +66,23 @@ export class ExploreSearchService {
         treeNode.children = [];
         treeNode.childrenAttached = false;
 
-        // TODO: geco-i2b2-initial-implementation-test
-        // treeNode.valueType = ValueType.TEXT;
-
         return treeNode;
       });
     }
 
     private exploreSearch(searchString: string, limit: number): Observable<TreeNode[]> {
+      const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
+
       return this.apiEndpointService.postCall(
-        'node/explore/search',
-        { searchString, limit }
+        `projects/${this.config.projectId}/datasource/query`,
+        {
+          operation: "searchOntology",
+          aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
+          outputDataObjectsNames: ["searchConcept"],
+          parameters: {
+            searchString
+          }
+        }
       ).pipe(
         map(this.mapSearchResults.bind(this))
       );

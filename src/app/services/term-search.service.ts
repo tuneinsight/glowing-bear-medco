@@ -83,7 +83,7 @@ export class TermSearchService {
         this.isLoading = false;
       }
     } else { // Found in this.results, replace
-      resultIndex = this.results.findIndex(({ name: resultName }) => resultName === node.name);
+      resultIndex = this.results.findIndex(({ conceptCode: resultConceptCode }) => resultConceptCode === node.conceptCode);
       this.results[resultIndex] = formattedResult;
     }
 
