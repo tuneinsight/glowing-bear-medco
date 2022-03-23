@@ -152,7 +152,7 @@ input:not(:checked) + .slider {
 
 
 input:not(:checked):hover + .slider{
-  background-color: #339C90;
+  background-color: #222831;
 }
 
 input:focus:checked + .slider {
