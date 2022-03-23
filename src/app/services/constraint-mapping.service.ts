@@ -128,11 +128,8 @@ export class ConstraintMappingService {
       item.encrypted = false;
       item.queryTerm = constraint.concept.path;
       if (constraint.concept.modifier) {
-        item.modifier = new ApiI2B2Modifier()
+        item.modifier = new ApiI2B2Modifier();
         item.queryTerm = constraint.concept.modifier.appliedConceptPath;
-
-        // TODO: geco-i2b2-initial-implementation-test
-        // @ts-ignore
         item.modifier.key = constraint.concept.modifier.path;
         item.modifier.appliedPath = constraint.concept.modifier.appliedPath;
       }

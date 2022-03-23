@@ -113,11 +113,12 @@ export class TermSearchService {
         let validAppliedConcept: TreeNode | null = null;
 
         while (actualNode.parent) {
-          if (actualNode.nodeType === TreeNodeType.CONCEPT_FOLDER) {
-            validAppliedConcept = actualNode;
-          }
           actualNode = actualNode.parent;
           displayNameList.push(actualNode.displayName);
+          if (!validAppliedConcept && 
+            (actualNode.nodeType === TreeNodeType.CONCEPT_FOLDER || actualNode.nodeType === TreeNodeType.MODIFIER)) {
+            validAppliedConcept = actualNode;
+          }
         }
 
        if (!node.isModifier()) {
