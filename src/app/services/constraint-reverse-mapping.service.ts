@@ -109,7 +109,7 @@ export class ConstraintReverseMappingService {
       // this should have been checked out before
       return null
     }
-    let conceptURI = item.modifier ? modifiedConceptPath(item.queryTerm, item.modifier.modifierKey) : item.queryTerm
+    let conceptURI = item.modifier ? modifiedConceptPath(item.queryTerm, item.modifier.key) : item.queryTerm
     // check if the concept is already loaded
     let existingConstraint = this.constraintService.allConstraints.find(
       value => (value instanceof ConceptConstraint) && ((<ConceptConstraint>value).concept.path === conceptURI))
@@ -120,7 +120,7 @@ export class ConstraintReverseMappingService {
     }
     // else, get details
     let obs = (item.modifier) ?
-      this.exploreSearchService.exploreSearchModifierInfo(item.modifier.modifierKey, item.modifier.appliedPath, item.queryTerm) :
+      this.exploreSearchService.exploreSearchModifierInfo(item.modifier.key, item.modifier.appliedPath, item.queryTerm) :
       this.exploreSearchService.exploreSearchConceptInfo(item.queryTerm)
 
     let treeNodeObs = obs.pipe(map(treenodes => {

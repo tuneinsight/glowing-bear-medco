@@ -117,11 +117,11 @@ export class TermSearchService {
           displayNameList.push(actualNode.displayName);
           if (!validAppliedConcept && 
             (actualNode.nodeType === TreeNodeType.CONCEPT_FOLDER || actualNode.nodeType === TreeNodeType.MODIFIER)) {
-            validAppliedConcept = actualNode;
+              validAppliedConcept = actualNode;
           }
         }
 
-       if (!node.isModifier()) {
+        if (!node.isModifier()) {
           this.addInResults(node, displayNameList, nodes.length);
         } else {
           this.addInResults(node, displayNameList, nodes.length, validAppliedConcept);
