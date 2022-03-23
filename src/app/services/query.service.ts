@@ -192,7 +192,7 @@ export class QueryService {
       }),
       switchMap(() => this.exploreQueryService.exploreLocalQuery(this.query))
     ).subscribe(
-      async (parsedResults) => {
+      (parsedResults) => {
         if (parsedResults[0].resultInstanceID) {
           this._lastSuccessfulSet.next(parsedResults[0].resultInstanceID);
         }
