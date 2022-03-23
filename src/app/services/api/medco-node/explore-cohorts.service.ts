@@ -55,9 +55,6 @@ export class ExploreCohortsService {
   }
 
   postCohortSingleNode(node: ApiNodeMetadata, cohortName: string, cohort: ApiCohort, exploreQueryID: string): Observable<string> {
-    const countSharedId = uuidv4();
-    const patientSharedId = uuidv4();
-
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
     return this.apiEndpointService.postCall(
@@ -65,7 +62,7 @@ export class ExploreCohortsService {
       {
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         operation: "addCohort",
-        broadcast: true,
+        broadcast: false,
         parameters: {
           name: cohortName,
           exploreQueryID: exploreQueryID
@@ -74,11 +71,19 @@ export class ExploreCohortsService {
     );
   }
 
-  removeCohortSingleNode(node: ApiNodeMetadata, cohortName: string) {
+  removeCohortSingleNode(node: ApiNodeMetadata, exploreQueryID: string) {
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
-    return this.apiEndpointService.deleteCall(
-      `node/explore/cohorts/${cohortName}`,
-      node.url
+    return this.apiEndpointService.postCall(
+      `projects/${this.config.projectId}/datasource/query`,
+      {
+        aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
+        operation: "deleteCohort",
+        broadcast: false,
+        parameters: {
+          exploreQueryID
+        }
+      }
     );
   }
 
@@ -103,8 +108,8 @@ export class ExploreCohortsService {
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }
 
-  removeCohortAllNodes(cohortName: string) {
-    return forkJoin(this.medcoNetworkService.nodes.map(node => this.removeCohortSingleNode(node, cohortName)))
+  removeCohortAllNodes(exploreQueryId: string) {
+    return forkJoin(this.medcoNetworkService.nodes.map(node => this.removeCohortSingleNode(node, exploreQueryId)))
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }
 
