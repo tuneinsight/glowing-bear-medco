@@ -261,7 +261,7 @@ export class CohortService {
   }
 
   removeCohorts(cohort: Cohort) {
-    this.exploreCohortsService.removeCohortAllNodes(cohort.exploreQueryId).subscribe(
+    this.exploreCohortsService.removeCohortAllNodes(cohort.name, cohort.exploreQueryId).subscribe(
       message => {
         console.log('on remove cohort, message: ', message)
       },

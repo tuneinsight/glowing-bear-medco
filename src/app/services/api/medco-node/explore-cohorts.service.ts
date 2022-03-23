@@ -71,7 +71,7 @@ export class ExploreCohortsService {
     );
   }
 
-  removeCohortSingleNode(node: ApiNodeMetadata, exploreQueryID: string) {
+  removeCohortSingleNode(node: ApiNodeMetadata, name: string, exploreQueryID: string) {
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
     return this.apiEndpointService.postCall(
@@ -81,6 +81,7 @@ export class ExploreCohortsService {
         operation: "deleteCohort",
         broadcast: false,
         parameters: {
+          name,
           exploreQueryID
         }
       }
@@ -108,8 +109,8 @@ export class ExploreCohortsService {
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }
 
-  removeCohortAllNodes(exploreQueryId: string) {
-    return forkJoin(this.medcoNetworkService.nodes.map(node => this.removeCohortSingleNode(node, exploreQueryId)))
+  removeCohortAllNodes(name: string, exploreQueryId: string) {
+    return forkJoin(this.medcoNetworkService.nodes.map(node => this.removeCohortSingleNode(node, name, exploreQueryId)))
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }
 
