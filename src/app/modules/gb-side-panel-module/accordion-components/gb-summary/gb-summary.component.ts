@@ -31,10 +31,7 @@ export class GbSummaryComponent {
   }
 
   get hasPerSiteCounts(): boolean {
-    
-    // TODO: geco-i2b2-initial-implementation-test
-    return false;
-    return this.queryService.queryType.hasPerSiteCounts;
+    return this.queryService.queryType?.hasPerSiteCounts || false;
   }
 
   get queryResults(): Observable<ExploreQueryResult> {

@@ -107,20 +107,26 @@ export class ExploreQueryService {
             const exploreResult = new ExploreQueryResult();
             exploreResult.queryId = queryId;
             exploreResult.resultInstanceID = [1];
-            const globalCountResponse = Object.values(expQueryResp.results).reduce(
+            const globalCountResponse = expQueryResp.results.patientList?.[0]?.length ||
+             Object.values(expQueryResp.results).reduce(
               (result, orgResult: any) => {
                 return result + orgResult.count.data[0][0];
                 },
               0) as number;
             exploreResult.globalCount = globalCountResponse;
-            exploreResult.nodes = [node];
-            if (haveRightsForPatientList) {
-              const patientListResult = Object.values(expQueryResp.results).reduce(
-                (result, orgResult: any) => {
-                  return [[ ...result[0], ...orgResult.patientList.data[0]]];
-                  },
-                [[]]) as number[][];
+            const patientListResult = expQueryResp.results.patientList || Object.values(expQueryResp.results).reduce(
+              (result, orgResult: any) => {
+                return [[ ...result[0], ...orgResult.patientList.data[0]]];
+              },
+              [[]]) as number[][];
               exploreResult.patientLists = patientListResult;
+              exploreResult.nodes = this.medcoNetworkService.nodes;
+              if (haveRightsForPatientList) {
+                exploreResult.perSiteCounts = Object.values(expQueryResp.results).reduce(
+                  (result: number[], orgResult: any) => {
+                    return [ ...result, orgResult.patientList.data[0].length];
+                  },
+                  []) as number[];
             }
             return exploreResult;
           } else {

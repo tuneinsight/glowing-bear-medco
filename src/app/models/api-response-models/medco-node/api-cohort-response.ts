@@ -6,7 +6,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 import {ApiQueryDefinition} from '../../api-request-models/medco-node/api-query-definition';
-import { ExploreQueryResult } from '../../query-models/explore-query-result';
 
 
 export class ApiCohortResponse {
