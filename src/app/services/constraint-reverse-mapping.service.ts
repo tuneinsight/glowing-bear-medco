@@ -124,13 +124,15 @@ export class ConstraintReverseMappingService {
       this.exploreSearchService.exploreSearchConceptInfo(item.queryTerm)
 
     let treeNodeObs = obs.pipe(map(treenodes => {
-      switch (treenodes.length) {
-        case 0:
-          return null
-        case 1:
-          return treenodes[0]
-        default:
-          return treenodes[0]
+      if (Array.isArray(treenodes)) {
+        switch (treenodes.length) {
+          case 0:
+            return null
+          case 1:
+            return treenodes[0]
+          default:
+            return treenodes[0]
+        }
       }
     }))
     if (item.modifier) {

@@ -19,12 +19,12 @@ import { AppConfig } from "../config/app.config";
 import { GenomicAnnotation } from "../models/constraint-models/genomic-annotation";
 import { ExploreSearchService } from "./api/medco-node/explore-search.service";
 import { ApiEndpointService } from "./api-endpoint.service";
-import { Observable } from "rxjs";
 import {
   ApiValueMetadata,
   DataType,
 } from "../models/api-response-models/medco-node/api-value-metadata";
 import { Modifier } from "../models/constraint-models/modifier";
+import { ConfirmationService } from "primeng";
 
 @Injectable()
 export class TreeNodeService {
@@ -40,6 +40,7 @@ export class TreeNodeService {
   private exploreSearchService: ExploreSearchService;
   private constraintService: ConstraintService;
   private apiEndpointService: ApiEndpointService;
+  private confirmationService: ConfirmationService;
 
   constructor(private injector: Injector) {}
 
@@ -52,6 +53,7 @@ export class TreeNodeService {
       this.exploreSearchService = this.injector.get(ExploreSearchService);
       this.constraintService = this.injector.get(ConstraintService);
       this.apiEndpointService = this.injector.get(ApiEndpointService);
+      this.confirmationService = this.injector.get(ConfirmationService);
 
       this.constraintService.conceptLabels = [];
 
@@ -100,29 +102,45 @@ export class TreeNodeService {
    */
   public loadChildrenNodes(
     parentNode: TreeNode,
-    constraintService: ConstraintService
+    constraintService: ConstraintService,
+    unlimitedChildren?: boolean
   ) {
     if (parentNode.leaf || parentNode.childrenAttached) {
       return;
     }
 
     this._isLoading = true;
-    let resultObservable: Observable<TreeNode[]> = parentNode.isModifier()
+    const resultObservable = parentNode.isModifier()
       ? this.exploreSearchService.exploreSearchModifierChildren(
           parentNode.path,
           parentNode.appliedPath,
-          parentNode.appliedConcept.path
+          parentNode.appliedConcept.path,
+          unlimitedChildren
         )
-      : this.exploreSearchService.exploreSearchConceptChildren(parentNode.path);
+      : this.exploreSearchService.exploreSearchConceptChildren(parentNode.path, unlimitedChildren);
 
     resultObservable.subscribe(
-      (treeNodes: TreeNode[]) => {
-        parentNode.attachChildTree(treeNodes);
-        parentNode.attachModifierData(treeNodes);
-        this.processTreeNodes(parentNode.children, constraintService);
-        this._isLoading = false;
-        if (treeNodes.length === 0) {
-          parentNode.leaf = true;
+      (treeNodes: TreeNode[] | { retry: boolean }) => {
+        if (Array.isArray(treeNodes)) {
+          parentNode.attachChildTree(treeNodes);
+          parentNode.attachModifierData(treeNodes);
+          this.processTreeNodes(parentNode.children, constraintService);
+          this._isLoading = false;
+          if (treeNodes.length === 0) {
+            parentNode.leaf = true;
+          }
+        } else {
+          this.confirmationService.confirm({
+            message: "This folder have a lot of children. Do you want to open it anyway?",
+            header: 'Confirmation',
+            icon: null,
+            accept: () => {
+              this.loadChildrenNodes(parentNode, constraintService, true);
+            },
+            reject: () => {
+      
+            }
+          });
         }
       },
       (err) => {

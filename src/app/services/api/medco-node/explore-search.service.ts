@@ -98,7 +98,7 @@ export class ExploreSearchService {
       return this.exploreSearch(searchString, limit);
     }
 
-  private exploreSearchConcept(operation: string, root: string): Observable<TreeNode[]> {
+  private exploreSearchConcept(operation: string, root: string, unlimitedChildren?: boolean): Observable<TreeNode[]> {
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
     return this.apiEndpointService.postCall(
@@ -109,11 +109,18 @@ export class ExploreSearchService {
         outputDataObjectsNames: ["patientList", "count"],
         parameters: {
           operation: operation,
-          path: root
+          path: root,
+          limit: unlimitedChildren ? "0" : undefined
         }
       }
     ).pipe(
-      map(this.mapSearchResults.bind(this))
+      map((searchConceptResponse) => {
+        if (searchConceptResponse.status === "error" && searchConceptResponse.error.indexOf("MAX_EXCEEDED") !== -1) {
+          return { retry: true };
+        } else {
+          return this.mapSearchResults(searchConceptResponse);
+        }
+      })
     );
   }
   /**
@@ -123,8 +130,8 @@ export class ExploreSearchService {
    *
    * @returns {Observable<Object>}
    */
-  exploreSearchConceptChildren(root: string): Observable<TreeNode[]> {
-    return this.exploreSearchConcept('children', root)
+  exploreSearchConceptChildren(root: string, unlimitedChildren?: boolean): Observable<TreeNode[]> {
+    return this.exploreSearchConcept('children', root, unlimitedChildren)
   }
 
   /**
@@ -134,12 +141,12 @@ export class ExploreSearchService {
    *
    * @returns {Observable<Object>}
    */
-  exploreSearchConceptInfo(root: string): Observable<TreeNode[]> {
-    return this.exploreSearchConcept('info', root)
+  exploreSearchConceptInfo(root: string, unlimitedChildren?: boolean): Observable<TreeNode[]> {
+    return this.exploreSearchConcept('info', root, unlimitedChildren)
   }
 
 
-  private exploreSearchModifier(operation: 'concept' | 'children' | 'info', path: string, appliedPath: string, appliedConcept: string): Observable<TreeNode[]> {
+  private exploreSearchModifier(operation: 'concept' | 'children' | 'info', path: string, appliedPath: string, appliedConcept: string, unlimitedChildren?: boolean): Observable<TreeNode[] | { retry: boolean }> {
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
     return this.apiEndpointService.postCall(
@@ -152,11 +159,18 @@ export class ExploreSearchService {
           operation: operation,
           path: path,
           appliedPath: appliedPath,
-          appliedConcept: appliedConcept
+          appliedConcept: appliedConcept,
+          limit: unlimitedChildren ? "0" : undefined
         }
       }
     ).pipe(
-      map(this.mapSearchResults.bind(this))
+      map((searchModifierResponse) => {
+        if (searchModifierResponse.status === "error" && searchModifierResponse.error.indexOf("MAX_EXCEEDED") !== -1) {
+          return { retry: true };
+        } else {
+          return this.mapSearchResults(searchModifierResponse);
+        }
+      })
     );
   }
 
@@ -226,8 +240,8 @@ export class ExploreSearchService {
    *
    * @returns {Observable<Object>}
    */
-  exploreSearchModifierChildren(root: string, appliedPath: string, appliedConcept: string): Observable<TreeNode[]> {
-    return this.exploreSearchModifier('children', root, appliedPath, appliedConcept)
+  exploreSearchModifierChildren(root: string, appliedPath: string, appliedConcept: string, unlimitedChildren?: boolean): Observable<TreeNode[] | { retry: boolean }> {
+    return this.exploreSearchModifier('children', root, appliedPath, appliedConcept, unlimitedChildren)
   }
 
   /**
@@ -237,7 +251,7 @@ export class ExploreSearchService {
    *
    * @returns {Observable<Object>}
    */
-  exploreSearchModifierInfo(root: string, appliedPath: string, appliedConcept: string): Observable<TreeNode[]> {
-    return this.exploreSearchModifier('info', root, appliedPath, appliedConcept)
+  exploreSearchModifierInfo(root: string, appliedPath: string, appliedConcept: string, unlimitedChildren?: boolean): Observable<TreeNode[] | { retry: boolean }> {
+    return this.exploreSearchModifier('info', root, appliedPath, appliedConcept, unlimitedChildren)
   }
 }
