@@ -128,6 +128,9 @@ export class ExploreQueryService {
                   },
                   []) as number[];
             }
+            if (exploreResult.globalCount === 0) {
+              MessageHelper.alert('info', '0 subjects found for this query.');
+            }
             return exploreResult;
           } else {
             MessageHelper.alert('error', 'Error while querying datasource.', expQueryResp.error);
