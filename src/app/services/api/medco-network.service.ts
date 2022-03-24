@@ -39,7 +39,7 @@ export class MedcoNetworkService {
 
       this.getNetwork().subscribe((metadata: ApiNetworkMetadata) => {
         this._networkPubKey = metadata['public-key'];
-        this._nodes = metadata.nodes.sort(({ current }) => current);
+        this._nodes = metadata.nodes.sort(({ current }) => +current);
         console.log(`Loaded nodes: ${metadata.nodes.map((a) => a.name).join(', ')}`);
         resolve();
 
