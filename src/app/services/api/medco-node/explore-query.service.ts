@@ -88,7 +88,7 @@ export class ExploreQueryService {
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         operation: "exploreQuery",
         broadcast: true,
-        outputDataObjectsNames: ["patientList", "count"],
+        outputDataObjectsNames: haveRightsForPatientList ? ["patientList", "count"] : ["count", "patientList"],
         parameters: {
           id: queryId,
           definition: {
@@ -107,26 +107,29 @@ export class ExploreQueryService {
             const exploreResult = new ExploreQueryResult();
             exploreResult.queryId = queryId;
             exploreResult.resultInstanceID = [1];
-            const globalCountResponse = expQueryResp.results.patientList?.[0]?.length ||
+            const globalCountResponse = expQueryResp.results.patientList?.[0]?.length || expQueryResp.results.count?.[0]?.[0] ||
              Object.values(expQueryResp.results).reduce(
               (result, orgResult: any) => {
                 return result + orgResult.count.data[0][0];
                 },
               0) as number;
             exploreResult.globalCount = globalCountResponse;
-            const patientListResult = expQueryResp.results.patientList || Object.values(expQueryResp.results).reduce(
-              (result, orgResult: any) => {
-                return [[ ...result[0], ...orgResult.patientList.data[0]]];
-              },
-              [[]]) as number[][];
-              exploreResult.patientLists = patientListResult;
-              exploreResult.nodes = this.medcoNetworkService.nodes;
-              if (haveRightsForPatientList) {
-                exploreResult.perSiteCounts = Object.values(expQueryResp.results).reduce(
-                  (result: number[], orgResult: any) => {
-                    return [ ...result, orgResult.patientList.data[0].length];
-                  },
-                  []) as number[];
+
+            if (Object.values(expQueryResp.results).length > 1) {
+              const patientListResult = expQueryResp.results.patientList || Object.values(expQueryResp.results).reduce(
+                (result, orgResult: any) => {
+                  return [[ ...result[0], ...orgResult.patientList.data[0]]];
+                },
+                [[]]) as number[][];
+                exploreResult.patientLists = patientListResult;
+                exploreResult.nodes = this.medcoNetworkService.nodes;
+                if (haveRightsForPatientList) {
+                  exploreResult.perSiteCounts = Object.values(expQueryResp.results).reduce(
+                    (result: number[], orgResult: any) => {
+                      return [ ...result, orgResult.patientList.data[0].length];
+                    },
+                    []) as number[];
+              }
             }
             if (exploreResult.globalCount === 0) {
               MessageHelper.alert('info', '0 subjects found for this query.');
