@@ -25,6 +25,7 @@ import {
 } from "../models/api-response-models/medco-node/api-value-metadata";
 import { Modifier } from "../models/constraint-models/modifier";
 import { ConfirmationService } from "primeng";
+import { KeycloakService } from "keycloak-angular";
 
 @Injectable()
 export class TreeNodeService {
@@ -41,6 +42,7 @@ export class TreeNodeService {
   private constraintService: ConstraintService;
   private apiEndpointService: ApiEndpointService;
   private confirmationService: ConfirmationService;
+  private keycloakService: KeycloakService;
 
   constructor(private injector: Injector) {}
 
@@ -50,6 +52,7 @@ export class TreeNodeService {
   load(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.config = this.injector.get(AppConfig);
+      this.keycloakService = this.injector.get(KeycloakService);
       this.exploreSearchService = this.injector.get(ExploreSearchService);
       this.constraintService = this.injector.get(ConstraintService);
       this.apiEndpointService = this.injector.get(ApiEndpointService);
@@ -86,9 +89,8 @@ export class TreeNodeService {
           );
         } else {
           this._isNoi2b2Datasource = true;
-          throw ErrorHelper.handleNewError(
-            'Cannot find i2b2 project, please create one with the name "i2b2" first'
-          );
+          alert('Cannot find i2b2 project, please create one with the name "i2b2", with a valid i2b2 datasource and login again.');
+          this.keycloakService.logout();
         }
       });
     });
