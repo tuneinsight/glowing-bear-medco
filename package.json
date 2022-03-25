@@ -4,6 +4,7 @@
   "license": "MPL-2.0",
   "scripts": {
     "ng": "./node_modules/@angular/cli/bin/ng",
+    "update": "./node_modules/@angular/cli/bin/ng update",
     "start": "./node_modules/@angular/cli/bin/ng serve --aot",
     "build": "./node_modules/@angular/cli/bin/ng build",
     "package": "./node_modules/@angular/cli/bin/ng build --prod",
