@@ -138,7 +138,7 @@ export class TreeNodeService {
               this.loadChildrenNodes(parentNode, constraintService, true);
             },
             reject: () => {
-      
+              this._isLoading = false;
             }
           });
         }
