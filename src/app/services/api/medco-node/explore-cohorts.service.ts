@@ -62,7 +62,7 @@ export class ExploreCohortsService {
       {
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         operation: "addCohort",
-        broadcast: false,
+        broadcast: true,
         parameters: {
           name: cohortName,
           exploreQueryID: exploreQueryID
@@ -79,7 +79,7 @@ export class ExploreCohortsService {
       {
         aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
         operation: "deleteCohort",
-        broadcast: false,
+        broadcast: true,
         parameters: {
           name,
           exploreQueryID
