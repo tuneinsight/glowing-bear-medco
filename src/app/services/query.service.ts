@@ -22,7 +22,7 @@ import { ApiExploreQueryResult } from '../models/api-response-models/medco-node/
 import { CryptoService } from './crypto.service';
 import { GenomicAnnotationsService } from './api/genomic-annotations.service';
 import { ExploreQueryResult } from '../models/query-models/explore-query-result';
-import { Observable, ReplaySubject, throwError, Subject, of } from 'rxjs';
+import { Observable, ReplaySubject, throwError, Subject, of, NextObserver } from 'rxjs';
 import { ErrorHelper } from '../utilities/error-helper';
 import { MessageHelper } from '../utilities/message-helper';
 import { ApiNodeMetadata } from '../models/api-response-models/medco-network/api-node-metadata';
@@ -84,7 +84,7 @@ export class QueryService {
   /**
    * Parse and decrypt results from MedCo nodes.
    */
-  private parseExploreQueryResults(encResults: [ApiNodeMetadata, ApiExploreQueryResult][]): Observable<ExploreQueryResult> {
+  public parseExploreQueryResults(encResults: [ApiNodeMetadata, ApiExploreQueryResult][]): Observable<ExploreQueryResult> {
     if (encResults.length === 0) {
       return throwError(ErrorHelper.handleNewError('Empty results, no processing done'));
     }
@@ -210,6 +210,30 @@ export class QueryService {
         this.isDirty = true;
       }
     );
+  }
+
+  public getExploreResultObserver(): NextObserver<ExploreQueryResult> {
+    const qs = this
+    return new class implements NextObserver<ExploreQueryResult> {
+      next(parsedResults: ExploreQueryResult) {
+        if (parsedResults.resultInstanceID) {
+          qs._lastSuccessfulSet.next(parsedResults.resultInstanceID)
+        }
+        qs.queryResults.next(parsedResults);
+        qs.isUpdating = false;
+        qs.isDirty = qs.constraintService.hasConstraint().valueOf();
+      }
+
+      error(err) {
+        if (err instanceof UserInputError) {
+          console.warn(`[EXPLORE] Interrupted explore query ${qs.query.uniqueId} due to user input error.`, err);
+        } else {
+          ErrorHelper.handleError(`Error during explore query ${qs.query.uniqueId}.`, err);
+        }
+        qs.isUpdating = false;
+        qs.isDirty = true;
+      }
+    }
   }
 
   get query(): ExploreQuery {

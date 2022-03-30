@@ -1,9 +1,9 @@
 import { TreeNode as PrimeNgTreeNode } from 'primeng';
-import { DropMode } from '../drop-mode';
-import { ValueType } from '../constraint-models/value-type';
-import { TreeNodeType } from './tree-node-type';
-import { MedcoEncryptionDescriptor } from './medco-encryption-descriptor';
 import { ApiValueMetadata } from '../api-response-models/medco-node/api-value-metadata';
+import { ValueType } from '../constraint-models/value-type';
+import { DropMode } from '../drop-mode';
+import { MedcoEncryptionDescriptor } from './medco-encryption-descriptor';
+import { TreeNodeType } from './tree-node-type';
 
 export class TreeNode implements PrimeNgTreeNode {
 
@@ -50,7 +50,29 @@ export class TreeNode implements PrimeNgTreeNode {
   parent: TreeNode;
   partialSelected: boolean;
 
-  clone(): TreeNode {
+  static splitTreeNodePath(path: string, appliedPath: string): TreeNodePaths {
+    const splittedNodePath = path.split('/');
+    const realAppliedPath = `${splittedNodePath.length > 1 ? `/${splittedNodePath[1]}` : ''}${appliedPath}${appliedPath[appliedPath.length - 1] !== '/' ? '/' : ''}`;
+    const pathList = [
+      ...(appliedPath !== '@' ? TreeNode.getPathList(realAppliedPath) : []),
+      ...TreeNode.getPathList(path)
+    ];
+    return { pathElements: pathList, realAppliedPath };
+  }
+
+  private static getPathList(path: string) {
+    const splittedPath = path.split('/').filter(value => value !== '');
+
+    const pathList: string[] = [];
+
+    splittedPath.forEach((_, index) => {
+      pathList.push(splittedPath.slice(0, index + 1).reduce((result, value) => `${result}${value}/`, '/'));
+    });
+
+    return pathList;
+  }
+
+  clone(clonedParent?: TreeNode, cloneChildren: boolean = true, cloneAppliedConcept: boolean = false): TreeNode {
     let copy: TreeNode = new TreeNode();
 
     copy.path = this.path;
@@ -59,6 +81,16 @@ export class TreeNode implements PrimeNgTreeNode {
     copy.description = this.description;
 
     copy.appliedPath = this.appliedPath;
+
+    if (clonedParent !== undefined && clonedParent !== null) {
+      copy.parent = clonedParent
+    } else if (this.parent !== undefined && this.parent !== null) {
+      copy.parent = this.parent.clone(undefined, false)
+    }
+
+    if (cloneAppliedConcept && this.appliedConcept) {
+      copy.appliedConcept = this.appliedConcept.clone(undefined, false, false)
+    }
 
     copy.nodeType = this.nodeType;
     copy.valueType = this.valueType;
@@ -77,7 +109,8 @@ export class TreeNode implements PrimeNgTreeNode {
       copy.encryptionDescriptor.id = this.encryptionDescriptor.id
     }
 
-    copy.children = this.children.map((child) => child.clone());
+
+    copy.comment = this.comment;
     copy.icon = this.icon;
     copy.label = this.label;
     copy.expandedIcon = this.expandedIcon;
@@ -86,6 +119,15 @@ export class TreeNode implements PrimeNgTreeNode {
     copy.expanded = this.expanded;
     copy.styleClass = this.styleClass;
     copy.partialSelected = this.partialSelected;
+
+    if (cloneChildren && this.children) {
+      const copiedChildren = this.children.map(child => {
+        return child.clone(copy, true)
+      })
+      copy.children = copiedChildren
+      console.log('Entering the copy children if statement', copy.children)
+    }
+
     return copy
   }
 
@@ -157,4 +199,15 @@ export class TreeNode implements PrimeNgTreeNode {
       }
     }
   }
+
+  splitTreeNodePath(): TreeNodePaths {
+    return TreeNode.splitTreeNodePath(this.path, this.appliedPath)
+  }
+
+
+}
+
+interface TreeNodePaths {
+  pathElements: string[],
+  realAppliedPath: string
 }

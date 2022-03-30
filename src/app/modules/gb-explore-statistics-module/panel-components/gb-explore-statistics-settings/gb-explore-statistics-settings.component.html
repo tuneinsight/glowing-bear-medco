@@ -1,0 +1,34 @@
+<p-accordionTab header="Settings" id="gb-explore-statistics-settings" [selected]="true">
+  <div class="small-font">
+
+
+    <!-- TODO when a concept or modifier is not numerical send an error message to the user -->
+    <!-- TODO Generalize this component to avoid code duplication!!! For example the drop down can be made a component common between survival curves and this component-->
+
+    <!-- TODO modify the service that will handle the dropping of the concept.. -->
+    <div class="input-label-wrapper">
+      <div>
+        <label>
+          Medical Concept:
+        </label>
+      </div>
+      <div class="input-field-margin"
+        [ngStyle]="{'background-color' : eventHovering ? 'var(--gb-clinical-green-light-light)' : 'white'}"
+        (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onConceptDrop($event)">
+        <p-autoComplete #autoComplete [(ngModel)]="concept" [suggestions]="suggestedConcepts"
+          (completeMethod)="search($event)" field="path" (onDropDownClick)="onDropdown($event)"
+          placeholder="Drag and drop a medical concept" dropdown="true" [inputStyle]="{'width':'auto'}"
+          styleClass="gb-concept-constraint-input" size="60">
+
+          <ng-template let-concept pTemplate="item">
+            <span>{{concept.label}}</span>
+          </ng-template>
+        </p-autoComplete>
+      </div>
+    </div>
+
+
+
+
+  </div>
+</p-accordionTab>

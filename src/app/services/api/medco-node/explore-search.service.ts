@@ -215,9 +215,9 @@ export class ExploreSearchService {
       return null
     }
     if (metadata) {
-      if (metadata.ValueMetadata) {
-        if ((metadata.ValueMetadata.Oktousevalues) && metadata.ValueMetadata.Oktousevalues === 'Y') {
-          switch (metadata.ValueMetadata.DataType) {
+      if (metadata.dataType) {
+        if ((metadata.okToUseValues) && metadata.okToUseValues === 'Y') {
+          switch (metadata.dataType) {
             case DataType.FLOAT:
             case DataType.INTEGER:
             case DataType.POS_FLOAT:
@@ -228,9 +228,8 @@ export class ExploreSearchService {
             case DataType.STRING:
               return ValueType.TEXT
             default:
-              MessageHelper.alert('warn', `In ontology tree, data type ${metadata.ValueMetadata.DataType} unkown`)
+              MessageHelper.alert('warn', `In ontology tree, data type ${metadata.dataType} unkown`)
               return ValueType.SIMPLE
-              break;
           }
         }
       }
