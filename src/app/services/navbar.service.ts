@@ -28,6 +28,7 @@ export class NavbarService {
   private _activeResultItem: MenuItem;
 
   private _isExplore = true;
+  private _isExploreStatistics = false;
   private _isExploreResults = false;
   private _isAnalysis = false;
   private _isResults = false;
@@ -36,8 +37,9 @@ export class NavbarService {
   private _lastSuccessfulSurvival: number;
 
   private EXPLORE_INDEX = 0;
-  private ANALYSIS_INDEX = 1;
-  private RESULTS_INDEX = 2;
+  private EXPLORE_STATS_INDEX = 1;
+  private ANALYSIS_INDEX = 2;
+  private RESULTS_INDEX = 3;
 
   constructor(private authService: AuthenticationService, private keycloakService: KeycloakService, private router: Router) {
     const haveRightsForSurvivalQuery = !!this.keycloakService.getUserRoles().find((role) => role === "survival_query");
@@ -48,11 +50,14 @@ export class NavbarService {
       // 0: explore tab, default page
       { label: OperationType.EXPLORE, routerLink: '/explore' },
 
+      // 1: explore statistics tab
+      { label: OperationType.EXPLORE_STATISTICS, routerLink: "/explore-statistics" },
+
       ...(haveRightsForSurvivalQuery ? [
-        // 1: survival analysis tab
+        // 2: survival analysis tab
         { label: OperationType.ANALYSIS, routerLink: '/analysis', visible: this.authService.hasAnalysisAuth },
 
-        // 2: results tab
+        // 3: results tab
         { label: 'Results', routerLink: '/results', visible: this.authService.hasAnalysisAuth }
       ] : [])
     ]
@@ -63,6 +68,7 @@ export class NavbarService {
 
   updateNavbar(routerLink: string) {
     this.isExplore = (routerLink === '/explore' || routerLink === '');
+    this.isExploreStatistics = (routerLink === '/explore-statistics');
     this.isAnalysis = (routerLink === '/analysis');
     this.isResults = (routerLink === '/results');
     this.isSurvivalRes = false
@@ -76,6 +82,8 @@ export class NavbarService {
 
     if (this.isExplore) {
       this.activeItem = this.items[this.EXPLORE_INDEX];
+    } else if (this.isExploreStatistics) {
+      this.activeItem = this._items[this.EXPLORE_STATS_INDEX];
     } else if (this.isAnalysis) {
       this.activeItem = this.items[this.ANALYSIS_INDEX];
     } else if (this.isResults) {
@@ -113,6 +121,10 @@ export class NavbarService {
       this.activeResultItem = this.resultItems[index - 1]
       this.router.navigateByUrl(this.activeResultItem.routerLink.toString())
     }
+  }
+
+  navigateToExploreTab() {
+    this.router.navigateByUrl('/explore-statistics');
   }
 
   navigateToNewResults() {
@@ -157,6 +169,14 @@ export class NavbarService {
 
   set isExplore(value: boolean) {
     this._isExplore = value;
+  }
+
+  get isExploreStatistics(): boolean {
+    return this._isExploreStatistics;
+  }
+
+  set isExploreStatistics(value: boolean) {
+    this._isExploreStatistics = value;
   }
 
   get isExploreResults(): boolean {

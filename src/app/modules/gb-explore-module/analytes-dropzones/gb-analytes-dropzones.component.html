@@ -1,0 +1,25 @@
+<!--inputs : name of the model linked to the concept -->
+
+<div *ngFor="let wrapper of childrenWrappers" class="dropzone">
+    <div class="input-field-margin small-font" [ngStyle]="{'background-color': 'white'}">
+        <gb-path-displayer style="display: inline-block;" [pathElements]="wrapper.pathElements"></gb-path-displayer>
+        <button type="button" class="gb-delete-button btn btn-outline-danger btn-sm left-margin-btn"
+            (click)="wrapper.onRemove()" title="Remove the selected concept from the analytes">
+            <i aria-hidden="true" class="fa fa-times"></i>
+        </button>
+    </div>
+</div>
+
+<div class="input-field-margin small-font dropzone"
+    [ngStyle]="{'background-color' : eventHovering ? 'rgba(51, 156, 144, 0.2)' : 'white'}"
+    (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onConceptDrop($event)">
+    <p-autoComplete #autoComplete [(ngModel)]="concept" [suggestions]="suggestedConcepts"
+        (completeMethod)="search($event)" field="path" (onDropDownClick)="onDropdown($event)"
+        (onSelect)="onSelect($event)" placeholder="Drag and drop a numerical concept" dropdown="true"
+        [inputStyle]="{'width':'auto'}" styleClass="gb-concept-constraint-input" size="60">
+
+        <ng-template let-concept pTemplate="item">
+            <span>{{concept.concept.label}}</span>
+        </ng-template>
+    </p-autoComplete>
+</div>

@@ -42,7 +42,7 @@ type LoadingState = 'loading' | 'complete';
 })
 export class GbSelectionComponent {
 
-  _timings: SelectItem[] = [
+  public static readonly timings: SelectItem[] = [
     { label: 'Treat groups independently', value: false },
     { label: 'Selected groups occur in the same instance', value: true }]
 
@@ -70,7 +70,7 @@ export class GbSelectionComponent {
   }
 
   get timings(): SelectItem[] {
-    return this._timings
+    return GbSelectionComponent.timings
   }
 
   set queryTiming(val: boolean) {

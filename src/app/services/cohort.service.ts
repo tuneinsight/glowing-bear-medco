@@ -23,6 +23,10 @@ import { CombinationConstraint } from '../models/constraint-models/combination-c
 import { ApiCohort } from '../models/api-request-models/medco-node/api-cohort';
 import { ErrorHelper } from '../utilities/error-helper';
 import { HttpErrorResponse } from '@angular/common/http';
+import { QueryService } from './query.service';
+import { ApiI2b2Panel } from '../models/api-request-models/medco-node/api-i2b2-panel';
+import { ApiQueryDefinition } from '../models/api-request-models/medco-node/api-query-definition';
+import { ApiNodeMetadata } from '../models/api-response-models/medco-network/api-node-metadata';
 
 @Injectable()
 export class CohortService {
@@ -41,6 +45,8 @@ export class CohortService {
   public restoring: Subject<boolean>
   private _queryTiming: Subject<ApiI2b2Timing>
   private _panelTimings: Subject<ApiI2b2Timing[]>
+
+  private _lastPatientList: [ApiNodeMetadata[], number[][]]
 
   // constraint on cohort name
   _patternValidation: RegExp
@@ -114,6 +120,7 @@ export class CohortService {
 
   constructor(
     private exploreCohortsService: ExploreCohortsService,
+    private queryService: QueryService,
     private exploreQueryService: ExploreQueryService,
     private medcoNetworkService: MedcoNetworkService,
     private constraintService: ConstraintService,
@@ -127,6 +134,14 @@ export class CohortService {
     }).bind(this))
     this._patternValidation = new RegExp('^\\w+$')
     this._cohorts = new Array<Cohort>()
+    
+    this.queryService.queryResults.subscribe(
+      result => {
+        if ((result) && (result.patientLists)) {
+          this._lastPatientList = [result.nodes, result.patientLists];
+        }
+      }
+    )
   }
 
   get cohorts() {
@@ -308,5 +323,56 @@ export class CohortService {
         }
       })
     this.restoring.next(true)
+  }
+
+  saveCohortExplore() {
+    this.saveCohort(this.constraintService.rootConstraint, this.queryService.lastDefinition, this.queryService.lastTiming)
+  }
+
+
+  saveCohort(rootConstraint: CombinationConstraint, cohortDefinition: ApiI2b2Panel[], queryTiming: ApiI2b2Timing) {
+    if (this.cohortName === '') {
+      throw ErrorHelper.handleNewUserInputError('You must provide a name for the cohort you want to save.');
+    } else if (!this.patternValidation.test(this.cohortName).valueOf()) {
+      throw ErrorHelper.handleNewUserInputError(`Name ${this.cohortName} can only contain alphanumerical symbols (without ö é ç ...) and underscores "_".`);
+    }
+
+    let existingCohorts = this.cohorts
+    if (existingCohorts.findIndex((c => c.name === this.cohortName).bind(this)) !== -1) {
+      throw ErrorHelper.handleNewUserInputError(`Name ${this.cohortName} already used.`);
+    }
+
+    let creationDates = new Array<Date>()
+    let updateDates = new Array<Date>()
+    let queryDefinitions = new Array<ApiQueryDefinition>()
+    const nunc = Date.now()
+    for (let i = 0; i < this.medcoNetworkService.nodes.length; i++) {
+      creationDates.push(new Date(nunc))
+      updateDates.push(new Date(nunc))
+      let definition = new ApiQueryDefinition()
+      definition.panels = cohortDefinition
+      definition.queryTiming = queryTiming
+      queryDefinitions.push(definition)
+    }
+
+    let cohort = new Cohort(
+      this.cohortName,
+      rootConstraint,
+      creationDates,
+      updateDates,
+    )
+    if (queryDefinitions.some(apiDef => (apiDef.panels) || (apiDef.queryTiming))) {
+      cohort.queryDefinition = queryDefinitions
+    }
+    cohort.patient_set_id = this.lastSuccessfulSet
+    this.postCohort(cohort);
+    MessageHelper.alert('success', 'Cohort successfully saved.');
+
+    // handle patient list locally
+    // if (this._lastPatientList) {
+    //   this.savedCohortsPatientListService.insertPatientList(this.cohortName, this._lastPatientList[0], this._lastPatientList[1])
+    //   this.savedCohortsPatientListService.statusStorage.set(this.cohortName, OperationStatus.done)
+    // }
+    this.cohortName = ''
   }
 }

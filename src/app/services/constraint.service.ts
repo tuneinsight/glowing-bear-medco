@@ -125,13 +125,10 @@ export class ConstraintService {
   /**
    * Generate the constraint corresponding to the query.
    */
-  public generateConstraint(): Constraint {
-    let resultConstraint: Constraint;
+   public generateConstraint(): CombinationConstraint {
     if (!this.hasConstraint()) {
       throw ErrorHelper.handleNewError('Empty constraints');
-
     }
-
     return this.rootConstraint;
   }
 
