@@ -1,11 +1,20 @@
 import {ApiNodeMetadata} from '../api-response-models/medco-network/api-node-metadata';
 
 export class ExploreQueryResult {
+  private _queryId: string;
   private _nodes: ApiNodeMetadata[]
   private _globalCount: number;
   private _perSiteCounts?: number[];
   patientLists?: number[][];
   private _resultInstanceID?: number[];
+
+  set queryId(value: string) {
+    this._queryId = value
+  }
+
+  get queryId(): string {
+    return this._queryId
+  }
 
   get nodes(): ApiNodeMetadata[] {
     return this._nodes;

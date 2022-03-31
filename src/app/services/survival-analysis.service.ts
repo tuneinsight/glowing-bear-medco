@@ -5,6 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+import { v4 as uuidv4 } from 'uuid';
 import { Injectable } from '@angular/core';
 import { AuthenticationService } from './authentication.service';
 import { CryptoService } from './crypto.service';
@@ -147,8 +148,7 @@ export class SurvivalService {
   runSurvivalAnalysis(): Observable<ApiSurvivalAnalysisResponse[]> {
     let apiSurvivalAnalysis = new ApiSurvivalAnalysis()
     let d = new Date()
-    apiSurvivalAnalysis.ID = `MedCo_Survival_Analysis_${d.getUTCFullYear()}${d.getUTCMonth()}${d.getUTCDate()}${d.getUTCHours()}` +
-      `${d.getUTCMinutes()}${d.getUTCSeconds()}${d.getUTCMilliseconds()}`
+    apiSurvivalAnalysis.id = uuidv4();
     if (!this.startConcept) {
       throw ErrorHelper.handleNewError('Start event is undefined')
 
@@ -157,8 +157,8 @@ export class SurvivalService {
     if (this.startConcept.modifier) {
       apiSurvivalAnalysis.startConcept = this.startConcept.modifier.appliedConceptPath
       apiSurvivalAnalysis.startModifier = {
-        ModifierKey: this.startConcept.modifier.path,
-        AppliedPath: this.startConcept.modifier.appliedPath
+        modifierKey: this.startConcept.modifier.path,
+        appliedPath: this.startConcept.modifier.appliedPath
       }
     }
 
@@ -169,8 +169,8 @@ export class SurvivalService {
     if (this.endConcept.modifier) {
       apiSurvivalAnalysis.endConcept = this.endConcept.modifier.appliedConceptPath
       apiSurvivalAnalysis.endModifier = {
-        ModifierKey: this.endConcept.modifier.path,
-        AppliedPath: this.endConcept.modifier.appliedPath
+        modifierKey: this.endConcept.modifier.path,
+        appliedPath: this.endConcept.modifier.appliedPath
       }
     }
 
@@ -183,9 +183,9 @@ export class SurvivalService {
     apiSurvivalAnalysis.startsWhen = this.startsWhen
     apiSurvivalAnalysis.endsWhen = this.endsWhen
 
-    apiSurvivalAnalysis.cohortName = this.cohortService.selectedCohort.name
-    apiSurvivalAnalysis.subGroupDefinitions = this.subGroups.map(
-      sg => { return { groupName: sg.name, subGroupTiming: sg.timing, panels: this.generatePanels(sg) } }
+    apiSurvivalAnalysis.cohortQueryID = this.cohortService.selectedCohort.exploreQueryId;
+    apiSurvivalAnalysis.subGroupsDefinitions = this.subGroups.map(
+      sg => { return { name: sg.name, timing: sg.timing, panels: this.generatePanels(sg) } }
     )
 
 
@@ -195,6 +195,7 @@ export class SurvivalService {
   survivalAnalysisDecrypt(survivalAnalysisResponse: ApiSurvivalAnalysisResponse): Observable<SurvivalAnalysisClear> {
     return forkJoin(
       // generate the ClearGroup[]
+      // @ts-ignore
       survivalAnalysisResponse.results.map(group =>
         this.cryptoService.decryptIntegersWithEphemeralKey(
           [group.initialCount]
@@ -241,6 +242,7 @@ export class SurvivalService {
       // package it into SurvivalAnalysisClear
       map(clearGroups => {
         let res = new SurvivalAnalysisClear();
+        // @ts-ignore
         res.results = clearGroups;
         return res;
       })

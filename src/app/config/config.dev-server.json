@@ -1,9 +1,9 @@
 {
-  "medco-node-url": "http://localhost/local-3nodes/medco-0",
+  "medco-node-url": "http://localhost:3100",
 
-  "keycloak-url": "http://localhost/auth",
-  "keycloak-realm": "master",
-  "keycloak-client-id": "medco",
+  "keycloak-url": "http://localhost:8080/auth",
+  "keycloak-realm": "ti-realm",
+  "keycloak-client-id": "glowing-bear",
 
   "footer-text": ""
 }

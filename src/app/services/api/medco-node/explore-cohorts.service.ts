@@ -6,6 +6,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+import { v4 as uuidv4 } from 'uuid';
 import { Injectable } from '@angular/core';
 import { MedcoNetworkService } from '../medco-network.service';
 import { Observable, forkJoin } from 'rxjs';
@@ -17,7 +18,7 @@ import {ApiCohortsPatientListsResponse} from '../../../models/api-response-model
 import {ApiCohortResponse} from '../../../models/api-response-models/medco-node/api-cohort-response';
 import {ApiEndpointService} from '../../api-endpoint.service';
 import {ApiCohort} from '../../../models/api-request-models/medco-node/api-cohort';
-import {HttpParams} from '@angular/common/http';
+import { KeycloakService } from 'keycloak-angular';
 
 @Injectable()
 export class ExploreCohortsService {
@@ -28,32 +29,62 @@ export class ExploreCohortsService {
   private static TIMEOUT_MS = 1000 * 60 * 10;
 
   constructor(private config: AppConfig, private apiEndpointService: ApiEndpointService,
-    private medcoNetworkService: MedcoNetworkService) { }
+    private medcoNetworkService: MedcoNetworkService,
+    private keycloakService: KeycloakService) { }
 
-  getCohortSingleNode(node: ApiNodeMetadata): Observable<ApiCohortResponse[]> {
+  getCohortSingleNode(): Observable<ApiCohortResponse[]> {
+    const countSharedId = uuidv4();
+    const patientSharedId = uuidv4();
 
-    const params = new HttpParams().set('limit', '0')
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
-    return this.apiEndpointService.getCall(
-      'node/explore/cohorts',
-      { params },
-      node.url
-    );
-  }
-
-  postCohortSingleNode(node: ApiNodeMetadata, cohortName: string, cohort: ApiCohort): Observable<string> {
     return this.apiEndpointService.postCall(
-      `node/explore/cohorts/${cohortName}`,
-      cohort,
-      node.url
+      `projects/${this.config.projectId}/datasource/query`,
+      {
+        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        operation: 'getCohorts',
+        parameters: {
+          limit: 10
+        },
+        outputDataObjectsSharedIDs: {
+          count: countSharedId,
+          patientList: patientSharedId
+        }
+      }
     );
   }
 
-  removeCohortSingleNode(node: ApiNodeMetadata, cohortName: string) {
+  postCohortSingleNode(cohortName: string, exploreQueryID: string): Observable<string> {
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
-    return this.apiEndpointService.deleteCall(
-      `node/explore/cohorts/${cohortName}`,
-      node.url
+    return this.apiEndpointService.postCall(
+      `projects/${this.config.projectId}/datasource/query`,
+      {
+        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        operation: 'addCohort',
+        broadcast: true,
+        parameters: {
+          name: cohortName,
+          exploreQueryID: exploreQueryID
+        }
+      }
+    );
+  }
+
+  removeCohortSingleNode(node: ApiNodeMetadata, name: string, exploreQueryID: string) {
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
+
+    return this.apiEndpointService.postCall(
+      `projects/${this.config.projectId}/datasource/query`,
+      {
+        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        operation: 'deleteCohort',
+        broadcast: true,
+        parameters: {
+          name,
+          exploreQueryID
+        }
+      }
     );
   }
 
@@ -69,17 +100,17 @@ export class ExploreCohortsService {
 
 
   getCohortAllNodes(): Observable<ApiCohortResponse[][]> {
-    return forkJoin(this.medcoNetworkService.nodes.map(node => this.getCohortSingleNode(node)))
+    return forkJoin(this.medcoNetworkService.nodes.map(() => this.getCohortSingleNode()))
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }
 
-  postCohortAllNodes(cohortName: string, cohort: ApiCohort[]): Observable<string[]> {
-    return forkJoin(this.medcoNetworkService.nodes.map((node, index) => this.postCohortSingleNode(node, cohortName, cohort[index])))
+  postCohortAllNodes(cohortName: string, cohort: ApiCohort[], exploreQueryID: string): Observable<string[]> {
+    return forkJoin(this.medcoNetworkService.nodes.map(() => this.postCohortSingleNode(cohortName, exploreQueryID)))
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }
 
-  removeCohortAllNodes(cohortName: string) {
-    return forkJoin(this.medcoNetworkService.nodes.map(node => this.removeCohortSingleNode(node, cohortName)))
+  removeCohortAllNodes(name: string, exploreQueryId: string) {
+    return forkJoin(this.medcoNetworkService.nodes.map(node => this.removeCohortSingleNode(node, name, exploreQueryId)))
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }
 

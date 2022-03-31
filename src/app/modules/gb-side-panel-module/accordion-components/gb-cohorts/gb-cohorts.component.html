@@ -1,7 +1,7 @@
 <div id="cohorts-component" class="small-font">
   <p-confirmDialog appendTo="body" header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
   <button pButton class="ui-button-secondary" [disabled]="cohortService.isRefreshing"
-    [ngStyle]="{'color': cohortService.isRefreshing ? 'var(--gb-light-light-clinical-green)':'var(--gb-clinical-green)'}"
+    [ngStyle]="{'color': cohortService.isRefreshing ? 'var(--gb-light-light-clinical-green)':'var(--gb-ti-main-color)'}"
     type="button" pTooltip="Refresh cohorts" tooltipPosition="top" (click)="refreshCohorts()" icon="fa fa-refresh">
   </button>
 
@@ -50,7 +50,7 @@
           icon="{{cohort.bookmarked ? 'fa fa-star':'fa fa-star-o'}}">
         </button>
         <p *ngIf="patientListsStatus.has(cohort.name) && patientListsStatus.get(cohort.name) === OperationStatus.waitOnAPI" class="loading-blink">
-          Waiting on MedCo server nodes response <span>•</span><span>•</span><span>•</span>
+          Waiting on TI4Health server nodes response <span>•</span><span>•</span><span>•</span>
         </p>
         <p *ngIf="patientListsStatus.has(cohort.name) && patientListsStatus.get(cohort.name) === OperationStatus.decryption" class="loading-blink">
           Decryption of results can take a few seconds, please do not refresh the page <span>🔒</span><span>🔒</span><span>🔓</span><br/>

@@ -25,7 +25,7 @@ import {ErrorHelper} from '../utilities/error-helper';
 @Injectable()
 export class CryptoService implements OnDestroy {
 
-  private static nbParallelWorkers = 8;
+  private static nbParallelWorkers = 0;
   private decryptionClients: WorkerClient<DecryptionWorker>[];
 
   private _ephemeralPublicKey: Point;

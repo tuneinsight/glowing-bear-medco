@@ -31,7 +31,7 @@ export class GbSummaryComponent {
   }
 
   get hasPerSiteCounts(): boolean {
-    return this.queryService.queryType.hasPerSiteCounts;
+    return this.queryService.queryType?.hasPerSiteCounts || false;
   }
 
   get queryResults(): Observable<ExploreQueryResult> {

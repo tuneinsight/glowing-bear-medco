@@ -286,7 +286,7 @@ export class GbSurvivalResultsComponent implements OnInit {
     }
 
     let exportDate = new Date(Date.now())
-    pdfDoc.export(`medco_survival_analysis_${exportDate.toISOString()}.pdf`)
+    pdfDoc.export(`ti4health_survival_analysis_${exportDate.toISOString()}.pdf`)
   }
 
   set id(i: number) {

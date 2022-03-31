@@ -9,8 +9,6 @@ import { Component } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { AnalysisType } from '../../../../models/analysis-models/analysis-type';
 import { ApiI2b2Panel } from '../../../../models/api-request-models/medco-node/api-i2b2-panel';
-import { MessageHelper } from '../../../../utilities/message-helper';
-import { switchMap, tap } from 'rxjs/operators';
 import { SurvivalAnalysisClear } from '../../../../models/survival-analysis/survival-analysis-clear';
 import { CohortService } from '../../../../services/cohort.service';
 import { NavbarService } from '../../../../services/navbar.service';
@@ -23,6 +21,15 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Cohort } from 'src/app/models/cohort-models/cohort';
 import {UserInputError} from '../../../../utilities/user-input-error';
 import {ErrorHelper} from '../../../../utilities/error-helper';
+import { ApiSurvivalAnalysisResponse } from 'src/app/models/api-response-models/survival-analysis/survival-analysis-response';
+
+const splitArrayIntoChunksOfLen = (arr: any[], len: number) => {
+  let chunks = [], i = 0, n = arr.length;
+  while (i < n) {
+    chunks.push(arr.slice(i, i += len));
+  }
+  return chunks;
+}
 
 @Component({
   selector: 'gb-top',
@@ -39,17 +46,74 @@ export class GbTopComponent {
   OperationStatus = OperationStatus
   _operationStatus: OperationStatus
 
-  private static filterResults(res: SurvivalAnalysisClear): SurvivalAnalysisClear {
-    let ret = new SurvivalAnalysisClear();
-    ret.results = [];
-    for (const result of res.results) {
-      if (result.groupResults.length > 0) {
-        ret.results.push(result);
-      } else {
-        MessageHelper.alert('warn', `No observation available for group ${result.groupId} within the given time limit`);
+  private formatResults(res: ApiSurvivalAnalysisResponse[]): SurvivalAnalysisClear {
+    const results = res[0].results.survivalQueryResult[0];
+
+    const types = this.survivalAnalysisService.subGroups;
+
+    let groupResultsList = [];
+    let timepointNb = 1;
+    let timepoint = {
+      censoringEvent: -1,
+      eventOfInterest: -1
+    }
+
+    if (types.length === 0) {
+
+      const initialCount = results[0];
+
+      for (let i = 3; i < results.length; i++) {
+        if (i % 2 === 1) {
+          timepoint.eventOfInterest = results[i];
+        } else {
+          timepoint.censoringEvent = results[i];
+          if (timepoint.eventOfInterest > 0 || timepoint.censoringEvent > 0) {
+            groupResultsList.push({ events: { ...timepoint }, timepoint: timepointNb });
+          }
+          timepointNb++;
+        }
+      }
+
+      return {
+        results: [{
+          groupId: 'Full cohort',
+          initialCount,
+          groupResults: groupResultsList
+        }]
+      };
+
+    } else {
+
+      const resultList = [];
+
+      const arrList = splitArrayIntoChunksOfLen(results, results.length / types.length);
+
+      for (let i = 0; i < arrList.length; i++) {
+        groupResultsList = [];
+        timepointNb = 1;
+        for (let n = 3; n < arrList[i].length; n++) {
+          if (n % 2 === 1) {
+            timepoint.eventOfInterest = arrList[i][n];
+          } else {
+            timepoint.censoringEvent = arrList[i][n];
+            if (timepoint.eventOfInterest > 0 || timepoint.censoringEvent > 0) {
+              groupResultsList.push({ events: { ...timepoint }, timepoint: timepointNb });
+            }
+            timepointNb++;
+          }
+        }
+
+        resultList.push({
+          groupId: types[i].name,
+          initialCount: arrList[i][0],
+          groupResults: [ ...groupResultsList ]
+        });
+      }
+
+      return {
+        results: resultList
       }
     }
-    return ret
   }
 
   constructor(private analysisService: AnalysisService,
@@ -107,19 +171,19 @@ export class GbTopComponent {
     settings.cohortName = this.cohortService.selectedCohort.name
 
     this.operationStatus = OperationStatus.waitOnAPI
-    this.survivalAnalysisService.runSurvivalAnalysis().pipe(
-      tap(() => { this.operationStatus = OperationStatus.decryption }),
-      switchMap(encryptedResult => this.survivalAnalysisService.survivalAnalysisDecrypt(encryptedResult[0]))
-    ).subscribe(clearResult => {
-      console.log('[ANALYSIS] Decrypted survival analysis result', clearResult);
-      this.operationStatus = OperationStatus.done
+    this.survivalAnalysisService.runSurvivalAnalysis().subscribe(clearResult => {
 
-      let survivalFiltered = GbTopComponent.filterResults(clearResult)
-      if (!(survivalFiltered.results) || survivalFiltered.results.length === 0) {
+      this.operationStatus = OperationStatus.done;
+
+      const formattedResults = this.formatResults(clearResult);
+
+      console.log('[ANALYSIS] Decrypted & formatted survival analysis result', formattedResults);
+
+      if (!(formattedResults.results) || formattedResults.results.length === 0) {
         return
       }
-      this._clearRes.next(survivalFiltered)
-      this.survivalResultsService.pushCopy(survivalFiltered, settings)
+      this._clearRes.next(formattedResults)
+      this.survivalResultsService.pushCopy(formattedResults, settings)
       this._ready = true
 
       this.navbarService.navigateToNewResults()

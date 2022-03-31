@@ -5,6 +5,7 @@ import { CombinationConstraint } from '../models/constraint-models/combination-c
 import { CombinationState } from '../models/constraint-models/combination-state';
 import { ApiI2b2Item } from '../models/api-request-models/medco-node/api-i2b2-item';
 import { ConceptConstraint } from '../models/constraint-models/concept-constraint';
+import { CohortConstraint } from '../models/constraint-models/cohort-constraint';
 import { GenomicAnnotationConstraint } from '../models/constraint-models/genomic-annotation-constraint';
 import { ValueType } from '../models/constraint-models/value-type';
 import { CryptoService } from './crypto.service';
@@ -55,6 +56,7 @@ export class ConstraintMappingService {
    */
   private generateI2b2Panel(constraint: Constraint): ApiI2b2Panel {
     let panel = new ApiI2b2Panel();
+
     panel.panelTiming = constraint.panelTimingSameInstance ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any
     panel.not = constraint.excluded;
 
@@ -92,7 +94,7 @@ export class ConstraintMappingService {
               break;
 
             case 'CohortConstraint':
-              panel.cohortItems.push(combConstraint.children[i].textRepresentation);
+              panel.cohortItems.push((combConstraint.children[i] as CohortConstraint).cohort.exploreQueryId);
               break;
 
 
@@ -116,7 +118,8 @@ export class ConstraintMappingService {
     }
 
     let item = new ApiI2b2Item();
-    if (constraint.concept.encryptionDescriptor.encrypted) {
+
+    if (constraint.concept.encryptionDescriptor && constraint.concept.encryptionDescriptor.encrypted) {
       // todo: children IDs implementation
       item.encrypted = true;
       item.queryTerm = this.cryptoService.encryptIntegerWithCothorityKey(constraint.concept.encryptionDescriptor.id);
@@ -125,10 +128,10 @@ export class ConstraintMappingService {
       item.encrypted = false;
       item.queryTerm = constraint.concept.path;
       if (constraint.concept.modifier) {
-        item.modifier = new ApiI2B2Modifier()
+        item.modifier = new ApiI2B2Modifier();
         item.queryTerm = constraint.concept.modifier.appliedConceptPath;
-        item.modifier.modifierKey = constraint.concept.modifier.path
-        item.modifier.appliedPath = constraint.concept.modifier.appliedPath
+        item.modifier.key = constraint.concept.modifier.path;
+        item.modifier.appliedPath = constraint.concept.modifier.appliedPath;
       }
 
       switch (constraint.concept.type) {

@@ -13,8 +13,9 @@ import { ReplaySubject } from 'rxjs';
 import { ExploreSearchService } from './api/medco-node/explore-search.service';
 import { TreeNodeService } from './tree-node.service';
 import { ErrorHelper } from '../utilities/error-helper';
-import { DropMode } from '../models/drop-mode';
 import { TreeNode } from '../models/tree-models/tree-node';
+import { TreeNodeType } from '../models/tree-models/tree-node-type';
+import { DropMode } from '../models/drop-mode';
 
 interface NodeFullPath {
   name: string;
@@ -51,13 +52,10 @@ export class TermSearchService {
   }
 
   addInResults(node: TreeNode, displayNameList: string[], nodesSize: number, appliedConcept?: TreeNode) {
-    const dataObject = node.clone();
-
-    dataObject.dropMode = DropMode.TreeNode;
-    dataObject.path = `${node.path}`;
-    dataObject.metadata = undefined;
+    node.dropMode = DropMode.TreeNode;
+    node.metadata = undefined;
     if (appliedConcept) {
-      dataObject.appliedConcept = appliedConcept;
+      node.appliedConcept = appliedConcept;
     }
 
     const formattedResult: ResultType = {
@@ -70,7 +68,7 @@ export class TermSearchService {
       }], []).reverse(),
       handleFuncStart: (function (event) {
         event.stopPropagation();
-        this.treeNodeService.selectedTreeNode = dataObject;
+        this.treeNodeService.selectedTreeNode = node;
       }).bind(this)
     };
 
@@ -83,7 +81,7 @@ export class TermSearchService {
         this.isLoading = false;
       }
     } else { // Found in this.results, replace
-      resultIndex = this.results.findIndex(({ name: resultName }) => resultName === node.name);
+      resultIndex = this.results.findIndex(({ conceptCode: resultConceptCode }) => resultConceptCode === node.conceptCode);
       this.results[resultIndex] = formattedResult;
     }
 
@@ -112,16 +110,21 @@ export class TermSearchService {
       nodes.forEach((node) => {
         let actualNode = node;
         let displayNameList: string[] = [actualNode.displayName];
+        let validAppliedConcept: TreeNode | null = null;
 
         while (actualNode.parent) {
           actualNode = actualNode.parent;
           displayNameList.push(actualNode.displayName);
+          if (!validAppliedConcept &&
+            (actualNode.nodeType === TreeNodeType.CONCEPT_FOLDER || actualNode.nodeType === TreeNodeType.MODIFIER)) {
+              validAppliedConcept = actualNode;
+          }
         }
 
-       if (node.nodeType.toLowerCase().indexOf('modifier') === -1) {
+        if (!node.isModifier()) {
           this.addInResults(node, displayNameList, nodes.length);
         } else {
-          this.addInResults(node, displayNameList, nodes.length, node.parent);
+          this.addInResults(node, displayNameList, nodes.length, validAppliedConcept);
         }
       });
     }, (err) => {

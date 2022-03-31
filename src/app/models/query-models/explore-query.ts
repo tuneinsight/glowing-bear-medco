@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import { v4 as uuidv4 } from 'uuid';
 import { Constraint } from '../constraint-models/constraint';
 
 export class ExploreQuery {
@@ -28,16 +29,16 @@ export class ExploreQuery {
    * Generates a new unique ID for this query.
    */
   generateUniqueId(): void {
-    let d = new Date();
-    let id = `MedCo_Explore_Query_${d.getUTCFullYear()}${d.getUTCMonth()}${d.getUTCDate()}${d.getUTCHours()}` +
-      `${d.getUTCMinutes()}${d.getUTCSeconds()}${d.getUTCMilliseconds()}`;
+    // let d = new Date();
+    // let id = `MedCo_Explore_Query_${d.getUTCFullYear()}${d.getUTCMonth()}${d.getUTCDate()}${d.getUTCHours()}` +
+    //   `${d.getUTCMinutes()}${d.getUTCSeconds()}${d.getUTCMilliseconds()}`;
 
-    if (this.name) {
-      // embed name without whitespaces if defined
-      id = `${id}_${this.name.replace(/\s/g, '_')}`;
-    }
+    // if (this.name) {
+    //   // embed name without whitespaces if defined
+    //   id = `${id}_${this.name.replace(/\s/g, '_')}`;
+    // }
 
-    this.uniqueId = id;
+    this.uniqueId = uuidv4();
   }
 
   // --- getters / setters

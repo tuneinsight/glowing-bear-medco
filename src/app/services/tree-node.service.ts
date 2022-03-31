@@ -8,35 +8,43 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import {Injectable, Injector} from '@angular/core';
-import {Concept} from '../models/constraint-models/concept';
-import {ConceptConstraint} from '../models/constraint-models/concept-constraint';
-import {TreeNode} from '../models/tree-models/tree-node';
-import {ConstraintService} from './constraint.service';
-import {ErrorHelper} from '../utilities/error-helper';
-import {TreeNodeType} from '../models/tree-models/tree-node-type';
-import {AppConfig} from '../config/app.config';
-import {GenomicAnnotation} from '../models/constraint-models/genomic-annotation';
-import {ExploreSearchService} from './api/medco-node/explore-search.service';
-import {Observable} from 'rxjs';
-import {ApiValueMetadata, DataType} from '../models/api-response-models/medco-node/api-value-metadata';
-import {Modifier} from '../models/constraint-models/modifier';
+import { Injectable, Injector } from '@angular/core';
+import { Concept } from '../models/constraint-models/concept';
+import { ConceptConstraint } from '../models/constraint-models/concept-constraint';
+import { TreeNode } from '../models/tree-models/tree-node';
+import { ConstraintService } from './constraint.service';
+import { ErrorHelper } from '../utilities/error-helper';
+import { TreeNodeType } from '../models/tree-models/tree-node-type';
+import { AppConfig } from '../config/app.config';
+import { GenomicAnnotation } from '../models/constraint-models/genomic-annotation';
+import { ExploreSearchService } from './api/medco-node/explore-search.service';
+import { ApiEndpointService } from './api-endpoint.service';
+import {
+  ApiValueMetadata,
+  DataType,
+} from '../models/api-response-models/medco-node/api-value-metadata';
+import { Modifier } from '../models/constraint-models/modifier';
+import { ConfirmationService } from 'primeng';
+import { KeycloakService } from 'keycloak-angular';
 
 @Injectable()
 export class TreeNodeService {
-
   // the variable that holds the entire tree structure, used by the tree on the left side bar
   private _rootTreeNodes: TreeNode[] = [];
   // the selected tree node in the side-panel by dragging
   private _selectedTreeNode: TreeNode = null;
   // true if a call is currently being executed
   private _isLoading = false;
+  private _isNoi2b2Datasource = false;
 
   private config: AppConfig;
   private exploreSearchService: ExploreSearchService;
   private constraintService: ConstraintService;
+  private apiEndpointService: ApiEndpointService;
+  private confirmationService: ConfirmationService;
+  private keycloakService: KeycloakService;
 
-  constructor(private injector: Injector) { }
+  constructor(private injector: Injector) {}
 
   /**
    * Reset and load the root tree nodes for rendering the tree on the left side panel.
@@ -44,30 +52,47 @@ export class TreeNodeService {
   load(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.config = this.injector.get(AppConfig);
+      this.keycloakService = this.injector.get(KeycloakService);
       this.exploreSearchService = this.injector.get(ExploreSearchService);
       this.constraintService = this.injector.get(ConstraintService);
+      this.apiEndpointService = this.injector.get(ApiEndpointService);
+      this.confirmationService = this.injector.get(ConfirmationService);
 
       this.constraintService.conceptLabels = [];
 
       // retrieve root tree nodes and extract the concepts
       this._isLoading = true;
-      this.exploreSearchService.exploreSearchConceptChildren('/').subscribe(
-        (treeNodes: TreeNode[]) => {
 
-          // reset concepts and concept constraints
-          this.constraintService.concepts = [];
-          this.constraintService.conceptConstraints = [];
+      this.apiEndpointService.getCall('projects').subscribe((projectsList) => {
+        const i2b2Project = projectsList
+          .reverse()
+          .find((project) => project.name === 'i2b2');
+        if (i2b2Project && i2b2Project.dataSourceId) {
+          console.log('Found project id', i2b2Project.uniqueId);
+          this.config.projectId = i2b2Project.uniqueId;
+          this.exploreSearchService.exploreSearchConceptChildren('/').subscribe(
+            (treeNodes: TreeNode[]) => {
+              // reset concepts and concept constraints
+              this.constraintService.concepts = [];
+              this.constraintService.conceptConstraints = [];
 
-          this.processTreeNodes(treeNodes, this.constraintService);
-          treeNodes.forEach((node) => this.rootTreeNodes.push(node));
-          this._isLoading = false;
-          resolve();
-        },
-        (err) => {
-          ErrorHelper.handleError('Error during initial tree loading', err);
-          this._isLoading = false;
-          reject(err);
-        });
+              this.processTreeNodes(treeNodes, this.constraintService);
+              treeNodes.forEach((node) => this.rootTreeNodes.push(node));
+              this._isLoading = false;
+              resolve();
+            },
+            (err) => {
+              ErrorHelper.handleError('Error during initial tree loading', err);
+              this._isLoading = false;
+              reject(err);
+            }
+          );
+        } else {
+          this._isNoi2b2Datasource = true;
+          alert('Cannot find i2b2 project, please create one with the name "i2b2", with a valid i2b2 datasource and login again.');
+          this.keycloakService.logout();
+        }
+      });
     });
   }
 
@@ -77,24 +102,47 @@ export class TreeNodeService {
    * @param {TreeNode} parentNode
    * @param {ConstraintService} constraintService
    */
-  public loadChildrenNodes(parentNode: TreeNode, constraintService: ConstraintService) {
+  public loadChildrenNodes(
+    parentNode: TreeNode,
+    constraintService: ConstraintService,
+    unlimitedChildren?: boolean
+  ) {
     if (parentNode.leaf || parentNode.childrenAttached) {
-      return
+      return;
     }
 
     this._isLoading = true;
-    let resultObservable: Observable<TreeNode[]> = parentNode.isModifier() ?
-      this.exploreSearchService.exploreSearchModifierChildren(parentNode.path, parentNode.appliedPath, parentNode.appliedConcept.path) :
-      this.exploreSearchService.exploreSearchConceptChildren(parentNode.path)
+    const resultObservable = parentNode.isModifier()
+      ? this.exploreSearchService.exploreSearchModifierChildren(
+          parentNode.path,
+          parentNode.appliedPath,
+          parentNode.appliedConcept.path,
+          unlimitedChildren
+        )
+      : this.exploreSearchService.exploreSearchConceptChildren(parentNode.path, unlimitedChildren);
 
     resultObservable.subscribe(
-      (treeNodes: TreeNode[]) => {
-        parentNode.attachChildTree(treeNodes);
-        parentNode.attachModifierData(treeNodes);
-        this.processTreeNodes(parentNode.children, constraintService);
-        this._isLoading = false;
-        if (treeNodes.length === 0) {
-          parentNode.leaf = true
+      (treeNodes: TreeNode[] | { retry: boolean }) => {
+        if (Array.isArray(treeNodes)) {
+          parentNode.attachChildTree(treeNodes);
+          parentNode.attachModifierData(treeNodes);
+          this.processTreeNodes(parentNode.children, constraintService);
+          this._isLoading = false;
+          if (treeNodes.length === 0) {
+            parentNode.leaf = true;
+          }
+        } else {
+          this.confirmationService.confirm({
+            message: 'This folder have a lot of children. Do you want to open it anyway?',
+            header: 'Confirmation',
+            icon: null,
+            accept: () => {
+              this.loadChildrenNodes(parentNode, constraintService, true);
+            },
+            reject: () => {
+              this._isLoading = false;
+            }
+          });
         }
       },
       (err) => {
@@ -102,7 +150,6 @@ export class TreeNodeService {
         this._isLoading = false;
       }
     );
-
   }
 
   /**
@@ -112,7 +159,10 @@ export class TreeNodeService {
    * @param treeNodes
    * @param constraintService
    */
-  processTreeNodes(treeNodes: TreeNode[], constraintService: ConstraintService) {
+  processTreeNodes(
+    treeNodes: TreeNode[],
+    constraintService: ConstraintService
+  ) {
     if (!treeNodes) {
       return;
     }
@@ -132,13 +182,11 @@ export class TreeNodeService {
    * @param {ConstraintService} constraintService
    */
   processTreeNode(node: TreeNode, constraintService: ConstraintService) {
-
     // generate label
     node.label = node.displayName;
     if (node.subjectCount) {
       node.label = node.label + ` (${node.subjectCount})`;
     }
-
 
     node.icon = '';
     node.expandedIcon = 'fa fa-folder-open';
@@ -159,9 +207,14 @@ export class TreeNodeService {
         }
         break;
       case TreeNodeType.GENOMIC_ANNOTATION:
-        if (constraintService.genomicAnnotations.filter(
-          (annotation: GenomicAnnotation) => annotation.name === node.name).length === 0) {
-          constraintService.genomicAnnotations.push(new GenomicAnnotation(node.name, node.displayName, node.path));
+        if (
+          constraintService.genomicAnnotations.filter(
+            (annotation: GenomicAnnotation) => annotation.name === node.name
+          ).length === 0
+        ) {
+          constraintService.genomicAnnotations.push(
+            new GenomicAnnotation(node.name, node.displayName, node.path)
+          );
         }
         break;
       case TreeNodeType.MODIFIER_FOLDER:
@@ -180,7 +233,10 @@ export class TreeNodeService {
       default:
         break;
     }
-    console.log(`Processed tree node ${node.name} of type ${node.nodeType}`, node)
+    console.log(
+      `Processed tree node ${node.name} of type ${node.nodeType}`,
+      node
+    );
   }
 
   /**
@@ -194,9 +250,8 @@ export class TreeNodeService {
     concept.path = treeNode.path;
     concept.type = treeNode.valueType;
     if (treeNode.metadata) {
-      this.processMetadata(concept, treeNode.metadata)
+      this.processMetadata(concept, treeNode.metadata);
     }
-
 
     concept.code = treeNode.conceptCode;
     concept.fullName = treeNode.path;
@@ -207,38 +262,37 @@ export class TreeNodeService {
   }
 
   private processMetadata(target: Concept, metadata: ApiValueMetadata) {
-    if (metadata.ValueMetadata.UnitValues) {
-      target.unit = metadata.ValueMetadata.UnitValues.NormalUnits
-    }
-    if (metadata.ValueMetadata.DataType) {
-      switch (metadata.ValueMetadata.DataType) {
-        case DataType.POS_INTEGER:
-          target.isInteger = true;
-          target.isPositive = true;
-          break;
-        case DataType.POS_FLOAT:
-          target.isInteger = false;
-          target.isPositive = true;
-          break;
-        case DataType.INTEGER:
-          target.isInteger = true;
-          target.isPositive = false;
-          break;
-        case DataType.FLOAT:
-          target.isInteger = false;
-          target.isPositive = false;
-          break;
-        case DataType.STRING:
-          target.isText = true;
-          break;
-        default:
-          break;
+    if (metadata.ValueMetadata) {
+      if (metadata.ValueMetadata.UnitValues) {
+        target.unit = metadata.ValueMetadata.UnitValues.NormalUnits;
+      }
+      if (metadata.ValueMetadata.DataType) {
+        switch (metadata.ValueMetadata.DataType) {
+          case DataType.POS_INTEGER:
+            target.isInteger = true;
+            target.isPositive = true;
+            break;
+          case DataType.POS_FLOAT:
+            target.isInteger = false;
+            target.isPositive = true;
+            break;
+          case DataType.INTEGER:
+            target.isInteger = true;
+            target.isPositive = false;
+            break;
+          case DataType.FLOAT:
+            target.isInteger = false;
+            target.isPositive = false;
+            break;
+          case DataType.STRING:
+            target.isText = true;
+            break;
+          default:
+            break;
+        }
       }
     }
-
   }
-
-
 
   /**
    * Parse a tree node and create the corresponding concept with a modifier.
@@ -250,30 +304,37 @@ export class TreeNodeService {
    */
   public getConceptFromModifierTreeNode(treeNode: TreeNode): Concept {
     if (!treeNode.isModifier()) {
-      throw ErrorHelper.handleNewError('Unexpected error. A tree node that is not a modifier cannot be passed ' +
-        'to getConceptModifierTreeNode')
+      throw ErrorHelper.handleNewError(
+        'Unexpected error. A tree node that is not a modifier cannot be passed ' +
+          'to getConceptModifierTreeNode'
+      );
     }
     // this is not the same object of the node if it happens to be here, so it is safe
     // to modify its fields
-    let concept = this.getConceptFromTreeNode(treeNode.appliedConcept)
+    let concept = this.getConceptFromTreeNode(treeNode.appliedConcept);
 
-    let modifier = new Modifier(treeNode.path, treeNode.appliedPath, treeNode.appliedConcept.path)
-    let modifierPathSplit = (modifier.path.length > 0 && modifier.path.startsWith('/')) ?
-      modifier.path.substring(1).split('/') :
-      modifier.path.split('/')
-    modifierPathSplit.shift()
-    let modifierPath = modifierPathSplit.join('/')
+    let modifier = new Modifier(
+      treeNode.path,
+      treeNode.appliedPath,
+      treeNode.appliedConcept.path
+    );
+    let modifierPathSplit =
+      modifier.path.length > 0 && modifier.path.startsWith('/')
+        ? modifier.path.substring(1).split('/')
+        : modifier.path.split('/');
+    modifierPathSplit.shift();
+    let modifierPath = modifierPathSplit.join('/');
 
     // override the fields
 
-    concept.path = `${concept.path}${modifierPath}`
-    concept.label = `${treeNode.displayName} (${concept.path})`
-    concept.modifier = modifier
-    concept.type = treeNode.valueType
+    concept.path = `${concept.path}${modifierPath}`;
+    concept.label = `${treeNode.displayName} (${concept.path})`;
+    concept.modifier = modifier;
+    concept.type = treeNode.valueType;
     if (treeNode.metadata) {
-      this.processMetadata(concept, treeNode.metadata)
+      this.processMetadata(concept, treeNode.metadata);
     }
-    return concept
+    return concept;
   }
 
   /**
@@ -282,9 +343,11 @@ export class TreeNodeService {
    * @param {number} depth
    * @param {TreeNode[]} descendants
    */
-  public getTreeNodeDescendantsWithDepth(treeNode: TreeNode,
+  public getTreeNodeDescendantsWithDepth(
+    treeNode: TreeNode,
     depth: number,
-    descendants: TreeNode[]) {
+    descendants: TreeNode[]
+  ) {
     if (treeNode) {
       if (depth === 2 && treeNode.hasChildren()) {
         for (let child of treeNode.children) {
@@ -306,15 +369,21 @@ export class TreeNodeService {
    * @param {string[]} excludedTypes
    * @param {TreeNode[]} descendants
    */
-  public getTreeNodeDescendantsWithExcludedTypes(treeNode: TreeNode,
+  public getTreeNodeDescendantsWithExcludedTypes(
+    treeNode: TreeNode,
     excludedTypes: TreeNodeType[],
-    descendants: TreeNode[]) {
+    descendants: TreeNode[]
+  ) {
     if (treeNode) {
       // If the tree node has children
       if (treeNode.children) {
         for (let child of treeNode.children) {
           if (child.children) {
-            this.getTreeNodeDescendantsWithExcludedTypes(child, excludedTypes, descendants);
+            this.getTreeNodeDescendantsWithExcludedTypes(
+              child,
+              excludedTypes,
+              descendants
+            );
           } else if (excludedTypes.indexOf(child.nodeType) === -1) {
             descendants.push(child);
           }
@@ -569,5 +638,9 @@ export class TreeNodeService {
 
   get isLoading(): boolean {
     return this._isLoading;
+  }
+
+  get isNoi2b2Datasource(): boolean {
+    return this._isNoi2b2Datasource;
   }
 }

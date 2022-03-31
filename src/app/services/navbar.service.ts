@@ -14,6 +14,7 @@ import { Subject, Observable } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
 import { Router } from '@angular/router'
 import {OperationType} from '../models/operation-models/operation-types';
+import { KeycloakService } from 'keycloak-angular';
 
 @Injectable()
 export class NavbarService {
@@ -38,7 +39,8 @@ export class NavbarService {
   private ANALYSIS_INDEX = 1;
   private RESULTS_INDEX = 2;
 
-  constructor(private authService: AuthenticationService, private router: Router) {
+  constructor(private authService: AuthenticationService, private keycloakService: KeycloakService, private router: Router) {
+    const haveRightsForSurvivalQuery = !!this.keycloakService.getUserRoles().find((role) => role === 'survival_query');
     this._selectedSurvivalId = new Subject<number>()
     this._selectedSurvivalIDtoDelete = new Subject<number>()
     this.items = [
@@ -46,11 +48,13 @@ export class NavbarService {
       // 0: explore tab, default page
       { label: OperationType.EXPLORE, routerLink: '/explore' },
 
-      // 1: survival analysis tab
-      { label: OperationType.ANALYSIS, routerLink: '/analysis', visible: this.authService.hasAnalysisAuth },
+      ...(haveRightsForSurvivalQuery ? [
+        // 1: survival analysis tab
+        { label: OperationType.ANALYSIS, routerLink: '/analysis', visible: this.authService.hasAnalysisAuth },
 
-      // 2: results tab
-      { label: 'Results', routerLink: '/results', visible: this.authService.hasAnalysisAuth }
+        // 2: results tab
+        { label: 'Results', routerLink: '/results', visible: this.authService.hasAnalysisAuth }
+      ] : [])
     ]
 
     this.resultItems = []

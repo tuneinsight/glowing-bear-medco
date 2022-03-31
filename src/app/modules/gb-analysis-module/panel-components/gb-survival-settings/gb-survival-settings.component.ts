@@ -99,10 +99,6 @@ export class GbSurvivalSettingsComponent implements OnInit {
     event.stopPropagation()
     let node = this.treeNodeService.selectedTreeNode
     if (node) {
-      if (node.encryptionDescriptor.encrypted) {
-        MessageHelper.alert('warn', 'Cannot select this concept as it is encrypted')
-        return
-      }
       switch (node.nodeType) {
         case TreeNodeType.CONCEPT:
         case TreeNodeType.CONCEPT_FOLDER:

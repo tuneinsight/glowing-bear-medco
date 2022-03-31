@@ -20,6 +20,7 @@ import { MedcoNetworkService } from '../medco-network.service';
 import { ApiEndpointService } from '../../api-endpoint.service';
 import {ApiValueMetadata, DataType} from '../../../models/api-response-models/medco-node/api-value-metadata';
 import {MessageHelper} from '../../../utilities/message-helper';
+import { KeycloakService } from 'keycloak-angular';
 
 @Injectable()
 export class ExploreSearchService {
@@ -36,16 +37,17 @@ export class ExploreSearchService {
     private http: HttpClient,
     private medcoNetworkService: MedcoNetworkService,
     private apiEndpointService: ApiEndpointService,
-    private injector: Injector) { }
+    private injector: Injector,
+    private keycloakService: KeycloakService) { }
 
     private mapSearchResults(searchResp) {
-      return searchResp.results.map((treeNodeObj) => {
+      return (searchResp.results.searchResult || []).map((treeNodeObj) => {
         let treeNode = new TreeNode();
         treeNode.path = treeNodeObj['path'];
         treeNode.appliedPath = treeNodeObj['appliedPath'];
         treeNode.name = treeNodeObj['name'];
         if (treeNodeObj['parent']) {
-          treeNode.parent = this.mapSearchResults({ results: [treeNodeObj['parent']] })[0];
+          treeNode.parent = this.mapSearchResults({ results: { searchResult: [treeNodeObj['parent']] } })[0];
           treeNode.parent.metadata = undefined;
         }
         treeNode.displayName = treeNodeObj['displayName'];
@@ -69,9 +71,18 @@ export class ExploreSearchService {
     }
 
     private exploreSearch(searchString: string, limit: number): Observable<TreeNode[]> {
+      const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
+
       return this.apiEndpointService.postCall(
-        'node/explore/search',
-        { searchString, limit }
+        `projects/${this.config.projectId}/datasource/query`,
+        {
+          operation: 'searchOntology',
+          aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+          outputDataObjectsNames: ['searchConcept'],
+          parameters: {
+            searchString
+          }
+        }
       ).pipe(
         map(this.mapSearchResults.bind(this))
       );
@@ -87,13 +98,29 @@ export class ExploreSearchService {
       return this.exploreSearch(searchString, limit);
     }
 
+  private exploreSearchConcept(operation: string, root: string, unlimitedChildren?: boolean): Observable<TreeNode[]> {
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
-  private exploreSearchConcept(operation: string, root: string): Observable<TreeNode[]> {
     return this.apiEndpointService.postCall(
-      'node/explore/search/concept',
-      { operation: operation, path: root }
+      `projects/${this.config.projectId}/datasource/query`,
+      {
+        operation: 'searchConcept',
+        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        outputDataObjectsNames: ['patientList', 'count'],
+        parameters: {
+          operation: operation,
+          path: root,
+          limit: unlimitedChildren ? '0' : undefined
+        }
+      }
     ).pipe(
-      map(this.mapSearchResults.bind(this))
+      map((searchConceptResponse) => {
+        if (searchConceptResponse.status === 'error' && searchConceptResponse.error.indexOf('MAX_EXCEEDED') !== -1) {
+          return { retry: true };
+        } else {
+          return this.mapSearchResults(searchConceptResponse);
+        }
+      })
     );
   }
   /**
@@ -103,8 +130,8 @@ export class ExploreSearchService {
    *
    * @returns {Observable<Object>}
    */
-  exploreSearchConceptChildren(root: string): Observable<TreeNode[]> {
-    return this.exploreSearchConcept('children', root)
+  exploreSearchConceptChildren(root: string, unlimitedChildren?: boolean): Observable<TreeNode[]> {
+    return this.exploreSearchConcept('children', root, unlimitedChildren)
   }
 
   /**
@@ -114,17 +141,41 @@ export class ExploreSearchService {
    *
    * @returns {Observable<Object>}
    */
-  exploreSearchConceptInfo(root: string): Observable<TreeNode[]> {
-    return this.exploreSearchConcept('info', root)
+  exploreSearchConceptInfo(root: string, unlimitedChildren?: boolean): Observable<TreeNode[]> {
+    return this.exploreSearchConcept('info', root, unlimitedChildren)
   }
 
 
-  private exploreSearchModifier(operation: string, root: string, appliedPath: string, appliedConcept: string): Observable<TreeNode[]> {
+  private exploreSearchModifier(
+    operation: 'concept' | 'children' | 'info',
+    path: string,
+    appliedPath: string,
+    appliedConcept: string,
+    unlimitedChildren?: boolean): Observable<TreeNode[] | { retry: boolean }> {
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
+
     return this.apiEndpointService.postCall(
-      'node/explore/search/modifier',
-      { operation: operation, path: root, appliedPath: appliedPath, appliedConcept: appliedConcept }
+      `projects/${this.config.projectId}/datasource/query`,
+      {
+        operation: 'searchModifier',
+        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        outputDataObjectsNames: ['patientList', 'count'],
+        parameters: {
+          operation: operation,
+          path: path,
+          appliedPath: appliedPath,
+          appliedConcept: appliedConcept,
+          limit: unlimitedChildren ? '0' : undefined
+        }
+      }
     ).pipe(
-      map(this.mapSearchResults.bind(this))
+      map((searchModifierResponse) => {
+        if (searchModifierResponse.status === 'error' && searchModifierResponse.error.indexOf('MAX_EXCEEDED') !== -1) {
+          return { retry: true };
+        } else {
+          return this.mapSearchResults(searchModifierResponse);
+        }
+      })
     );
   }
 
@@ -194,8 +245,11 @@ export class ExploreSearchService {
    *
    * @returns {Observable<Object>}
    */
-  exploreSearchModifierChildren(root: string, appliedPath: string, appliedConcept: string): Observable<TreeNode[]> {
-    return this.exploreSearchModifier('children', root, appliedPath, appliedConcept)
+  exploreSearchModifierChildren(root: string,
+    appliedPath: string,
+    appliedConcept: string,
+    unlimitedChildren?: boolean): Observable<TreeNode[] | { retry: boolean }> {
+    return this.exploreSearchModifier('children', root, appliedPath, appliedConcept, unlimitedChildren)
   }
 
   /**
@@ -205,7 +259,10 @@ export class ExploreSearchService {
    *
    * @returns {Observable<Object>}
    */
-  exploreSearchModifierInfo(root: string, appliedPath: string, appliedConcept: string): Observable<TreeNode[]> {
-    return this.exploreSearchModifier('info', root, appliedPath, appliedConcept)
+  exploreSearchModifierInfo(root: string,
+    appliedPath: string,
+    appliedConcept: string,
+    unlimitedChildren?: boolean): Observable<TreeNode[] | { retry: boolean }> {
+    return this.exploreSearchModifier('info', root, appliedPath, appliedConcept, unlimitedChildren)
   }
 }

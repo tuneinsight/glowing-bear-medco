@@ -8,6 +8,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import { v4 as uuidv4 } from 'uuid';
 import { Injectable } from '@angular/core';
 import { TreeNodeService } from './tree-node.service';
 import { ExploreQuery } from '../models/query-models/explore-query';
@@ -157,11 +158,14 @@ export class QueryService {
   }
 
   public execQuery(): void {
+    const isLocal = true;
+
+    console.log('this.queryType', this.queryType);
 
     if (!this.constraintService.hasConstraint()) {
       MessageHelper.alert('warn', 'No constraints specified, please correct.');
       return;
-    } else if (!this.queryType) {
+    } else if (!this.queryType && !isLocal) {
       MessageHelper.alert('warn', 'No authorized query type.');
       return;
     }
@@ -179,21 +183,20 @@ export class QueryService {
     // prepare and execute query
     this.query.generateUniqueId();
     this.query.constraint = this.constraintService.generateConstraint();
-    this.query.queryTimingSameInstanceNum = this.queryTimingSameInstance
+    this.query.queryTimingSameInstanceNum = this.queryTimingSameInstance;
 
     this.genomicAnnotationsService.addVariantIdsToConstraints(this.query.constraint).pipe(
       catchError((err) => {
         MessageHelper.alert('warn', 'Invalid genomic annotation in query, please correct.');
         return throwError(err);
       }),
-      switchMap(() => this.exploreQueryService.exploreQuery(this.query)),
-      switchMap(results => this.parseExploreQueryResults(results))
+      switchMap(() => this.exploreQueryService.exploreLocalQuery(this.query))
     ).subscribe(
-      (parsedResults: ExploreQueryResult) => {
-        if (parsedResults.resultInstanceID) {
-          this._lastSuccessfulSet.next(parsedResults.resultInstanceID)
+      (parsedResults) => {
+        if (parsedResults[0].resultInstanceID) {
+          this._lastSuccessfulSet.next(parsedResults[0].resultInstanceID);
         }
-        this.queryResults.next(parsedResults);
+        this.queryResults.next(parsedResults[0]);
         this.isUpdating = false;
         this.isDirty = this.constraintService.hasConstraint().valueOf();
       },
@@ -274,7 +277,7 @@ export class QueryService {
     }).filter((role) => role !== null);
 
     if (authorizedTypes.length === 0) {
-      console.log(`User ${this.authService.username} has no explore query types available.`);
+//      console.log(`User ${this.authService.username} has no explore query types available.`);
       return undefined;
     }
 

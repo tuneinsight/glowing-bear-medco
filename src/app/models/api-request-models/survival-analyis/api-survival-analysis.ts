@@ -9,21 +9,21 @@ import { ApiI2b2Panel } from '../medco-node/api-i2b2-panel'
 import { ApiI2b2Timing } from '../medco-node/api-i2b2-timing'
 
 export class ApiSurvivalAnalysis {
-  ID: string
-  cohortName: string
-  subGroupDefinitions: Array<{ groupName: string, subGroupTiming: ApiI2b2Timing, panels: Array<ApiI2b2Panel> }>
+  id: string
+  cohortQueryID: string
+  subGroupsDefinitions: { name: string, timing: ApiI2b2Timing, panels: Array<ApiI2b2Panel> }[]
   timeLimit: number
   timeGranularity: string
   startConcept: string
   startsWhen: string
   startModifier?: {
-    ModifierKey: string
-    AppliedPath: string
+    modifierKey: string
+    appliedPath: string
   }
   endConcept: string
   endModifier?: {
-    ModifierKey: string
-    AppliedPath: string
+    modifierKey: string
+    appliedPath: string
   }
   endsWhen: string
   userPublicKey: string

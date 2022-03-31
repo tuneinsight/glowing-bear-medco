@@ -25,7 +25,7 @@
         </label>
       </div>
       <div class="input-field-margin"
-        [ngStyle]="{'background-color' : startEventHovering ? 'var(--gb-clinical-green-light-light)' : 'white'}"
+        [ngStyle]="{'background-color' : startEventHovering ? 'var(--gb-ti-main-color-light-light)' : 'white'}"
         (dragover)="onStartDragOver($event)" (dragleave)="onStartDragLeave($event)" (drop)="onStartDrop($event)">
         <p-autoComplete #autoComplete [(ngModel)]="startConcept" [suggestions]="suggestedStartConcepts"
           (completeMethod)="searchStart($event)" field="path" (onDropDownClick)="onDropdown($event)"
@@ -52,7 +52,7 @@
       </div>
 
       <div #autoCompleteContainer class="input-field-margin"
-        [ngStyle]="{'background-color' : endEventHovering ?  'var(--gb-clinical-green-light-light)' : 'white'}"
+        [ngStyle]="{'background-color' : endEventHovering ?  'var(--gb-ti-main-color-light-light)' : 'white'}"
         (dragover)="onEndDragOver($event)" (dragleave)="onEndDragLeave($event)" (drop)="onEndDrop($event)">
         <p-autoComplete #autoComplete [(ngModel)]="endConcept" [suggestions]="suggestedEndConcepts"
           (completeMethod)="searchEnd($event)" field="path" (onDropDownClick)="onDropdown($event)"

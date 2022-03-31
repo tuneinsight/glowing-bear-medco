@@ -64,6 +64,23 @@ export class ApiEndpointService {
   }
 
   /**
+   * Make a patch http request
+   * @param urlPart - the part used in baseUrl/urlPart
+   * @param body
+   * @param apiUrl - use to override the api url configured
+   * @returns {Observable<any | any>}
+   */
+   patchCall(urlPart: string, body: object, apiUrl?: string): Observable<any> {
+    const url = apiUrl ?
+      apiUrl + '/' + urlPart :
+      this.endpointUrl + '/' + urlPart;
+
+    return this.http.patch(url, body).pipe(
+      catchError(ErrorHelper.handleHTTPError)
+    );
+  }
+
+  /**
    * Make a delete http request
    * @param urlPart
    * @param options
