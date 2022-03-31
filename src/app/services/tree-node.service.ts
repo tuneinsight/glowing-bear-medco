@@ -22,11 +22,11 @@ import { ApiEndpointService } from './api-endpoint.service';
 import {
   ApiValueMetadata,
   DataType,
-} from '../models/api-response-models/medco-node/api-value-metadata';
-import { Modifier } from '../models/constraint-models/modifier';
-import { ConfirmationService } from 'primeng';
-import { KeycloakService } from 'keycloak-angular';
-import { MessageHelper } from '../utilities/message-helper';
+} from "../models/api-response-models/medco-node/api-value-metadata";
+import { Modifier } from "../models/constraint-models/modifier";
+import { ConfirmationService } from "primeng";
+import { KeycloakService } from "keycloak-angular";
+import { MessageHelper } from "../utilities/message-helper";
 
 @Injectable()
 export class TreeNodeService {
