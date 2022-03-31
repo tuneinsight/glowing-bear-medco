@@ -1,6 +1,6 @@
 {
   "name": "glowing-bear-medco",
-  "version": "0.0.0-dev",
+  "version": "0.1.0-ti4health-spo",
   "license": "MPL-2.0",
   "scripts": {
     "ng": "./node_modules/@angular/cli/bin/ng",
@@ -87,7 +87,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ldsec/glowing-bear-medco.git"
+    "url": "https://github.com/tuneinsight/glowing-bear-medco.git"
   },
-  "homepage": "https://medco.epfl.ch/"
+  "homepage": "https://tuneinsight.com"
 }
