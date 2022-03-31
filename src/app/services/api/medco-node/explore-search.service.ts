@@ -71,14 +71,14 @@ export class ExploreSearchService {
     }
 
     private exploreSearch(searchString: string, limit: number): Observable<TreeNode[]> {
-      const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
+      const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
       return this.apiEndpointService.postCall(
         `projects/${this.config.projectId}/datasource/query`,
         {
-          operation: "searchOntology",
-          aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
-          outputDataObjectsNames: ["searchConcept"],
+          operation: 'searchOntology',
+          aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+          outputDataObjectsNames: ['searchConcept'],
           parameters: {
             searchString
           }
@@ -99,23 +99,23 @@ export class ExploreSearchService {
     }
 
   private exploreSearchConcept(operation: string, root: string, unlimitedChildren?: boolean): Observable<TreeNode[]> {
-    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
     return this.apiEndpointService.postCall(
       `projects/${this.config.projectId}/datasource/query`,
       {
-        operation: "searchConcept",
-        aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
-        outputDataObjectsNames: ["patientList", "count"],
+        operation: 'searchConcept',
+        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        outputDataObjectsNames: ['patientList', 'count'],
         parameters: {
           operation: operation,
           path: root,
-          limit: unlimitedChildren ? "0" : undefined
+          limit: unlimitedChildren ? '0' : undefined
         }
       }
     ).pipe(
       map((searchConceptResponse) => {
-        if (searchConceptResponse.status === "error" && searchConceptResponse.error.indexOf("MAX_EXCEEDED") !== -1) {
+        if (searchConceptResponse.status === 'error' && searchConceptResponse.error.indexOf('MAX_EXCEEDED') !== -1) {
           return { retry: true };
         } else {
           return this.mapSearchResults(searchConceptResponse);
@@ -146,26 +146,31 @@ export class ExploreSearchService {
   }
 
 
-  private exploreSearchModifier(operation: 'concept' | 'children' | 'info', path: string, appliedPath: string, appliedConcept: string, unlimitedChildren?: boolean): Observable<TreeNode[] | { retry: boolean }> {
-    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
+  private exploreSearchModifier(
+    operation: 'concept' | 'children' | 'info',
+    path: string,
+    appliedPath: string,
+    appliedConcept: string,
+    unlimitedChildren?: boolean): Observable<TreeNode[] | { retry: boolean }> {
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
     return this.apiEndpointService.postCall(
       `projects/${this.config.projectId}/datasource/query`,
       {
         operation: 'searchModifier',
-        aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
-        outputDataObjectsNames: ["patientList", "count"],
+        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        outputDataObjectsNames: ['patientList', 'count'],
         parameters: {
           operation: operation,
           path: path,
           appliedPath: appliedPath,
           appliedConcept: appliedConcept,
-          limit: unlimitedChildren ? "0" : undefined
+          limit: unlimitedChildren ? '0' : undefined
         }
       }
     ).pipe(
       map((searchModifierResponse) => {
-        if (searchModifierResponse.status === "error" && searchModifierResponse.error.indexOf("MAX_EXCEEDED") !== -1) {
+        if (searchModifierResponse.status === 'error' && searchModifierResponse.error.indexOf('MAX_EXCEEDED') !== -1) {
           return { retry: true };
         } else {
           return this.mapSearchResults(searchModifierResponse);
@@ -240,7 +245,10 @@ export class ExploreSearchService {
    *
    * @returns {Observable<Object>}
    */
-  exploreSearchModifierChildren(root: string, appliedPath: string, appliedConcept: string, unlimitedChildren?: boolean): Observable<TreeNode[] | { retry: boolean }> {
+  exploreSearchModifierChildren(root: string,
+    appliedPath: string,
+    appliedConcept: string,
+    unlimitedChildren?: boolean): Observable<TreeNode[] | { retry: boolean }> {
     return this.exploreSearchModifier('children', root, appliedPath, appliedConcept, unlimitedChildren)
   }
 
@@ -251,7 +259,10 @@ export class ExploreSearchService {
    *
    * @returns {Observable<Object>}
    */
-  exploreSearchModifierInfo(root: string, appliedPath: string, appliedConcept: string, unlimitedChildren?: boolean): Observable<TreeNode[] | { retry: boolean }> {
+  exploreSearchModifierInfo(root: string,
+    appliedPath: string,
+    appliedConcept: string,
+    unlimitedChildren?: boolean): Observable<TreeNode[] | { retry: boolean }> {
     return this.exploreSearchModifier('info', root, appliedPath, appliedConcept, unlimitedChildren)
   }
 }

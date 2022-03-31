@@ -36,13 +36,13 @@ export class ExploreCohortsService {
     const countSharedId = uuidv4();
     const patientSharedId = uuidv4();
 
-    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
     return this.apiEndpointService.postCall(
       `projects/${this.config.projectId}/datasource/query`,
       {
-        aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
-        operation: "getCohorts",
+        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        operation: 'getCohorts',
         parameters: {
           limit: 10
         },
@@ -54,14 +54,14 @@ export class ExploreCohortsService {
     );
   }
 
-  postCohortSingleNode(node: ApiNodeMetadata, cohortName: string, cohort: ApiCohort, exploreQueryID: string): Observable<string> {
-    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
+  postCohortSingleNode(cohortName: string, exploreQueryID: string): Observable<string> {
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
     return this.apiEndpointService.postCall(
       `projects/${this.config.projectId}/datasource/query`,
       {
-        aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
-        operation: "addCohort",
+        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        operation: 'addCohort',
         broadcast: true,
         parameters: {
           name: cohortName,
@@ -72,13 +72,13 @@ export class ExploreCohortsService {
   }
 
   removeCohortSingleNode(node: ApiNodeMetadata, name: string, exploreQueryID: string) {
-    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
     return this.apiEndpointService.postCall(
       `projects/${this.config.projectId}/datasource/query`,
       {
-        aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
-        operation: "deleteCohort",
+        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        operation: 'deleteCohort',
         broadcast: true,
         parameters: {
           name,
@@ -105,7 +105,7 @@ export class ExploreCohortsService {
   }
 
   postCohortAllNodes(cohortName: string, cohort: ApiCohort[], exploreQueryID: string): Observable<string[]> {
-    return forkJoin(this.medcoNetworkService.nodes.map((node, index) => this.postCohortSingleNode(node, cohortName, cohort[index], exploreQueryID)))
+    return forkJoin(this.medcoNetworkService.nodes.map(() => this.postCohortSingleNode(cohortName, exploreQueryID)))
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }
 

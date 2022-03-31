@@ -34,10 +34,10 @@ export class ApiSurvivalAnalysisService {
     return this.apiEndpointService.postCall(
       `projects/${this.appConfig.projectId}/datasource/query`,
       {
-        operation: "survivalQuery",
-        aggregationType: "aggregated",
+        operation: 'survivalQuery',
+        aggregationType: 'aggregated',
         broadcast: true,
-        outputDataObjectsNames: ["survivalQueryResult"],
+        outputDataObjectsNames: ['survivalQueryResult'],
         parameters: apiSurvivalAnalysis
       }
     )

@@ -115,7 +115,7 @@ export class TermSearchService {
         while (actualNode.parent) {
           actualNode = actualNode.parent;
           displayNameList.push(actualNode.displayName);
-          if (!validAppliedConcept && 
+          if (!validAppliedConcept &&
             (actualNode.nodeType === TreeNodeType.CONCEPT_FOLDER || actualNode.nodeType === TreeNodeType.MODIFIER)) {
               validAppliedConcept = actualNode;
           }
