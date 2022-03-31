@@ -79,16 +79,16 @@ export class ExploreQueryService {
   //   ).pipe(map((expQueryResp) => [node, expQueryResp['result']]));
   // }
 
-  public exploreQuerySingleNode(queryId: string, panels: ApiI2b2Panel[], queryTiming: ApiI2b2Timing, node: ApiNodeMetadata, sync: boolean = true): Observable<ExploreQueryResult> {
-    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
+  public exploreQuerySingleNode(queryId: string, panels: ApiI2b2Panel[]): Observable<ExploreQueryResult> {
+    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
     return this.apiEndpointService.postCall(
       `projects/${this.config.projectId}/datasource/query`,
       {
-        aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
-        operation: "exploreQuery",
+        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        operation: 'exploreQuery',
         broadcast: true,
-        outputDataObjectsNames: haveRightsForPatientList ? ["patientList", "count"] : ["count", "patientList"],
+        outputDataObjectsNames: haveRightsForPatientList ? ['patientList', 'count'] : ['count', 'patientList'],
         parameters: {
           id: queryId,
           definition: {
@@ -169,7 +169,7 @@ export class ExploreQueryService {
     this.preparePanelTimings(panels, queryTiming)
 
     return forkJoin([
-      this.exploreQuerySingleNode(queryId, panels, queryTiming, this.medcoNetworkService.nodes[0])
+      this.exploreQuerySingleNode(queryId, panels)
     ]).pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
   }
 
@@ -184,11 +184,11 @@ export class ExploreQueryService {
    */
      private exploreQueryAllNodes(queryId: string, userPublicKey: string,
       panels: ApiI2b2Panel[], queryTiming: ApiI2b2Timing) {
-  
+
       this.preparePanelTimings(panels, queryTiming)
-  
+
       return forkJoin(this.medcoNetworkService.nodes.map(
-        (node) => this.exploreQuerySingleNode(queryId, /* userPublicKey,*/ panels, queryTiming, node)
+        (node) => this.exploreQuerySingleNode(queryId, /* userPublicKey,*/ panels)
       )).pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
     }
 

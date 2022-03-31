@@ -65,7 +65,7 @@ export class AuthenticationService {
             this.userRoles.includes(AuthenticationService.GECO_PATIENT_LIST_ROLE) ||
             this.userRoles.includes(AuthenticationService.GECO_GLOBAL_COUNT_ROLE);
   }
- 
+
   /**
    * Returns true if the user has the authorization for analysis.
    */

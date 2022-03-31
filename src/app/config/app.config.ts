@@ -12,9 +12,17 @@ import {ErrorHelper} from '../utilities/error-helper';
 
 @Injectable()
 export class AppConfig {
-  private _projectId: string;
+
+  get projectId(): string {
+    return this._projectId;
+  }
+
+  set projectId(value: string) {
+    this._projectId = value;
+  }
 
   static path = 'app/config/';
+  private _projectId: string;
   config: Object = null;
   env: Object = null;
 
@@ -66,13 +74,5 @@ export class AppConfig {
           reject(err);
         });
     });
-  }
-
-  get projectId(): string {
-    return this._projectId;
-  }
-
-  set projectId(value: string) {
-    this._projectId = value;
   }
 }

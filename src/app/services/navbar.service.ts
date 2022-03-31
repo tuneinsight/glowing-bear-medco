@@ -42,7 +42,7 @@ export class NavbarService {
   private RESULTS_INDEX = 3;
 
   constructor(private authService: AuthenticationService, private keycloakService: KeycloakService, private router: Router) {
-    const haveRightsForSurvivalQuery = !!this.keycloakService.getUserRoles().find((role) => role === "survival_query");
+    const haveRightsForSurvivalQuery = !!this.keycloakService.getUserRoles().find((role) => role === 'survival_query');
     this._selectedSurvivalId = new Subject<number>()
     this._selectedSurvivalIDtoDelete = new Subject<number>()
     this.items = [

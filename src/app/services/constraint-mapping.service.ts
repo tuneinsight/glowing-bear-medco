@@ -56,7 +56,7 @@ export class ConstraintMappingService {
    */
   private generateI2b2Panel(constraint: Constraint): ApiI2b2Panel {
     let panel = new ApiI2b2Panel();
-    
+
     panel.panelTiming = constraint.panelTimingSameInstance ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any
     panel.not = constraint.excluded;
 

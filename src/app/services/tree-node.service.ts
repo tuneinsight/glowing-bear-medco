@@ -8,17 +8,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Injectable, Injector } from "@angular/core";
-import { Concept } from "../models/constraint-models/concept";
-import { ConceptConstraint } from "../models/constraint-models/concept-constraint";
-import { TreeNode } from "../models/tree-models/tree-node";
-import { ConstraintService } from "./constraint.service";
-import { ErrorHelper } from "../utilities/error-helper";
-import { TreeNodeType } from "../models/tree-models/tree-node-type";
-import { AppConfig } from "../config/app.config";
-import { GenomicAnnotation } from "../models/constraint-models/genomic-annotation";
-import { ExploreSearchService } from "./api/medco-node/explore-search.service";
-import { ApiEndpointService } from "./api-endpoint.service";
+import { Injectable, Injector } from '@angular/core';
+import { Concept } from '../models/constraint-models/concept';
+import { ConceptConstraint } from '../models/constraint-models/concept-constraint';
+import { TreeNode } from '../models/tree-models/tree-node';
+import { ConstraintService } from './constraint.service';
+import { ErrorHelper } from '../utilities/error-helper';
+import { TreeNodeType } from '../models/tree-models/tree-node-type';
+import { AppConfig } from '../config/app.config';
+import { GenomicAnnotation } from '../models/constraint-models/genomic-annotation';
+import { ExploreSearchService } from './api/medco-node/explore-search.service';
+import { ApiEndpointService } from './api-endpoint.service';
 import {
   ApiValueMetadata,
   DataType,
@@ -64,14 +64,14 @@ export class TreeNodeService {
       // retrieve root tree nodes and extract the concepts
       this._isLoading = true;
 
-      this.apiEndpointService.getCall("projects").subscribe((projectsList) => {
+      this.apiEndpointService.getCall('projects').subscribe((projectsList) => {
         const i2b2Project = projectsList
           .reverse()
-          .find((project) => project.name === "i2b2");
+          .find((project) => project.name === 'i2b2');
         if (i2b2Project && i2b2Project.dataSourceId) {
-          console.log("Found project id", i2b2Project.uniqueId);
+          console.log('Found project id', i2b2Project.uniqueId);
           this.config.projectId = i2b2Project.uniqueId;
-          this.exploreSearchService.exploreSearchConceptChildren("/").subscribe(
+          this.exploreSearchService.exploreSearchConceptChildren('/').subscribe(
             (treeNodes: TreeNode[]) => {
               // reset concepts and concept constraints
               this.constraintService.concepts = [];
@@ -83,7 +83,7 @@ export class TreeNodeService {
               resolve();
             },
             (err) => {
-              ErrorHelper.handleError("Error during initial tree loading", err);
+              ErrorHelper.handleError('Error during initial tree loading', err);
               this._isLoading = false;
               reject(err);
             }
@@ -134,7 +134,7 @@ export class TreeNodeService {
           }
         } else {
           this.confirmationService.confirm({
-            message: "This folder have a lot of children. Do you want to open it anyway?",
+            message: 'This folder have a lot of children. Do you want to open it anyway?',
             header: 'Confirmation',
             icon: null,
             accept: () => {
@@ -147,7 +147,7 @@ export class TreeNodeService {
         }
       },
       (err) => {
-        ErrorHelper.handleError("Error during tree children loading", err);
+        ErrorHelper.handleError('Error during tree children loading', err);
         this._isLoading = false;
       }
     );
@@ -189,9 +189,9 @@ export class TreeNodeService {
       node.label = node.label + ` (${node.subjectCount})`;
     }
 
-    node.icon = "";
-    node.expandedIcon = "fa fa-folder-open";
-    node.collapsedIcon = "fa fa-folder";
+    node.icon = '';
+    node.expandedIcon = 'fa fa-folder-open';
+    node.collapsedIcon = 'fa fa-folder';
 
     // extract concept
     switch (node.nodeType) {
@@ -228,7 +228,7 @@ export class TreeNodeService {
         constraintService.allConstraints.push(constraintFromModifier);
         if (node.nodeType === TreeNodeType.MODIFIER) {
           node.leaf = true;
-          node.icon = "fa fa-file";
+          node.icon = 'fa fa-file';
         }
         break;
       default:
@@ -306,8 +306,8 @@ export class TreeNodeService {
   public getConceptFromModifierTreeNode(treeNode: TreeNode): Concept {
     if (!treeNode.isModifier()) {
       throw ErrorHelper.handleNewError(
-        "Unexpected error. A tree node that is not a modifier cannot be passed " +
-          "to getConceptModifierTreeNode"
+        'Unexpected error. A tree node that is not a modifier cannot be passed ' +
+          'to getConceptModifierTreeNode'
       );
     }
     // this is not the same object of the node if it happens to be here, so it is safe
@@ -320,11 +320,11 @@ export class TreeNodeService {
       treeNode.appliedConcept.path
     );
     let modifierPathSplit =
-      modifier.path.length > 0 && modifier.path.startsWith("/")
-        ? modifier.path.substring(1).split("/")
-        : modifier.path.split("/");
+      modifier.path.length > 0 && modifier.path.startsWith('/')
+        ? modifier.path.substring(1).split('/')
+        : modifier.path.split('/');
     modifierPathSplit.shift();
-    let modifierPath = modifierPathSplit.join("/");
+    let modifierPath = modifierPathSplit.join('/');
 
     // override the fields
 
@@ -513,11 +513,11 @@ export class TreeNodeService {
    */
   public getParentTreeNodePaths(path: string): string[] {
     let paths: string[] = [];
-    const parts = path.split("\\");
+    const parts = path.split('\\');
     if (parts.length - 2 > 1) {
-      let parentPath = "\\";
+      let parentPath = '\\';
       for (let i = 1; i < parts.length - 2; i++) {
-        parentPath += parts[i] + "\\";
+        parentPath += parts[i] + '\\';
         paths.push(parentPath);
       }
     }

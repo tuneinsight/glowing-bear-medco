@@ -24,7 +24,7 @@ import {ErrorHelper} from '../../../../utilities/error-helper';
 import { ApiSurvivalAnalysisResponse } from 'src/app/models/api-response-models/survival-analysis/survival-analysis-response';
 
 const splitArrayIntoChunksOfLen = (arr: any[], len: number) => {
-  var chunks = [], i = 0, n = arr.length;
+  let chunks = [], i = 0, n = arr.length;
   while (i < n) {
     chunks.push(arr.slice(i, i += len));
   }
@@ -76,7 +76,7 @@ export class GbTopComponent {
 
       return {
         results: [{
-          groupId: "Full cohort",
+          groupId: 'Full cohort',
           initialCount,
           groupResults: groupResultsList
         }]
@@ -109,7 +109,7 @@ export class GbTopComponent {
           groupResults: [ ...groupResultsList ]
         });
       }
-      
+
       return {
         results: resultList
       }
@@ -174,7 +174,7 @@ export class GbTopComponent {
     this.survivalAnalysisService.runSurvivalAnalysis().subscribe(clearResult => {
 
       this.operationStatus = OperationStatus.done;
-      
+
       const formattedResults = this.formatResults(clearResult);
 
       console.log('[ANALYSIS] Decrypted & formatted survival analysis result', formattedResults);
