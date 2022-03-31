@@ -4,9 +4,9 @@ FROM node:12 as dev
 ENV GB_SRC="/glowing-bear-src"
 
 VOLUME $GB_SRC
-EXPOSE 4200
+EXPOSE 4300
 WORKDIR $GB_SRC
-ENTRYPOINT npm install && exec npm start -- --port 4200 --host 0.0.0.0
+ENTRYPOINT npm install && exec npm start -- --port 4300 --host 0.0.0.0
 
 
 # -------------------------------------------
