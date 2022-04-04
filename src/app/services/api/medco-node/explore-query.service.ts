@@ -235,7 +235,7 @@ export class ExploreQueryService {
   private preparePanelTimings(panels: ApiI2b2Panel[], queryTiming: ApiI2b2Timing): void {
     if (queryTiming === ApiI2b2Timing.any) {
       panels.forEach(panel => {
-        panel.panelTiming = ApiI2b2Timing.any
+        panel.timing = ApiI2b2Timing.any
       })
     }
   }

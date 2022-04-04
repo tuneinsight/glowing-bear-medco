@@ -261,9 +261,15 @@ export class ExploreStatisticsService {
             throw ErrorHelper.handleNewError('No analytes have been specified (numerical medical concepts). The value returned by the request will be the reference interval for the specified analytes.');
         }
 
+        console.log('analytes', analytes);
+
         // the analytes split into two groups: modifiers and concepts
-        const { conceptsPaths, modifiers }: { conceptsPaths: string[]; modifiers: ModifierApiObjet[]; } =
+        const { conceptsPaths, modifiers }/*: { conceptsPaths: string[]; modifiers: ModifierApiObjet[]; }*/ =
             this.extractConceptsAndModifiers(analytes);
+
+        console.log('conceptsPaths', conceptsPaths);
+        console.log('modifiers', modifiers);
+
 
 
         this._lastCohortDefintion = this.constraintMappingService.mapConstraint(cohortConstraint)
@@ -274,10 +280,11 @@ export class ExploreStatisticsService {
             (cohortConstraint instanceof CombinationConstraint) && (cohortConstraint as CombinationConstraint).children.length === 0
         )
 
-        const apiRequest: ApiExploreStatistics = {
+        const apiRequest/*: ApiExploreStatistics*/ = {
             id: ExploreStatisticsService.getNewQueryID(),
-            concepts: conceptsPaths,
-            modifiers: modifiers,
+            //concepts: conceptsPaths,
+            analytes: [...this._lastCohortDefintion[0].conceptItems, ...modifiers],
+//            modifiers: modifiers,
             userPublicKey: this.cryptoService.ephemeralPublicKey,
             bucketSize,
             minObservations,
@@ -288,7 +295,9 @@ export class ExploreStatisticsService {
 
         this.displayLoadingIcon.next(true);
 
-        const observableRequest = this.sendRequest(apiRequest);
+        const observableRequest = this.sendRequest(apiRequest as any);
+
+        console.log('observableRequest', observableRequest);
 
         this.navbarService.navigateToExploreTab();
         console.log('Api request ', apiRequest);
@@ -360,23 +369,19 @@ export class ExploreStatisticsService {
         });
     }
 
-    private sendRequest(apiRequest: ApiExploreStatistics): Observable<ApiExploreStatisticsResponse[]> {
+    private sendRequest(apiRequest: ApiExploreStatistics): Observable<any> {
         const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
         return this.apiEndpointService.postCall(
             `projects/${this.config.projectId}/datasource/query`,
             {
-              operation: "searchOntology",
+              operation: "statisticsQuery",
               aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
               outputDataObjectsNames: ["statisticsQueryResult"],
               parameters: apiRequest
             }
-          ).pipe(
-              ((e) => {
-                  console.log('e', e);
-              }) as any
-//            map(this.mapSearchResults.bind(this))
-          );
+          )
+          .pipe(timeout(ExploreStatisticsService.TIMEOUT_MS));
         return forkJoin(this.medcoNetworkService.nodes
             .map(
                 node => this.apiEndpointService.postCall(
@@ -396,11 +401,14 @@ export class ExploreStatisticsService {
 
 
 
-        const modifiers: Array<ModifierApiObjet> = analytes.filter(node => node.isModifier).map(node => {
+        const modifiers/*: Array<ModifierApiObjet>*/ = analytes.filter(node => node.isModifier()).map(node => {
             return {
-                ParentConceptPath: node.appliedPath,
-                ModifierKey: node.path,
-                AppliedPath: node.appliedConcept.path
+                ...node.clone(),
+                modifier: {
+                    //parentConceptPath: node.appliedPath,
+                    appliedPath: node.appliedConcept.path,
+                    key: node.path
+                }
             };
         });
 

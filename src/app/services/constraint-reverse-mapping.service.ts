@@ -45,7 +45,7 @@ export class ConstraintReverseMappingService {
     if (panels.length === 1 && panels[0].conceptItems.length === 1) {
 
       return this.mapItem(panels[0].conceptItems[0]).pipe(map(constraint => {
-        constraint.panelTimingSameInstance = panels[0].panelTiming === ApiI2b2Timing.sameInstanceNum
+        constraint.panelTimingSameInstance = panels[0].timing === ApiI2b2Timing.sameInstanceNum
         constraint.excluded = panels[0].not
         return constraint
       }))
@@ -71,7 +71,7 @@ export class ConstraintReverseMappingService {
    * of clear concepts and returns false.
    * If one or more encrypted concepts are found, null is set instead and true is returned.
    *
-   * @param panelTiming
+   * @param timing
    * @param panel
    * @param target
    */
@@ -82,7 +82,7 @@ export class ConstraintReverseMappingService {
         return null
       }
     }
-    let sameInstance = panel.panelTiming === ApiI2b2Timing.sameInstanceNum
+    let sameInstance = panel.timing === ApiI2b2Timing.sameInstanceNum
     if (panel.conceptItems.length === 1) {
       return this.mapItem(panel.conceptItems[0]).pipe(map(constraint => {
         constraint.panelTimingSameInstance = sameInstance
