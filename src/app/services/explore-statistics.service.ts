@@ -27,6 +27,7 @@ import { CryptoService } from './crypto.service';
 import { NavbarService } from './navbar.service';
 import { QueryService } from './query.service';
 import { AppConfig } from '../config/app.config';
+import { ExploreQueryService } from './api/medco-node/explore-query.service';
 
 export class ConfidenceInterval {
     constructor(private _lowerBound: number, private _middle: number, private _higherBound: number) {
@@ -145,6 +146,7 @@ export class ExploreStatisticsService {
         private constraintService: ConstraintService,
         private cohortService: CohortService,
         private queryService: QueryService,
+        private exploreQueryService: ExploreQueryService,
         private constraintMappingService: ConstraintMappingService,
         private reverseConstraintMappingService: ConstraintReverseMappingService,
         private navbarService: NavbarService,
@@ -261,16 +263,9 @@ export class ExploreStatisticsService {
             throw ErrorHelper.handleNewError('No analytes have been specified (numerical medical concepts). The value returned by the request will be the reference interval for the specified analytes.');
         }
 
-        console.log('analytes', analytes);
-
         // the analytes split into two groups: modifiers and concepts
         const { conceptsPaths, modifiers }/*: { conceptsPaths: string[]; modifiers: ModifierApiObjet[]; }*/ =
             this.extractConceptsAndModifiers(analytes);
-
-        console.log('conceptsPaths', conceptsPaths);
-        console.log('modifiers', modifiers);
-
-
 
         this._lastCohortDefintion = this.constraintMappingService.mapConstraint(cohortConstraint)
         this._lastQueryTiming = this.queryService.lastTiming
@@ -283,7 +278,7 @@ export class ExploreStatisticsService {
         const apiRequest/*: ApiExploreStatistics*/ = {
             id: ExploreStatisticsService.getNewQueryID(),
             //concepts: conceptsPaths,
-            analytes: [...this._lastCohortDefintion[0].conceptItems, ...modifiers],
+            analytes: [...modifiers],
 //            modifiers: modifiers,
             userPublicKey: this.cryptoService.ephemeralPublicKey,
             bucketSize,
@@ -381,16 +376,12 @@ export class ExploreStatisticsService {
               parameters: apiRequest
             }
           )
-          .pipe(timeout(ExploreStatisticsService.TIMEOUT_MS));
-        return forkJoin(this.medcoNetworkService.nodes
-            .map(
-                node => this.apiEndpointService.postCall(
-                    'node/explore-statistics/query',
-                    apiRequest,
-                    node.url
-                )
-            ))
-            .pipe(timeout(ExploreStatisticsService.TIMEOUT_MS));
+          .pipe(
+              map((e) => {
+                  console.log('HERE', e);
+                  return this.exploreQueryService.getDataobjectData(e.id);
+                })
+            )
     }
 
     private extractConceptsAndModifiers(analytes: TreeNode[]) {
@@ -403,9 +394,8 @@ export class ExploreStatisticsService {
 
         const modifiers/*: Array<ModifierApiObjet>*/ = analytes.filter(node => node.isModifier()).map(node => {
             return {
-                ...node.clone(),
+                queryTerm: node.appliedConcept.path,
                 modifier: {
-                    //parentConceptPath: node.appliedPath,
                     appliedPath: node.appliedConcept.path,
                     key: node.path
                 }

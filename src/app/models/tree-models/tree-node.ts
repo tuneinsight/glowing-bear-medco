@@ -20,7 +20,7 @@ export class TreeNode implements PrimeNgTreeNode {
   // type of node (concept, study, ...)
   nodeType: TreeNodeType;
   // type of value if node is an ontology concept
-  valueType: ValueType;
+  type: ValueType;
   conceptCode: string;
   dropMode: DropMode;
   metadata: ApiValueMetadata;
@@ -93,7 +93,7 @@ export class TreeNode implements PrimeNgTreeNode {
     }
 
     copy.nodeType = this.nodeType;
-    copy.valueType = this.valueType;
+    copy.type = this.type;
     copy.conceptCode = this.conceptCode;
     copy.dropMode = this.dropMode;
     if (this.metadata) {

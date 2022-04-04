@@ -249,7 +249,7 @@ export class TreeNodeService {
     let concept = new Concept();
     concept.label = `${treeNode.displayName} (${treeNode.path})`;
     concept.path = treeNode.path;
-    concept.type = treeNode.valueType;
+    concept.type = treeNode.type;
     if (treeNode.metadata) {
       this.processMetadata(concept, treeNode.metadata);
     }
@@ -331,7 +331,7 @@ export class TreeNodeService {
     concept.path = `${concept.path}${modifierPath}`;
     concept.label = `${treeNode.displayName} (${concept.path})`;
     concept.modifier = modifier;
-    concept.type = treeNode.valueType;
+    concept.type = treeNode.type;
     if (treeNode.metadata) {
       this.processMetadata(concept, treeNode.metadata);
     }

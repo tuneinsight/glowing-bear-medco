@@ -61,7 +61,7 @@ export class ExploreSearchService {
         treeNode.encryptionDescriptor = treeNodeObj['medcoEncryption'];
 
         treeNode.nodeType = this.nodeType(treeNodeObj['type'] as string);
-        treeNode.valueType = this.valueType(treeNode.nodeType, treeNode.metadata);
+        treeNode.type = this.type(treeNode.nodeType, treeNode.metadata);
         treeNode.depth = treeNode.path.split('/').length - 2;
         treeNode.children = [];
         treeNode.childrenAttached = false;
@@ -210,7 +210,7 @@ export class ExploreSearchService {
     }
   }
 
-  private valueType(nodeType: TreeNodeType, metadata: ApiValueMetadata): ValueType {
+  private type(nodeType: TreeNodeType, metadata: ApiValueMetadata): ValueType {
     if (nodeType === TreeNodeType.GENOMIC_ANNOTATION) {
       return null
     }

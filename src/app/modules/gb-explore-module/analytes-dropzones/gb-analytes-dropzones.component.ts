@@ -29,8 +29,8 @@ export class GbAnalytesDropzonesComponent extends GbConceptFormComponent {
     childrenWrappers: TreeNodeWrapper[] = []
 
 
-    public static validValueType(valueType: ValueType): boolean {
-        return valueType === ValueType.NUMERICAL
+    public static validValueType(type: ValueType): boolean {
+        return type === ValueType.NUMERICAL
     }
 
     constructor(constraintService: ConstraintService,
@@ -54,7 +54,7 @@ export class GbAnalytesDropzonesComponent extends GbConceptFormComponent {
             return null
         }
 
-        if (!GbAnalytesDropzonesComponent.validValueType(node.valueType)) {
+        if (!GbAnalytesDropzonesComponent.validValueType(node.type)) {
             ErrorHelper.handleNewError('The node you dropped in this form is not of numerical type.')
             return null
         }
