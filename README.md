@@ -1,7 +1,9 @@
-# Glowing Bear MedCo
-*glowing-bear-medco* is the web user interface of MedCo.
-You can find more information about the MedCo project [here](https://medco.epfl.ch/).
-For further details, support, and contacts, you can check the [MedCo Technical Documentation](https://ldsec.gitbook.io/medco-documentation/).
+# Glowing Bear for TI4Health
+*glowing-bear-medco* is the web user interface enabling cohorts exploration and analysis for the TI4Health platform.
+
+This version of Glowing Bear is adapted for Tune Insight's platform TI4health's API.
+
+It is a fork of the version previously developed at EPFL for the [MedCo project](https://medco.epfl.ch/).
 
 ## Source code organization
 - *deployment*: docker deployment files
@@ -16,7 +18,7 @@ For further details, support, and contacts, you can check the [MedCo Technical D
       - *gb-navbar-module*: navigation bar module, containing the menu with tabs
       - *gb-side-panel-module*: side panel module, containing the summary, ontology tree and saved cohorts
       - *gb-analysis-module*: analysis module, containing the analysis option (only survival at the current time) and settings for the analysis to run
-      - *gb-survival-results-module*: survival results module, containing the results of the various operations run on survival data points in the context of survival analysis. An overview of this compenent's logic can be found in this [file](https://github.com/ldsec/glowing-bear-medco/src/survival-analysis.md).
+      - *gb-survival-results-module*: survival results module, containing the results of the various operations run on survival data points in the context of survival analysis. An overview of this compenent's logic can be found in this [file](https://github.com/tuneinsight/glowing-bear-medco/src/survival-analysis.md).
     - *services*: services handling data flow
     - *utilities*: utility tools: crypto, log, error, etc.
   - *assets*: static assets 
@@ -24,16 +26,15 @@ For further details, support, and contacts, you can check the [MedCo Technical D
   - *styles*: CSS styles
 
 ## Getting started
-*glowing-bear-medco* needs a MedCo deployment to be used. A description of the available deployment profiles, along with a detailed guide on how to use them, is available 
-[here](https://ldsec.gitbook.io/medco-documentation/system-administrator-guide/deployment).
 
 ### Use the live development server
 ```bash
 cd deployment
 ./dev-server.sh
 ```
-The default configuration will attempt to use the local `dev-local-3nodes` deployment of MedCo. 
-An alternative configuration is provided to use the deployment `medco-demo.epfl.ch` (if it is online). To use it, update `src/app/config/env.json` with the value `medco-demo`.
+
+The backend for this version is developed and provided by Tune Insight. If you're interested in contributing please [contact us](contact@tuneinsight.com).
+
 
 ### Build the Docker image
 ```bash
@@ -41,16 +42,5 @@ cd deployment
 docker-compose build glowing-bear-medco
 ```
 
-### Generate the mapping table
-The crypto utility has a point to integer mapping table present in the file `src/app/utilities/crypto/point-to-int-mapping.ts`.
-In order to regenerate this file, e.g. so that it contains more points, you can run the following command:
-
-```bash
-cd deployment
-USER_ID=$(id -u):$(id -g) docker-compose -f docker-compose.gen-mapping-table.yml run gen-mapping-table
-```
-
-Note that the maximum value present in this mapping table is the maximum number that the library will be able to decrypt.
-
 ## License
-*glowing-bear-medco* is licensed under the MPL 2.0. If you need more information, please contact us.
+*glowing-bear-medco* is licensed under the MPL 2.0. If you need more information, please [contact us](contact@tuneinsight.com).
