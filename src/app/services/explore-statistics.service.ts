@@ -379,14 +379,14 @@ export class ExploreStatisticsService {
               operation: "statisticsQuery",
               aggregationType: "aggregated",
               broadcast: true,
-              outputDataObjectsNames: ["statisticsQueryResult"],
+              outputDataObjectsNames: Object.keys(this._analytes),
               parameters: apiRequest
             }
           )
           .pipe(
               map((e) => {
                   console.log('HERE', e);
-                  console.log(this.formatStatisticsQuery(e.results.statisticsQueryResult));
+                  console.log(this.formatStatisticsQuery(e.results['0'].data));
                   return this.exploreQueryService.getDataobjectData(e.id);
                 })
             )
