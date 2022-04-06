@@ -8,7 +8,7 @@
 export class OperationType {
 
 
-  static readonly EXPLORE: string = 'Cohort Building'
+  static readonly EXPLORE: string = 'Cohort Selection'
   static readonly EXPLORE_STATISTICS: string = 'Reference Interval Estimation'
   static readonly ANALYSIS: string = 'Analysis'
 

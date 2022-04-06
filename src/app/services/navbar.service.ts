@@ -58,7 +58,7 @@ export class NavbarService {
         { label: OperationType.ANALYSIS, routerLink: '/analysis', visible: this.authService.hasAnalysisAuth },
 
         // 3: results tab
-        { label: 'Results', routerLink: '/results', visible: this.authService.hasAnalysisAuth }
+//        { label: 'Results', routerLink: '/results', visible: this.authService.hasAnalysisAuth }
       ] : [])
     ]
 

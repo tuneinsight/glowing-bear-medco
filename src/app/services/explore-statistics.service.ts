@@ -283,7 +283,7 @@ export class ExploreStatisticsService {
             userPublicKey: this.cryptoService.ephemeralPublicKey,
             bucketSize,
             minObservations,
-            timing: this._lastQueryTiming,
+            //timing: this._lastQueryTiming,
             panels: this._lastCohortDefintion,
             isPanelEmpty: panelEmpty
         };
@@ -364,6 +364,12 @@ export class ExploreStatisticsService {
         });
     }
 
+    private formatStatisticsQuery(results: number[][]) {
+        const t = results.map((result) => result.map((innerResult) => innerResult));
+        console.log('t', t);
+        return "";
+    }
+
     private sendRequest(apiRequest: ApiExploreStatistics): Observable<any> {
         const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
 
@@ -371,7 +377,8 @@ export class ExploreStatisticsService {
             `projects/${this.config.projectId}/datasource/query`,
             {
               operation: "statisticsQuery",
-              aggregationType: haveRightsForPatientList ? "per_node" : "aggregated",
+              aggregationType: "aggregated",
+              broadcast: true,
               outputDataObjectsNames: ["statisticsQueryResult"],
               parameters: apiRequest
             }
@@ -379,6 +386,7 @@ export class ExploreStatisticsService {
           .pipe(
               map((e) => {
                   console.log('HERE', e);
+                  console.log(this.formatStatisticsQuery(e.results.statisticsQueryResult));
                   return this.exploreQueryService.getDataobjectData(e.id);
                 })
             )
