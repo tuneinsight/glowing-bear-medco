@@ -62,6 +62,10 @@ export class AppConfig {
           this.http.get(AppConfig.path + 'config.' + this.getEnv() + '.json')
             .subscribe((responseData) => {
               this.config = responseData;
+
+              // TODO: Remove hard-coded Bioref-mode config
+              (this.config as any).isBiorefMode = true;
+
               console.log('Successfully retrieved config: ', this.config);
               resolve();
             }, (err) => {

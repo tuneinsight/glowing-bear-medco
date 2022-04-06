@@ -15,6 +15,7 @@ import { AuthenticationService } from './authentication.service';
 import { Router } from '@angular/router'
 import {OperationType} from '../models/operation-models/operation-types';
 import { KeycloakService } from 'keycloak-angular';
+import { AppConfig } from '../config/app.config';
 
 @Injectable()
 export class NavbarService {
@@ -41,26 +42,45 @@ export class NavbarService {
   private ANALYSIS_INDEX = 2;
   private RESULTS_INDEX = 3;
 
-  constructor(private authService: AuthenticationService, private keycloakService: KeycloakService, private router: Router) {
+  constructor(private authService: AuthenticationService,
+    private keycloakService: KeycloakService,
+    private router: Router,
+    private appConfig: AppConfig) {
     const haveRightsForSurvivalQuery = !!this.keycloakService.getUserRoles().find((role) => role === 'survival_query');
     this._selectedSurvivalId = new Subject<number>()
     this._selectedSurvivalIDtoDelete = new Subject<number>()
+
+    const isBiorefMode = this.appConfig.getConfig('isBiorefMode');
+
     this.items = [
 
-      // 0: explore tab, default page
+      // explore tab, default page
       { label: OperationType.EXPLORE, routerLink: '/explore' },
 
-      // 1: explore statistics tab
-      { label: OperationType.EXPLORE_STATISTICS, routerLink: "/explore-statistics" },
+      // explore statistics tab
+      ...(isBiorefMode ? [{ label: OperationType.EXPLORE_STATISTICS, routerLink: "/explore-statistics" }] : []),
 
-      ...(haveRightsForSurvivalQuery ? [
-        // 2: survival analysis tab
+      ...(haveRightsForSurvivalQuery && !isBiorefMode ? [
+        // survival analysis tab
         { label: OperationType.ANALYSIS, routerLink: '/analysis', visible: this.authService.hasAnalysisAuth },
 
-        // 3: results tab
-//        { label: 'Results', routerLink: '/results', visible: this.authService.hasAnalysisAuth }
+        // results tab
+        { label: OperationType.RESULTS, routerLink: '/results', visible: this.authService.hasAnalysisAuth }
       ] : [])
-    ]
+    ].map((item, index) => ({...item, label: `${index + 1}. ${item.label}`}));
+
+    this.items.forEach((item, index) => {
+      switch (item.label) {
+        case OperationType.EXPLORE:
+          return this.EXPLORE_INDEX = index;
+        case OperationType.EXPLORE_STATISTICS:
+          return this.EXPLORE_STATS_INDEX = index;
+        case OperationType.ANALYSIS:
+          return this.ANALYSIS_INDEX = index;
+        case OperationType.RESULTS:
+          return this.RESULTS_INDEX = index;
+      }
+    });    
 
     this.resultItems = []
     this._lastSuccessfulSurvival = 0
@@ -71,7 +91,7 @@ export class NavbarService {
     this.isExploreStatistics = (routerLink === '/explore-statistics');
     this.isAnalysis = (routerLink === '/analysis');
     this.isResults = (routerLink === '/results');
-    this.isSurvivalRes = false
+    this.isSurvivalRes = false;
     for (let i = 0; i < this.resultItems.length; i++) {
       if (routerLink === this.resultItems[i].routerLink.toString()) {
         this.isSurvivalRes = true
