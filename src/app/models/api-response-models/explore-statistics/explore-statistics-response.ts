@@ -8,7 +8,7 @@
 
 // This class describes an interval from a histogram.
 export class ApiInterval {
-  encCount: string // the encrypted count of observations that fall within this interval
+  count: string // the encrypted count of observations that fall within this interval
   higherBound: string
   lowerBound: string
 }
@@ -26,9 +26,9 @@ export class ApiExploreStatisticsResponse {
   // ID returned by the i2b2 query about the cohort based on the inclusion and exclusion constraints fed the input of the front end query.
   patientSetID: number
   // list of encrypted masked patient IDs.
-  encryptedPatientList: string[]
+  // encryptedPatientList: string[]
   // per site count of the patient matching the cohort linked to the inclusion and exclusion criterias of the query
-  encryptedCohortCount: string
+  // encryptedCohortCount: string
 
   // Each item of this array contains the histogram of a specific analyte (concept or modifier).
   results: ApiExploreStatisticResult[]

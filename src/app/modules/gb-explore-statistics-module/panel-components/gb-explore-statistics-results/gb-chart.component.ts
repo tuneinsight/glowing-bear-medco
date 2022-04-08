@@ -73,8 +73,8 @@ export abstract class ChartComponent implements AfterViewInit, OnDestroy, SVGCon
         // the reference to the `canvas` on which the chart will be drawn. See the @Component to see the canvas.
         const context = this.canvasRef.nativeElement.getContext('2d');
 
-        this.chart = this.draw(context)
-        this.chart.update()
+        /* this.chart = */ this.draw(context)
+        // this.chart.update()
     }
 
     abstract draw(context: CanvasRenderingContext2D);

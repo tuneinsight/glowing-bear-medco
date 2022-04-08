@@ -210,20 +210,18 @@ export class ExploreStatisticsService {
         if (this.queryService.queryType !== ExploreQueryType.PATIENT_LIST) {
             throw ErrorHelper.handleNewError('Unable parse the cohort content of the statistics query. User is not authorized to see the patient list.')
         }
-        const nodes: ApiNodeMetadata[] = this.medcoNetworkService.nodes
+        const nodes = this.medcoNetworkService.nodes;
         const exploreResults: ApiExploreQueryResult[] = answers.map(statAnswer => {
-            const exploreResult = new ApiExploreQueryResult()
-            exploreResult.status = 'available'
-            exploreResult.encryptedPatientList = statAnswer.encryptedPatientList
-            exploreResult.queryID = statAnswer.cohortQueryID
-            exploreResult.encryptedCount = statAnswer.encryptedCohortCount
+            const exploreResult = new ApiExploreQueryResult();
+            exploreResult.status = 'available';
+            exploreResult.queryID = statAnswer.cohortQueryID;
 
-            return exploreResult
+            return exploreResult;
         })
 
-        if (nodes.length !== exploreResults.length) {
-            throw ErrorHelper.handleNewError('Different number of server nodes and server responses received')
-        }
+        // if (nodes.length !== exploreResults.length) {
+        //     throw ErrorHelper.handleNewError('Different number of server nodes and server responses received')
+        // }
 
         const zipped: [ApiNodeMetadata, ApiExploreQueryResult][] = []
         for (let i = 0; i < nodes.length; i++) {
@@ -240,7 +238,6 @@ export class ExploreStatisticsService {
 
 
         const uniqueAnalytes = new Set(this._analytes);
-        console.log('Analytes ', uniqueAnalytes);
         this.analytesSubject.next(uniqueAnalytes)
 
 
@@ -292,10 +289,7 @@ export class ExploreStatisticsService {
 
         const observableRequest = this.sendRequest(apiRequest as any);
 
-        console.log('observableRequest', observableRequest);
-
         this.navbarService.navigateToExploreTab();
-        console.log('Api request ', apiRequest);
 
         observableRequest.subscribe((answers: ApiExploreStatisticsResponse[]) => {
             this.handleAnswer(answers, cohortConstraint);
@@ -319,49 +313,38 @@ export class ExploreStatisticsService {
         }
 
         if (this.queryService.queryType === ExploreQueryType.PATIENT_LIST) {
-            this.parseCohortFromAnswer(answers);
+        //    this.parseCohortFromAnswer(answers);
         }
-
 
         // query IDs of the cohort built from the constraints and saved in the backend nodes' DB
         const patientQueryIDs = answers.map(a => a.cohortQueryID);
         this.cohortService.lastSuccessfulSet = patientQueryIDs
 
         // All servers are supposed to send the same information so we pick the element with index zero
-        const serverResponse: ApiExploreStatisticsResponse = answers[0];
-
+        const serverResponse = answers[0];
 
         if (serverResponse.results === undefined || serverResponse.results === null) {
             this.displayLoadingIcon.next(false);
             throw ErrorHelper.handleNewError('Empty server response. Please verify you selected an analyte.');
         }
 
-        const chartsInformationsObservables: Observable<ChartInformation>[] =
+        const chartsInformations =
             serverResponse.results.map((result: ApiExploreStatisticResult) => {
 
-            const encCounts: string[] = result.intervals.map((i: ApiInterval) => i.encCount);
+            //const encCounts: string[] = result.intervals.map((i: ApiInterval) => i.encCount);
 
-            const decryptedCounts = this.cryptoService.decryptIntegersWithEphemeralKey(encCounts);
-
-            return decryptedCounts.pipe(
-                map(counts => {
-                    const intervals = counts.map((count, intervalIndex) => {
-                        const apiInterval = result.intervals[intervalIndex];
-                        return new Interval(apiInterval.lowerBound, apiInterval.higherBound, count);
-                    });
-
-                    return new ChartInformation(intervals, result.unit, result.analyteName, cohortConstraint.textRepresentation);
-                })
+            //const decryptedCounts = this.cryptoService.decryptIntegersWithEphemeralKey(encCounts);
+            const intervals = result.intervals.map((i) => 
+                new Interval(i.lowerBound, i.higherBound, parseInt(i.count))
             );
+
+            return new ChartInformation(intervals, result.unit, result.analyteName, cohortConstraint.textRepresentation);
         });
 
 
-
-        forkJoin(chartsInformationsObservables).subscribe((chartsInformations: ChartInformation[]) => {
-            // waiting for the intervals to be decrypted by the crypto service to emit the chart information to external listeners.
-            this.chartsDataSubject.next(chartsInformations);
-            this.displayLoadingIcon.next(false);
-        });
+        // waiting for the intervals to be decrypted by the crypto service to emit the chart information to external listeners.
+        this.chartsDataSubject.next(chartsInformations);
+        this.displayLoadingIcon.next(false);
     }
 
     private formatStatisticsQuery(results: number[][]) {
@@ -370,9 +353,7 @@ export class ExploreStatisticsService {
         return "";
     }
 
-    private sendRequest(apiRequest: ApiExploreStatistics): Observable<any> {
-        const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === "patient_list");
-
+    private sendRequest(apiRequest: ApiExploreStatistics): Observable<ApiExploreStatisticsResponse[]> {
         return this.apiEndpointService.postCall(
             `projects/${this.config.projectId}/datasource/query`,
             {
@@ -385,9 +366,31 @@ export class ExploreStatisticsService {
           )
           .pipe(
               map((e) => {
-                  console.log('HERE', e);
-                  console.log(this.formatStatisticsQuery(e.results['0'].data));
-                  return this.exploreQueryService.getDataobjectData(e.id);
+                  const resultsArr = Object.values(e.results);
+
+                  const formattedResults = resultsArr.map((value: any, index) => {
+                      return {
+                          analyteName: this._analytes[index].displayName,
+                          intervals: value.data[0].map((dataValue, dataIndex) => {
+                              const bounds = JSON.parse(value.columns[dataIndex]);
+                              return {
+                                  count: dataValue,
+                                  lowerBound : `${bounds[0]}.00000`,
+                                  higherBound: `${bounds[1]}.00000`
+                                };
+                          }),
+                          unit: " test value 2",
+                          timers: []
+                        };
+                  });
+
+                  return [{
+                      globalTimers: [],
+                      results: formattedResults,
+                      cohortQueryID: 0,
+                      patientSetID: 0
+                      //cohortQueryID:
+                    }];
                 })
             )
     }

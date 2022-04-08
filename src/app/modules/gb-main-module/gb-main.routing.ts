@@ -22,6 +22,10 @@ export const routes: Routes = [
     loadChildren: () => import('../gb-explore-module/gb-explore.module').then(m => m.GbExploreModule)
   },
   {
+    path: 'explore-statistics',
+    loadChildren: () => import('../gb-explore-statistics-module/gb-explore-statistics.module').then(m => m.GbExploreStatisticsModule)
+  },
+  {
     path: 'analysis',
     loadChildren: () => import('../gb-analysis-module/gb-analysis.module').then(m => m.GbAnalysisModule)
   },
