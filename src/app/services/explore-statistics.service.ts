@@ -1,22 +1,19 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Injectable, Output } from '@angular/core';
 import { KeycloakService } from 'keycloak-angular';
-import { forkJoin, Observable, of, ReplaySubject, Subject } from 'rxjs';
-import { map, timeout } from 'rxjs/operators';
+import { Observable, of, ReplaySubject, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiI2b2Panel } from '../models/api-request-models/medco-node/api-i2b2-panel';
 import { ApiI2b2Timing } from '../models/api-request-models/medco-node/api-i2b2-timing';
-import { ApiExploreStatistics, ModifierApiObjet } from '../models/api-request-models/survival-analyis/api-explore-statistics';
-import { ApiExploreStatisticResult, ApiExploreStatisticsResponse, ApiInterval } from '../models/api-response-models/explore-statistics/explore-statistics-response';
+import { ApiExploreStatistics} from '../models/api-request-models/survival-analyis/api-explore-statistics';
+import { ApiExploreStatisticResult, ApiExploreStatisticsResponse } from '../models/api-response-models/explore-statistics/explore-statistics-response';
 import { ApiNodeMetadata } from '../models/api-response-models/medco-network/api-node-metadata';
 import { ApiExploreQueryResult } from '../models/api-response-models/medco-node/api-explore-query-result';
 import { CombinationConstraint } from '../models/constraint-models/combination-constraint';
 import { Constraint } from '../models/constraint-models/constraint';
-import { ExploreQueryResult } from '../models/query-models/explore-query-result';
 import { ExploreQueryType } from '../models/query-models/explore-query-type';
 import { TreeNode } from '../models/tree-models/tree-node';
-import { ConstraintHelper } from '../utilities/constraint-utilities/constraint-helper';
 import { ErrorHelper } from '../utilities/error-helper';
-import { PDF } from '../utilities/files/pdf';
 import { ApiEndpointService } from './api-endpoint.service';
 import { MedcoNetworkService } from './api/medco-network.service';
 import { CohortService } from './cohort.service';
@@ -28,21 +25,10 @@ import { NavbarService } from './navbar.service';
 import { QueryService } from './query.service';
 import { AppConfig } from '../config/app.config';
 import { ExploreQueryService } from './api/medco-node/explore-query.service';
+import { ReferenceIntervalComputer } from './reference-intervals';
 
 export class ConfidenceInterval {
-    constructor(private _lowerBound: number, private _middle: number, private _higherBound: number) {
-    }
-
-    get lowerBound() {
-        return this._lowerBound
-    }
-
-    get middle() {
-        return this._middle
-    }
-
-    get higherBound() {
-        return this._higherBound
+    constructor(public readonly lowerBound: number, public readonly middle: number, public readonly higherBound: number) {
     }
 }
 
@@ -65,9 +51,11 @@ class ReferenceRange {
     readonly CI2: ConfidenceInterval
 
     constructor(intervals: Interval[]) {
-        // TODO put Upal's code: replace the arbitrary values 1,2,3
-        this.CI1 = new ConfidenceInterval(1, 2, 3)
-        this.CI2 = new ConfidenceInterval(4, 5, 6)
+        const riComputer = new ReferenceIntervalComputer(intervals)
+        const RI = riComputer.compute()
+
+        this.CI1 = RI[0]
+        this.CI2 = RI[1]
     }
 }
 
