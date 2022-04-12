@@ -11,6 +11,8 @@ services:
     volumes:
       - ..:/glowing-bear-src
     user: ${USER_GROUP:?}
+    environment:
+      - GITHUB_PERSONNAL_TOKEN
 
   glowing-bear-medco:
     image: medco/glowing-bear-medco:dev
