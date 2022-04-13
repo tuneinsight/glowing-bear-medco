@@ -145,7 +145,7 @@ export class SurvivalService {
     return this.constraintMappingService.mapConstraint(constraint)
   }
 
-  runSurvivalAnalysis(): Observable<ApiSurvivalAnalysisResponse[]> {
+  runSurvivalAnalysis(): Observable<ApiSurvivalAnalysisResponse> {
     let apiSurvivalAnalysis = new ApiSurvivalAnalysis()
     let d = new Date()
     apiSurvivalAnalysis.id = uuidv4();

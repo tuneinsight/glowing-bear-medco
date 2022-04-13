@@ -44,13 +44,9 @@ export class ApiSurvivalAnalysisService {
   }
 
 
-  survivalAnalysisAllNodes(apiSurvivalAnalysis: ApiSurvivalAnalysis): Observable<ApiSurvivalAnalysisResponse[]> {
+  survivalAnalysisAllNodes(apiSurvivalAnalysis: ApiSurvivalAnalysis): Observable<ApiSurvivalAnalysisResponse> {
     apiSurvivalAnalysis.userPublicKey = this.cryptoService.ephemeralPublicKey
-    return forkJoin(this.medcoNetworkService.nodes.map(
-      () => {
-        return this.survivalAnalysisSingleNode(apiSurvivalAnalysis)
-      }
-    ))
+    return this.survivalAnalysisSingleNode(apiSurvivalAnalysis)
       .pipe(timeout(ApiSurvivalAnalysisService.TIMEOUT_MS))
   }
 }

@@ -28,7 +28,7 @@ const splitArrayIntoChunksOfLen = (arr: any[], len: number) => {
   while (i < n) {
     chunks.push(arr.slice(i, i += len));
   }
-  return chunks;
+  return chunks as number[][];
 }
 
 @Component({
@@ -46,10 +46,10 @@ export class GbTopComponent {
   OperationStatus = OperationStatus
   _operationStatus: OperationStatus
 
-  private formatResults(res: ApiSurvivalAnalysisResponse[]): SurvivalAnalysisClear {
-    const results = res[0].results.survivalQueryResult[0];
+  private formatResults(res: ApiSurvivalAnalysisResponse): SurvivalAnalysisClear {
+    const results = res.results.survivalQueryResult.data[0];
 
-    const types = this.survivalAnalysisService.subGroups;
+    const types = this.survivalAnalysisService.subGroups.reverse();
 
     let groupResultsList = [];
     let timepointNb = 1;
