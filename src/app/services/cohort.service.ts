@@ -21,7 +21,6 @@ import { ApiCohortResponse } from '../models/api-response-models/medco-node/api-
 import { CombinationState } from '../models/constraint-models/combination-state';
 import { CombinationConstraint } from '../models/constraint-models/combination-constraint';
 import { ApiCohort } from '../models/api-request-models/medco-node/api-cohort';
-import { ErrorHelper } from '../utilities/error-helper';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable()
@@ -190,9 +189,8 @@ export class CohortService {
     this._isRefreshing = true;
     this.exploreCohortsService.getCohortAllNodes().subscribe({
       next: (apiCohorts => {
-        console.log('apiCohorts', apiCohorts);
         try {
-          this.updateCohorts(CohortService.apiCohortsToCohort(apiCohorts[0].results.cohorts))
+          this.updateCohorts(CohortService.apiCohortsToCohort(apiCohorts.results.cohorts))
         } catch (err) {
           MessageHelper.alert('error', 'An error occured with received saved cohorts', (err as Error).message)
         }
@@ -223,10 +221,9 @@ export class CohortService {
       apiCohorts.push(apiCohort)
     })
 
-    this.exploreCohortsService.postCohortAllNodes(cohortName, apiCohorts, this.exploreQueryService.lastQueryId).subscribe(messages => {
+    this.exploreCohortsService.postCohortAllNodes(cohortName, apiCohorts, this.exploreQueryService.lastQueryId).subscribe(message => {
       cohort.exploreQueryId = this.exploreQueryService.lastQueryId;
-      messages.forEach(message => console.log('on post cohort, message: ', message)),
-        this.updateCohorts([cohort])
+      this.updateCohorts([cohort]);
       this._isRefreshing = false
     },
       error => {

@@ -32,7 +32,7 @@ export class ExploreCohortsService {
     private medcoNetworkService: MedcoNetworkService,
     private keycloakService: KeycloakService) { }
 
-  getCohortSingleNode(): Observable<ApiCohortResponse[]> {
+  getCohortSingleNode(): Observable<ApiCohortResponse> {
     const countSharedId = uuidv4();
     const patientSharedId = uuidv4();
 
@@ -71,7 +71,7 @@ export class ExploreCohortsService {
     );
   }
 
-  removeCohortSingleNode(node: ApiNodeMetadata, name: string, exploreQueryID: string) {
+  removeCohortSingleNode(name: string, exploreQueryID: string) {
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
     return this.apiEndpointService.postCall(
@@ -99,18 +99,18 @@ export class ExploreCohortsService {
   }
 
 
-  getCohortAllNodes(): Observable<ApiCohortResponse[][]> {
-    return forkJoin(this.medcoNetworkService.nodes.map(() => this.getCohortSingleNode()))
+  getCohortAllNodes(): Observable<ApiCohortResponse> {
+    return this.getCohortSingleNode()
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }
 
-  postCohortAllNodes(cohortName: string, cohort: ApiCohort[], exploreQueryID: string): Observable<string[]> {
-    return forkJoin(this.medcoNetworkService.nodes.map(() => this.postCohortSingleNode(cohortName, exploreQueryID)))
+  postCohortAllNodes(cohortName: string, cohort: ApiCohort[], exploreQueryID: string): Observable<string> {
+    return this.postCohortSingleNode(cohortName, exploreQueryID)
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }
 
   removeCohortAllNodes(name: string, exploreQueryId: string) {
-    return forkJoin(this.medcoNetworkService.nodes.map(node => this.removeCohortSingleNode(node, name, exploreQueryId)))
+    return this.removeCohortSingleNode(name, exploreQueryId)
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }
 

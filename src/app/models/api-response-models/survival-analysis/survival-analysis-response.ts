@@ -7,6 +7,8 @@
  */
 export class ApiSurvivalAnalysisResponse {
   results: {
-    survivalQueryResult: number[][]
+    survivalQueryResult: {
+      data: number[][]
+    }
   }
 }

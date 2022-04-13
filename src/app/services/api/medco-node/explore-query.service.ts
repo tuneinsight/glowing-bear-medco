@@ -107,7 +107,7 @@ export class ExploreQueryService {
             const exploreResult = new ExploreQueryResult();
             exploreResult.queryId = queryId;
             exploreResult.resultInstanceID = [1];
-            const globalCountResponse = expQueryResp.results.patientList?.[0]?.length || expQueryResp.results.count?.[0]?.[0] ||
+            const globalCountResponse = expQueryResp.results.count?.data?.[0]?.[0] ||
              Object.values(expQueryResp.results).reduce(
               (result, orgResult: any) => {
                 return result + orgResult.count.data[0][0];
@@ -116,7 +116,7 @@ export class ExploreQueryService {
             exploreResult.globalCount = globalCountResponse;
 
             if (Object.values(expQueryResp.results).length > 1) {
-              const patientListResult = expQueryResp.results.patientList || Object.values(expQueryResp.results).reduce(
+              const patientListResult = expQueryResp.results.patientList?.data?.[0] || Object.values(expQueryResp.results).reduce(
                 (result, orgResult: any) => {
                   return [[ ...result[0], ...orgResult.patientList.data[0]]];
                 },
