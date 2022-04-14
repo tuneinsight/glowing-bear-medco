@@ -79,7 +79,7 @@ export class ExploreQueryService {
   //   ).pipe(map((expQueryResp) => [node, expQueryResp['result']]));
   // }
 
-  public exploreQuerySingleNode(queryId: string, panels: ApiI2b2Panel[]): Observable<ExploreQueryResult> {
+  public exploreQuerySingleNode(queryId: string, panels: ApiI2b2Panel[], publicKey: string): Observable<ExploreQueryResult> {
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
     return this.apiEndpointService.postCall(
@@ -89,6 +89,7 @@ export class ExploreQueryService {
         operation: 'exploreQuery',
         broadcast: true,
         outputDataObjectsNames: haveRightsForPatientList ? ['patientList', 'count'] : ['count', 'patientList'],
+        targetPublicKey: publicKey,
         parameters: {
           id: queryId,
           definition: {
@@ -102,11 +103,19 @@ export class ExploreQueryService {
           return throwError(err);
         }),
         map(async (expQueryResp) => {
+          console.log('expQueryResp', expQueryResp);
           if (expQueryResp.results) {
             this.lastQueryId = queryId;
             const exploreResult = new ExploreQueryResult();
             exploreResult.queryId = queryId;
             exploreResult.resultInstanceID = [1];
+            if (expQueryResp.aggregatedResults?.type === 'ciphertable') {
+              const res = this.cryptoService.decodeBase64Url(expQueryResp.aggregatedResults.value) as Uint8Array;
+              console.log('res', res);
+              const res2 = this.cryptoService.decryptCipherTable(res);
+              console.log('res2', res2);
+              
+            }
             const globalCountResponse = expQueryResp.results.patientList?.[0]?.length || expQueryResp.results.count?.[0]?.[0] ||
              Object.values(expQueryResp.results).reduce(
               (result, orgResult: any) => {
@@ -168,9 +177,8 @@ export class ExploreQueryService {
 
     this.preparePanelTimings(panels, queryTiming)
 
-    return forkJoin([
-      this.exploreQuerySingleNode(queryId, panels)
-    ]).pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
+    return this.exploreQuerySingleNode(queryId, panels, userPublicKey)
+      .pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
   }
 
     /**
@@ -187,9 +195,8 @@ export class ExploreQueryService {
 
       this.preparePanelTimings(panels, queryTiming)
 
-      return forkJoin(this.medcoNetworkService.nodes.map(
-        (node) => this.exploreQuerySingleNode(queryId, /* userPublicKey,*/ panels)
-      )).pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
+      return this.exploreQuerySingleNode(queryId, panels, userPublicKey)
+        .pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
     }
 
   /**
