@@ -8,7 +8,7 @@
 import {Injectable} from '@angular/core';
 import {AppConfig} from '../../../config/app.config';
 import {Observable, throwError} from 'rxjs';
-import {timeout, map, tap, exhaust, catchError} from 'rxjs/operators';
+import {timeout, map, tap, catchError} from 'rxjs/operators';
 import {ApiI2b2Panel} from '../../../models/api-request-models/medco-node/api-i2b2-panel';
 import {ConstraintMappingService} from '../../constraint-mapping.service';
 import {ApiEndpointService} from '../../api-endpoint.service';
@@ -99,7 +99,22 @@ export class ExploreQueryService {
           MessageHelper.alert('error', 'Error while querying datasource.');
           return throwError(err);
         }),
-        map(async (expQueryResp) => {
+        map((expQueryResp) => {
+          if (expQueryResp.aggregatedResults) { // For global_count mode
+            const valueInUint8 = this.cryptoService.decodeBase64Url(expQueryResp.aggregatedResults.value) as Uint8Array;
+            const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
+            if (isCipherFormat(decryptedValue)) {
+              decryptedValue.data[0] = decryptedValue.data[0].map((value) => Math.round(value));
+              expQueryResp.results = {
+                global: {
+                  count: {
+                    type: "floatMatrix",
+                    ...decryptedValue
+                  }
+                }
+              };
+            }
+          }
           if (expQueryResp.results) {
             this.lastQueryId = queryId;
             const exploreResult = new ExploreQueryResult();
@@ -169,8 +184,7 @@ export class ExploreQueryService {
             MessageHelper.alert('error', 'Error while querying datasource.', expQueryResp.error);
             return throwError(expQueryResp.error);
           }
-      }),
-      exhaust()
+      })
     ) as Observable<ExploreQueryResult>;
   }
 
