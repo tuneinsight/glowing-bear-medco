@@ -80,13 +80,10 @@ export class CryptoService implements OnDestroy {
         }),
         map((paramsResponse) => {
           const params = paramsResponse.params;
-          console.log('params', params);
           const paramsBytes = this.cryptoFunc.decodeBase64Url(params) as Uint8Array;
-          //if (!util.isUint8Array(paramsBytes)) return;
           const csID = this.cryptoFunc.loadCryptoSystem(paramsBytes);
           if (typeof csID !== 'string') return;
           const keyPair = this.cryptoFunc.genKeyPair(csID) as [Uint8Array, Uint8Array];
-          console.log('keyPair', keyPair);
           const base64PublicKey = this.cryptoFunc.encodeBase64Url(keyPair[1]);
   
           this.publicKey = base64PublicKey;

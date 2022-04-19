@@ -17,11 +17,15 @@ import {GenomicAnnotationsService} from '../genomic-annotations.service';
 import {MedcoNetworkService} from '../medco-network.service';
 import {ExploreQuery} from '../../../models/query-models/explore-query';
 import {CryptoService} from '../../crypto.service';
-import {ApiNodeMetadata} from '../../../models/api-response-models/medco-network/api-node-metadata';
 import {ApiI2b2Timing} from '../../../models/api-request-models/medco-node/api-i2b2-timing';
 import { KeycloakService } from 'keycloak-angular';
 import { ExploreQueryResult } from 'src/app/models/query-models/explore-query-result';
 import { MessageHelper } from 'src/app/utilities/message-helper';
+import { CipherFormat } from '@tuneinsight/geco-cryptolib';
+
+const isCipherFormat = (obj: CipherFormat | Error): obj is CipherFormat => {
+  return (obj as CipherFormat).data !== undefined;
+}
 
 @Injectable()
 export class ExploreQueryService {
@@ -103,23 +107,26 @@ export class ExploreQueryService {
           return throwError(err);
         }),
         map(async (expQueryResp) => {
-          console.log('expQueryResp', expQueryResp);
           if (expQueryResp.results) {
             this.lastQueryId = queryId;
             const exploreResult = new ExploreQueryResult();
             exploreResult.queryId = queryId;
             exploreResult.resultInstanceID = [1];
-            if (expQueryResp.aggregatedResults?.type === 'ciphertable') {
-              const res = this.cryptoService.decodeBase64Url(expQueryResp.aggregatedResults.value) as Uint8Array;
-              console.log('res', res);
-              const res2 = this.cryptoService.decryptCipherTable(res);
-              console.log('res2', res2);
-              
-            }
             const globalCountResponse = expQueryResp.results.patientList?.[0]?.length || expQueryResp.results.count?.[0]?.[0] ||
              Object.values(expQueryResp.results).reduce(
-              (result, orgResult: any) => {
-                return result + orgResult.count.data[0][0];
+              (result: number, orgResult: any) => {
+                  if (orgResult.count.type === 'ciphertable') {
+                    const valueInUint8 = this.cryptoService.decodeBase64Url(orgResult.count.value) as Uint8Array;
+                    const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
+                    if (isCipherFormat(decryptedValue)) {
+                      const roundedValues = decryptedValue.data[0].map((value) => Math.round(value));
+                      return result + roundedValues[0];
+                    } else {
+                      return result;
+                    }
+                  } else {
+                    return result + orgResult.count.data[0][0];
+                  }
                 },
               0) as number;
             exploreResult.globalCount = globalCountResponse;
@@ -127,7 +134,18 @@ export class ExploreQueryService {
             if (Object.values(expQueryResp.results).length > 1) {
               const patientListResult = expQueryResp.results.patientList || Object.values(expQueryResp.results).reduce(
                 (result, orgResult: any) => {
-                  return [[ ...result[0], ...orgResult.patientList.data[0]]];
+                  if (orgResult.patientList.type === 'ciphertable') {
+                    const valueInUint8 = this.cryptoService.decodeBase64Url(orgResult.patientList.value) as Uint8Array;
+                    const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
+                    if (isCipherFormat(decryptedValue)) {
+                      const roundedValues = decryptedValue.data[0].map((value) => Math.round(value));
+                      return [[ ...result[0], ...roundedValues]];
+                    } else {
+                      return result;
+                    }
+                  } else {
+                    return [[ ...result[0], ...orgResult.patientList.data[0]]];
+                  }
                 },
                 [[]]) as number[][];
                 exploreResult.patientLists = patientListResult;
@@ -135,7 +153,17 @@ export class ExploreQueryService {
                 if (haveRightsForPatientList) {
                   exploreResult.perSiteCounts = Object.values(expQueryResp.results).reduce(
                     (result: number[], orgResult: any) => {
-                      return [ ...result, orgResult.patientList.data[0].length];
+                      if (orgResult.patientList.type === 'ciphertable') {
+                        const valueInUint8 = this.cryptoService.decodeBase64Url(orgResult.patientList.value) as Uint8Array;
+                        const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
+                        if (isCipherFormat(decryptedValue)) {
+                          return [ ...result, decryptedValue.data[0].length];
+                        } else {
+                          return result;
+                        }
+                      } else {
+                        return [ ...result, orgResult.patientList.data[0].length];
+                      }
                     },
                     []) as number[];
               }
