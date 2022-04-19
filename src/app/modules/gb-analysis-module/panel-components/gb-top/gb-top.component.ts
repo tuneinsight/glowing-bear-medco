@@ -46,8 +46,8 @@ export class GbTopComponent {
   OperationStatus = OperationStatus
   _operationStatus: OperationStatus
 
-  private formatResults(res: ApiSurvivalAnalysisResponse[]): SurvivalAnalysisClear {
-    const results = res[0].results.survivalQueryResult[0];
+  private formatResults(res: ApiSurvivalAnalysisResponse): SurvivalAnalysisClear {
+    const results = res.aggregatedResults.data[0];
 
     const types = this.survivalAnalysisService.subGroups;
 

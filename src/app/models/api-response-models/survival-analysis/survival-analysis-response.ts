@@ -6,7 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 export class ApiSurvivalAnalysisResponse {
-  results: {
-    survivalQueryResult: number[][]
+  aggregatedResults: {
+    type: 'floatMatrix';
+    data: number[][];
+  } | {
+    type: 'ciphertable';
+    value: string;
+    data: number[][];
   }
 }

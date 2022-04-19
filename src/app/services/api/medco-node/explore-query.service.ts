@@ -5,15 +5,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import { v4 as uuidv4 } from 'uuid';
 import {Injectable} from '@angular/core';
 import {AppConfig} from '../../../config/app.config';
-import {Observable, forkJoin, throwError} from 'rxjs';
+import {Observable, throwError} from 'rxjs';
 import {timeout, map, tap, exhaust, catchError} from 'rxjs/operators';
 import {ApiI2b2Panel} from '../../../models/api-request-models/medco-node/api-i2b2-panel';
 import {ConstraintMappingService} from '../../constraint-mapping.service';
 import {ApiEndpointService} from '../../api-endpoint.service';
-import {GenomicAnnotationsService} from '../genomic-annotations.service';
 import {MedcoNetworkService} from '../medco-network.service';
 import {ExploreQuery} from '../../../models/query-models/explore-query';
 import {CryptoService} from '../../crypto.service';
@@ -21,11 +19,7 @@ import {ApiI2b2Timing} from '../../../models/api-request-models/medco-node/api-i
 import { KeycloakService } from 'keycloak-angular';
 import { ExploreQueryResult } from 'src/app/models/query-models/explore-query-result';
 import { MessageHelper } from 'src/app/utilities/message-helper';
-import { CipherFormat } from '@tuneinsight/geco-cryptolib';
-
-const isCipherFormat = (obj: CipherFormat | Error): obj is CipherFormat => {
-  return (obj as CipherFormat).data !== undefined;
-}
+import { isCipherFormat } from 'src/app/utilities/is-cipher-format';
 
 @Injectable()
 export class ExploreQueryService {
@@ -52,7 +46,6 @@ export class ExploreQueryService {
   constructor(private config: AppConfig,
     private apiEndpointService: ApiEndpointService,
     private medcoNetworkService: MedcoNetworkService,
-    private genomicAnnotationsService: GenomicAnnotationsService,
     private constraintMappingService: ConstraintMappingService,
     private cryptoService: CryptoService,
     private keycloakService: KeycloakService) { }
@@ -139,12 +132,12 @@ export class ExploreQueryService {
                     const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
                     if (isCipherFormat(decryptedValue)) {
                       const roundedValues = decryptedValue.data[0].map((value) => Math.round(value));
-                      return [[ ...result[0], ...roundedValues]];
+                      return [[ ...result[0], ...roundedValues ]];
                     } else {
                       return result;
                     }
                   } else {
-                    return [[ ...result[0], ...orgResult.patientList.data[0]]];
+                    return [[ ...result[0], ...orgResult.patientList.data[0] ]];
                   }
                 },
                 [[]]) as number[][];
@@ -157,12 +150,12 @@ export class ExploreQueryService {
                         const valueInUint8 = this.cryptoService.decodeBase64Url(orgResult.patientList.value) as Uint8Array;
                         const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
                         if (isCipherFormat(decryptedValue)) {
-                          return [ ...result, decryptedValue.data[0].length];
+                          return [ ...result, decryptedValue.data[0].length ];
                         } else {
                           return result;
                         }
                       } else {
-                        return [ ...result, orgResult.patientList.data[0].length];
+                        return [ ...result, orgResult.patientList.data[0].length ];
                       }
                     },
                     []) as number[];
