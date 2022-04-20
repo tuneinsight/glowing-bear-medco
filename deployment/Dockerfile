@@ -14,13 +14,17 @@ ENTRYPOINT  npm install && \
 # -------------------------------------------
 FROM node:12 as build
 
+ARG GITHUB_PERSONNAL_TOKEN
+
 # build time env
 ENV GB_SRC="/glowing-bear-src" \
-    GB_DIST="/glowing-bear-dist"
+    GB_DIST="/glowing-bear-dist" \
+    GITHUB_PERSONNAL_TOKEN=$GITHUB_PERSONNAL_TOKEN
 
 COPY . $GB_SRC
 RUN cd $GB_SRC && \
     npm install && \
+    cp node_modules/@tuneinsight/geco-cryptolib/geco-cryptolib.wasm src/assets/ && \
     npm run package && \
     mv $GB_SRC/dist $GB_DIST
 
