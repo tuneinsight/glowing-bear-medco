@@ -20,8 +20,8 @@ ENV GB_SRC="/glowing-bear-src" \
     TI_ACCESS_TOKEN=$TI_ACCESS_TOKEN
 
 COPY . $GB_SRC
-RUN cd $GB_SRC && \
-    --mount=type=secret,id=TI_ACCESS_TOKEN export TI_ACCESS_TOKEN=$(cat /run/secrets/TI_ACCESS_TOKEN) && \
+RUN --mount=type=secret,id=TI_ACCESS_TOKEN export TI_ACCESS_TOKEN=$(cat /run/secrets/TI_ACCESS_TOKEN) && \
+    cd $GB_SRC && \
     npm install && \
     cp node_modules/@tuneinsight/geco-cryptolib/geco-cryptolib.wasm src/assets/ && \
     npm run package && \
