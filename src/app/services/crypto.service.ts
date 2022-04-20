@@ -21,7 +21,7 @@ import {DecryptionWorker} from '../../decryption.worker';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {BehaviorSubject, Observable, throwError} from 'rxjs';
 import {ErrorHelper} from '../utilities/error-helper';
-import GeCoCryptoLib, {GeCoCryptoLibLoad} from "@tuneinsight/geco-cryptolib";
+import GeCoCryptoLib, {GeCoCryptoLibLoad} from '@tuneinsight/geco-cryptolib';
 import { KeycloakService } from 'keycloak-angular';
 import { ApiEndpointService } from './api-endpoint.service';
 import { catchError, exhaust, map } from 'rxjs/operators';
@@ -46,25 +46,25 @@ export class CryptoService implements OnDestroy {
   /**
    * This constructor loads an ephemeral pair of keys for this instance of Glowing-Bear.
    */
-  
+
    private cryptoFunc: GeCoCryptoLib; // Here the exported functions are stored after wasm was initiated
    /*
     WasmSuite is defined like this:
     type MyFunctionInterface = (input: string) => string;
-   
+
     interface WasmSuite {
         myFunction: MyFunctionInterface;
     }
    */
- 
+
     // This is just to let components know when WASM is ready
    public ready: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
    private apiEndpointService: ApiEndpointService;
    private keycloakService: KeycloakService;
- 
+
    constructor(private injector: Injector) { }
- 
+
    load() {
     return GeCoCryptoLibLoad('assets/geco-cryptolib.wasm').then(async () => {
       this.keycloakService = this.injector.get(KeycloakService);
@@ -72,7 +72,7 @@ export class CryptoService implements OnDestroy {
       this.cryptoFunc = globalThis.GeCoCryptoLib;
       const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
       await this.apiEndpointService.getCall(
-        "params"
+        'params'
       ).pipe(
         catchError((err) => {
           MessageHelper.alert('error', 'Error while getting crypto params.');
@@ -82,19 +82,19 @@ export class CryptoService implements OnDestroy {
           const params = paramsResponse.params;
           const paramsBytes = this.cryptoFunc.decodeBase64Url(params) as Uint8Array;
           const csID = this.cryptoFunc.loadCryptoSystem(paramsBytes);
-          if (typeof csID !== 'string') return;
+          if (typeof csID !== 'string') { return; }
           const keyPair = this.cryptoFunc.genKeyPair(csID) as [Uint8Array, Uint8Array];
           const base64PublicKey = this.cryptoFunc.encodeBase64Url(keyPair[1]);
-  
+
           this.publicKey = base64PublicKey;
-          
+
           this.csID = csID;
           this.ready.next(true);
         })
       ).toPromise();
     });
   }
- 
+
   public encryptFloatMatrix(floats: number[][], cols: string[]) {
     return this.cryptoFunc.encryptFloatMatrix(this.csID, floats, cols);
   }
@@ -124,8 +124,8 @@ export class CryptoService implements OnDestroy {
    * @returns {string} the integer encrypted with cothority key
    */
   encryptIntegerWithCothorityKey(integer: number) {
-    //let cothorityKey = DeserializePoint(this.medcoNetworkService.networkPubKey);
-    //return EncryptInt(cothorityKey, integer).toString();
+    // let cothorityKey = DeserializePoint(this.medcoNetworkService.networkPubKey);
+    // return EncryptInt(cothorityKey, integer).toString();
     return 'test';
   }
 

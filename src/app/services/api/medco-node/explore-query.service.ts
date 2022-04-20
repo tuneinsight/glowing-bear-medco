@@ -108,7 +108,7 @@ export class ExploreQueryService {
               expQueryResp.results = {
                 global: {
                   count: {
-                    type: "floatMatrix",
+                    type: 'floatMatrix',
                     ...decryptedValue
                   }
                 }
