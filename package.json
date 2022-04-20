@@ -27,7 +27,7 @@
     "@angular/router": "^9.1.13",
     "@dedis/kyber": "^3.4.4",
     "@fullcalendar/core": "^5.10.1",
-    "@tuneinsight/geco-cryptolib": "0.1.0-ti4health-rc.1-wasm-cryptolib-63414df",
+    "@tuneinsight/geco-cryptolib": "0.1.0-ti4health-rc.1-wasm-cryptolib-94dd1c2",
     "angular-web-worker": "^1.0.6",
     "arraybuffer-to-buffer": "0.0.7",
     "base64url": "^3.0.1",
