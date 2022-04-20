@@ -16,8 +16,7 @@ FROM node:12 as build
 
 # build time env
 ENV GB_SRC="/glowing-bear-src" \
-    GB_DIST="/glowing-bear-dist" \
-    TI_ACCESS_TOKEN=$TI_ACCESS_TOKEN
+    GB_DIST="/glowing-bear-dist"
 
 COPY . $GB_SRC
 RUN --mount=type=secret,id=TI_ACCESS_TOKEN export TI_ACCESS_TOKEN=$(cat /run/secrets/TI_ACCESS_TOKEN) && \
