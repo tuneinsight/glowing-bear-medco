@@ -20,6 +20,8 @@ jobs:
 
       - name: Install NPM dependencies
         run: npm install
+        env:
+          GITHUB_PERSONNAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run linter
         run: npm run lint

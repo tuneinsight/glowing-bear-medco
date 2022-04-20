@@ -46,6 +46,8 @@ jobs:
 
       - name: Build and push glowing-bear-medco
         uses: docker/build-push-action@v2
+        env:
+          GITHUB_PERSONNAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           file: ./deployment/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
