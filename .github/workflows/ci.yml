@@ -20,11 +20,10 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Fix git permissions for private package
-        run: git config --global url."https://${{ secrets.PAT }}@github.com/".insteadOf ssh://git@github.com/
-
       - name: Install NPM dependencies
         run: npm install
+        env:
+          GITHUB_PERSONNAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run linter
         run: npm run lint
