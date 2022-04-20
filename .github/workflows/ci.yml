@@ -15,6 +15,12 @@ jobs:
           node-version: 12.x
       - run: node --version
 
+      - name: Environment
+        run: |
+          go version
+          npm version
+          env
+
       - name: Checkout code
         uses: actions/checkout@v2
         with:
