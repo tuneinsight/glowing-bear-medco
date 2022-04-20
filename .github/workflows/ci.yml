@@ -7,6 +7,8 @@ jobs:
   npm-tests:
     name: Code beautification and unit tests
     runs-on: ubuntu-latest
+    env:
+      GITHUB_PERSONNAL_TOKEN: ${{ secrets.TI_ACCESS_TOKEN }}
 
     steps:
       - name: Set up Node.js
@@ -23,13 +25,9 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          persist-credentials: false
 
       - name: Install NPM dependencies
         run: npm install
-        env:
-          GITHUB_PERSONNAL_TOKEN: ${{ secrets.TI_ACCESS_TOKEN }}
 
       - name: Run linter
         run: npm run lint
