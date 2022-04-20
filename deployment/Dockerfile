@@ -14,8 +14,6 @@ ENTRYPOINT  npm install && \
 # -------------------------------------------
 FROM node:12 as build
 
-ARG TI_ACCESS_TOKEN
-
 # build time env
 ENV GB_SRC="/glowing-bear-src" \
     GB_DIST="/glowing-bear-dist" \
