@@ -48,6 +48,9 @@ jobs:
           fi
           echo ::set-output name=version::${VERSION}
 
+      - name: Fix Git for SSH
+        run: git config --global url."https://${{ secrets.TI_ACCESS_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
+
       - name: Build and push glowing-bear-medco
         uses: docker/build-push-action@v2
         with:
