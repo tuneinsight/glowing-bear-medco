@@ -59,3 +59,5 @@ jobs:
           tags: ghcr.io/tuneinsight/glowing-bear-medco:${{ steps.get_version.outputs.version }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+          secrets: |
+            TI_ACCESS_TOKEN=${{ secrets.TI_ACCESS_TOKEN }}
