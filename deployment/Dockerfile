@@ -14,12 +14,12 @@ ENTRYPOINT  npm install && \
 # -------------------------------------------
 FROM node:12 as build
 
-ARG GITHUB_PERSONNAL_TOKEN
+ARG TI_ACCESS_TOKEN
 
 # build time env
 ENV GB_SRC="/glowing-bear-src" \
     GB_DIST="/glowing-bear-dist" \
-    GITHUB_PERSONNAL_TOKEN=$GITHUB_PERSONNAL_TOKEN
+    TI_ACCESS_TOKEN=$TI_ACCESS_TOKEN
 
 COPY . $GB_SRC
 RUN cd $GB_SRC && \

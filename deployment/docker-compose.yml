@@ -12,7 +12,7 @@ services:
       - ..:/glowing-bear-src
     user: ${USER_GROUP:?}
     environment:
-      - GITHUB_PERSONNAL_TOKEN
+      - TI_ACCESS_TOKEN
 
   glowing-bear-medco:
     image: medco/glowing-bear-medco:dev
@@ -23,7 +23,7 @@ services:
     ports:
       - "82:80"
     environment:
-      - GITHUB_PERSONNAL_TOKEN
+      - TI_ACCESS_TOKEN
       - GB_MEDCO_NODE_URL=http://localhost:3001
       - GB_KEYCLOAK_URL=http://localhost:8080/auth
       - GB_KEYCLOAK_REALM=ti-realm
