@@ -14,7 +14,8 @@ ENTRYPOINT  npm install && \
 # -------------------------------------------
 FROM node:12 as build
 
-ARG TI_ACCESS_TOKEN
+RUN --mount=type=secret,id=TI_ACCESS_TOKEN \
+  cat /run/secrets/TI_ACCESS_TOKEN
 
 # build time env
 ENV GB_SRC="/glowing-bear-src" \
