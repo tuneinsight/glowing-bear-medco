@@ -104,7 +104,7 @@ export class ExploreQueryService {
             const valueInUint8 = this.cryptoService.decodeBase64Url(expQueryResp.aggregatedResults.value) as Uint8Array;
             const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
             if (isCipherFormat(decryptedValue)) {
-              decryptedValue.data[0] = decryptedValue.data[0].map((value) => Math.round(value));
+              decryptedValue.data[0] = [decryptedValue.data[0].map((value) => Math.round(value)).length];
               expQueryResp.results = {
                 global: {
                   count: {
