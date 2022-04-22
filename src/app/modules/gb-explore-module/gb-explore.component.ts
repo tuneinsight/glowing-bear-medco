@@ -11,6 +11,7 @@
 import { AfterViewChecked, ChangeDetectorRef, Component, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AppConfig } from 'src/app/config/app.config';
 import { Cohort } from 'src/app/models/cohort-models/cohort';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { ExploreStatisticsService } from 'src/app/services/explore-statistics.service';
@@ -39,6 +40,7 @@ export class GbExploreComponent implements AfterViewChecked {
 
 
   constructor(
+    private config: AppConfig,
     private authService: AuthenticationService,
     private queryService: QueryService,
     private cohortService: CohortService,
@@ -128,6 +130,10 @@ export class GbExploreComponent implements AfterViewChecked {
 
   get hasConstraint(): boolean {
     return this.constraintService.hasConstraint().valueOf()
+  }
+
+  get isBiorefMode(): boolean {
+    return this.config.getConfig('isBiorefMode');
   }
 
 

@@ -38,6 +38,10 @@ export class AppConfig {
     return value != null ? value : defaultValue;
   }
 
+  public setConfig(key: string, value: any = null) {
+    this.config[key] = value;
+  }
+
   /**
    * Use to get the data found in the first file (env file)
    */
@@ -62,9 +66,6 @@ export class AppConfig {
           this.http.get(AppConfig.path + 'config.' + this.getEnv() + '.json')
             .subscribe((responseData) => {
               this.config = responseData;
-
-              // TODO: Remove hard-coded Bioref-mode config
-              (this.config as any).isBiorefMode = true;
 
               console.log('Successfully retrieved config: ', this.config);
               resolve();

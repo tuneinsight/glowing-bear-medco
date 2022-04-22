@@ -8,7 +8,7 @@
         [style]="{'min-width':'25em'}"
         dropdownIcon="pi pi-caret-down white-color"
         [(ngModel)]="queryTiming" [options]="timings" [ngStyle]="{'margin-bottom':'1em'}"></p-dropdown>
-        <gb-generic-tooltip [infos]="'In general a cohort definition is defined like: (sub-constraint 1) AND (sub-constraint 2) AND ...
+        <gb-generic-tooltip *ngIf="isBiorefMode" [infos]="'In general a cohort definition is defined like: (sub-constraint 1) AND (sub-constraint 2) AND ...
 
         The chosen counting method determines which patients are present in the cohort.
 

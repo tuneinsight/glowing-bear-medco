@@ -37,11 +37,6 @@ export class NavbarService {
 
   private _lastSuccessfulSurvival: number;
 
-  private EXPLORE_INDEX = 0;
-  private EXPLORE_STATS_INDEX = 1;
-  private ANALYSIS_INDEX = 2;
-  private RESULTS_INDEX = 3;
-
   constructor(private authService: AuthenticationService,
     private keycloakService: KeycloakService,
     private router: Router,
@@ -51,6 +46,8 @@ export class NavbarService {
     this._selectedSurvivalIDtoDelete = new Subject<number>()
 
     const isBiorefMode = this.appConfig.getConfig('isBiorefMode');
+
+    console.log('isBiorefMode', isBiorefMode);
 
     this.items = [
 
@@ -68,19 +65,6 @@ export class NavbarService {
         { label: OperationType.RESULTS, routerLink: '/results', visible: this.authService.hasAnalysisAuth }
       ] : [])
     ].map((item, index) => ({...item, label: `${index + 1}. ${item.label}`}));
-
-    this.items.forEach((item, index) => {
-      switch (item.label) {
-        case OperationType.EXPLORE:
-          return this.EXPLORE_INDEX = index;
-        case OperationType.EXPLORE_STATISTICS:
-          return this.EXPLORE_STATS_INDEX = index;
-        case OperationType.ANALYSIS:
-          return this.ANALYSIS_INDEX = index;
-        case OperationType.RESULTS:
-          return this.RESULTS_INDEX = index;
-      }
-    });    
 
     this.resultItems = []
     this._lastSuccessfulSurvival = 0
@@ -101,16 +85,16 @@ export class NavbarService {
     console.log('Updated router link: ', routerLink)
 
     if (this.isExplore) {
-      this.activeItem = this.items[this.EXPLORE_INDEX];
+      this.activeItem = this.items.find((item) => item.label === OperationType.EXPLORE);
     } else if (this.isExploreStatistics) {
-      this.activeItem = this._items[this.EXPLORE_STATS_INDEX];
+      this.activeItem = this.items.find((item) => item.label === OperationType.EXPLORE_STATISTICS);
     } else if (this.isAnalysis) {
-      this.activeItem = this.items[this.ANALYSIS_INDEX];
+      this.activeItem = this.items.find((item) => item.label === OperationType.ANALYSIS);
     } else if (this.isResults) {
-      this.activeItem = this.items[this.RESULTS_INDEX];
+      this.activeItem = this.items.find((item) => item.label === OperationType.RESULTS);
     } else {
       if (this.isSurvivalRes) {
-        this.activeItem = this.items[this.RESULTS_INDEX]
+        this.activeItem = this.items.find((item) => item.label === OperationType.RESULTS);
         for (let j = 0; j < this.resultItems.length; j++) {
           if (this.resultItems[j].routerLink.toString() === routerLink) {
             this.activeResultItem = this.resultItems[j]

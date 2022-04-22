@@ -46,10 +46,10 @@
               </button>
             </ng-template>
 
-            <i *ngIf="isUpdating" class="fa fa-circle-o-notch fa-spin"
+            <i *ngIf="isBiorefMode && isUpdating" class="fa fa-circle-o-notch fa-spin"
               style="padding-left: .5em; padding-right: .5em;"></i>
           </span>
-          <gb-generic-tooltip *ngIf="userHasExploreStatsRole()" [infos]="'To estimate personalized reference intervals, only three easy steps are required:
+          <gb-generic-tooltip *ngIf="isBiorefMode" [infos]="'To estimate personalized reference intervals, only three easy steps are required:
 
           1) Drag & drop the laboratory analyte(s) of interest from the ontology sidebar into the box in the Analytes field
 
@@ -60,7 +60,9 @@
       </div>
   </div>
 
-  <div *ngIf="userHasExploreStatsRole()" #analytesDropzones class="input-label-wrapper small-font analytes-explore-container">
+  
+
+  <div *ngIf="isBiorefMode" #analytesDropzones class="input-label-wrapper small-font analytes-explore-container">
     <div>
       <label class="title-label">
         Analytes:
@@ -70,7 +72,7 @@
   </div>
 
   <div style="margin-top: 1em;">
-    <div class="title-label">
+    <div *ngIf="isBiorefMode" class="title-label">
       Cohort definition:
     </div>
     <gb-selection [operationType]="OperationType.EXPLORE"></gb-selection>

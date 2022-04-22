@@ -79,6 +79,7 @@ export class TreeNodeService {
 
               this.processTreeNodes(treeNodes, this.constraintService);
               treeNodes.forEach((node) => this.rootTreeNodes.push(node));
+              this.config.setConfig('isBiorefMode', this.keycloakService.isUserInRole('statistics_query'));
               this._isLoading = false;
               resolve();
             },

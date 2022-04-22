@@ -20,6 +20,7 @@ import { CohortService } from '../../../services/cohort.service';
 import { ApiI2b2Timing } from '../../../models/api-request-models/medco-node/api-i2b2-timing';
 import { CombinationConstraint } from '../../../models/constraint-models/combination-constraint';
 import { OperationType } from '../../../models/operation-models/operation-types';
+import { AppConfig } from 'src/app/config/app.config';
 
 type LoadingState = 'loading' | 'complete';
 
@@ -50,7 +51,8 @@ export class GbSelectionComponent {
 
   private isUploadListenerNotAdded: boolean;
 
-  constructor(private constraintService: ConstraintService,
+  constructor(private config: AppConfig,
+    private constraintService: ConstraintService,
     private queryService: QueryService,
     private cohortService: CohortService) {
     this.isUploadListenerNotAdded = true;
@@ -93,6 +95,10 @@ export class GbSelectionComponent {
 
   get rootConstraint(): CombinationConstraint {
     return this.constraintService.rootConstraint
+  }
+
+  get isBiorefMode(): boolean {
+    return this.config.getConfig('isBiorefMode');
   }
 
 
