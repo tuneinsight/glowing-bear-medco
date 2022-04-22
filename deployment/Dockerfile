@@ -26,9 +26,14 @@ RUN --mount=type=secret,id=TI_ACCESS_TOKEN export TI_ACCESS_TOKEN=$(cat /run/sec
     npm run package && \
     mv $GB_SRC/dist $GB_DIST
 
+# Remove unecessary files from the build
+RUN rm -rf $GB_DIST/*.map
+RUN rm -rf $GB_DIST/assets/icons/psd/*.psd
 
 # -------------------------------------------
 FROM nginx:1.21.6-alpine as release
+
+RUN apk add bash
 
 # build time env
 ENV GB_DIST="/glowing-bear-dist" \
