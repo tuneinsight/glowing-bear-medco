@@ -96,50 +96,35 @@ export class ExploreQueryService {
       }
     ).pipe(
         catchError((err) => {
-          MessageHelper.alert('error', 'Error while querying datasource.');
+          MessageHelper.alert('error', 'Error while querying the data source.');
           return throwError(err);
         }),
         map((expQueryResp) => {
-          if (expQueryResp.aggregatedResults) { // For global_count mode
-            const valueInUint8 = this.cryptoService.decodeBase64Url(expQueryResp.aggregatedResults.value) as Uint8Array;
-            const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
-            if (isCipherFormat(decryptedValue)) {
-              decryptedValue.data[0] = [decryptedValue.data[0].map((value) => Math.round(value)).length];
-              expQueryResp.results = {
-                global: {
-                  count: {
-                    type: 'floatMatrix',
-                    ...decryptedValue
-                  }
-                }
-              };
-            }
-          }
           if (expQueryResp.results) {
             this.lastQueryId = queryId;
             const exploreResult = new ExploreQueryResult();
             exploreResult.queryId = queryId;
             exploreResult.resultInstanceID = [1];
-            const globalCountResponse = expQueryResp.results.count?.data?.[0]?.[0] ||
-             Object.values(expQueryResp.results).reduce(
-              (result: number, orgResult: any) => {
-                  if (orgResult.count.type === 'ciphertable') {
-                    const valueInUint8 = this.cryptoService.decodeBase64Url(orgResult.count.value) as Uint8Array;
+
+            if (!haveRightsForPatientList) {
+              // global count mode
+              if (expQueryResp.results.count) {
+                const count = expQueryResp.results.count;  
+                exploreResult.globalCount = count // If the result is in cleartext we use it as is
+                if (count.type === 'ciphertable') {
+                    const valueInUint8 = this.cryptoService.decodeBase64Url(count.value) as Uint8Array;
                     const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
                     if (isCipherFormat(decryptedValue)) {
-                      const roundedValues = decryptedValue.data[0].map((value) => Math.round(value));
-                      return result + roundedValues[0];
+                      exploreResult.globalCount = Math.round(decryptedValue.data[0][0]);
                     } else {
-                      return result;
+                      MessageHelper.alert('error', 'Error decrypting the result.');
                     }
-                  } else {
-                    return result + orgResult.count.data[0][0];
-                  }
-                },
-              0) as number;
-            exploreResult.globalCount = globalCountResponse;
+                }
+              }
+            }
 
-            if (Object.values(expQueryResp.results).length > 1) {
+            if (!expQueryResp.results.count) {
+              // patient list mode
               const patientListResult = expQueryResp.results.patientList?.data?.[0] || Object.values(expQueryResp.results).reduce(
                 (result, orgResult: any) => {
                   if (orgResult.patientList.type === 'ciphertable') {
@@ -174,6 +159,7 @@ export class ExploreQueryService {
                       }
                     },
                     []) as number[];
+                    exploreResult.globalCount = exploreResult.perSiteCounts.reduce((a, b) => a + b, 0);
               }
             }
             if (exploreResult.globalCount === 0) {

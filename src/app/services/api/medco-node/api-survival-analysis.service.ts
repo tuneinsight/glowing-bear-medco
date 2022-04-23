@@ -43,14 +43,14 @@ export class ApiSurvivalAnalysisService {
         targetPublicKey: publicKey
       }
     ).pipe(map((response: ApiSurvivalAnalysisResponse) => {
-      if (response.aggregatedResults.type === 'ciphertable') {
-        const valueInUint8 = this.cryptoService.decodeBase64Url(response.aggregatedResults.value) as Uint8Array;
+      if (response.results.survivalQueryResult.type === 'ciphertable') {
+        const valueInUint8 = this.cryptoService.decodeBase64Url(response.results.survivalQueryResult.value) as Uint8Array;
         const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
         if (isCipherFormat(decryptedValue)) {
-          response.aggregatedResults.data = decryptedValue.data;
+          response.results.survivalQueryResult.data = decryptedValue.data;
         }
       }
-      response.aggregatedResults.data[0] = response.aggregatedResults.data[0].map((value) => Math.round(value));
+      response.results.survivalQueryResult.data[0] = response.results.survivalQueryResult.data[0].map((value) => Math.round(value));
       return response;
     }))
   }
