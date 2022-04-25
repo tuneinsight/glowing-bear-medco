@@ -109,7 +109,7 @@ export class ExploreQueryService {
             if (!haveRightsForPatientList) {
               // global count mode
               if (expQueryResp.results.count) {
-                const count = expQueryResp.results.count;  
+                const count = expQueryResp.results.count;
                 exploreResult.globalCount = count // If the result is in cleartext we use it as is
                 if (count.type === 'ciphertable') {
                     const valueInUint8 = this.cryptoService.decodeBase64Url(count.value) as Uint8Array;
