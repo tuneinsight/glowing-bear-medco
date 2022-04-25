@@ -1,4 +1,7 @@
 .git
+.github
+.angular
 dist
 node_modules
+deployment
 cypress

@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import {Injectable, OnDestroy} from '@angular/core';
+import {Injectable, Injector, OnDestroy} from '@angular/core';
 import {
   EncryptInt,
   DeserializePoint,
@@ -19,8 +19,15 @@ import {MedcoNetworkService} from './api/medco-network.service';
 import {WorkerClient, WorkerManager} from 'angular-web-worker/angular';
 import {DecryptionWorker} from '../../decryption.worker';
 import {fromPromise} from 'rxjs/internal-compatibility';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable, throwError} from 'rxjs';
 import {ErrorHelper} from '../utilities/error-helper';
+import GeCoCryptoLib, {GeCoCryptoLibLoad} from '@tuneinsight/geco-cryptolib';
+import { KeycloakService } from 'keycloak-angular';
+import { ApiEndpointService } from './api-endpoint.service';
+import { catchError, exhaust, map } from 'rxjs/operators';
+import { MessageHelper } from '../utilities/message-helper';
+
+type Test = GeCoCryptoLib['encryptFloatMatrix']
 
 @Injectable()
 export class CryptoService implements OnDestroy {
@@ -31,46 +38,82 @@ export class CryptoService implements OnDestroy {
   private _ephemeralPublicKey: Point;
   private _ephemeralPrivateKey: Scalar;
 
+  private csID: string;
+
+  private publicKey: string;
+  private privateKey: string;
+
   /**
    * This constructor loads an ephemeral pair of keys for this instance of Glowing-Bear.
    */
-  constructor(private medcoNetworkService: MedcoNetworkService, private workerManager: WorkerManager) {
 
-    // create clients workers
-    this.decryptionClients = [];
-    if (this.workerManager.isBrowserCompatible) {
-      for (let i = 0 ; i < CryptoService.nbParallelWorkers ; i++) {
-        this.decryptionClients.push(this.workerManager.createClient(DecryptionWorker));
-      }
-      console.log('[CRYPTO] Web worker support is enabled.')
-    } else {
-      // fallback if web workers are not supported
-      for (let i = 0 ; i < CryptoService.nbParallelWorkers ; i++) {
-        this.decryptionClients.push(this.workerManager.createClient(DecryptionWorker, true));
-      }
-      console.warn('[CRYPTO] Web workers are not supported in this environment, decryption will slow down the UI.')
+   private cryptoFunc: GeCoCryptoLib; // Here the exported functions are stored after wasm was initiated
+   /*
+    WasmSuite is defined like this:
+    type MyFunctionInterface = (input: string) => string;
+
+    interface WasmSuite {
+        myFunction: MyFunctionInterface;
     }
+   */
+
+    // This is just to let components know when WASM is ready
+   public ready: BehaviorSubject<boolean> = new BehaviorSubject(false);
+
+   private apiEndpointService: ApiEndpointService;
+   private keycloakService: KeycloakService;
+
+   constructor(private injector: Injector) { }
+
+   load() {
+    return GeCoCryptoLibLoad('assets/geco-cryptolib.wasm').then(async () => {
+      this.keycloakService = this.injector.get(KeycloakService);
+      this.apiEndpointService = this.injector.get(ApiEndpointService);
+      this.cryptoFunc = globalThis.GeCoCryptoLib;
+      const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
+      await this.apiEndpointService.getCall(
+        'params'
+      ).pipe(
+        catchError((err) => {
+          MessageHelper.alert('error', 'Error while getting crypto params.');
+          return throwError(err);
+        }),
+        map((paramsResponse) => {
+          const params = paramsResponse.params;
+          const paramsBytes = this.cryptoFunc.decodeBase64Url(params) as Uint8Array;
+          const csID = this.cryptoFunc.loadCryptoSystem(paramsBytes);
+          if (typeof csID !== 'string') { return; }
+          const keyPair = this.cryptoFunc.genKeyPair(csID) as [Uint8Array, Uint8Array];
+          const base64PublicKey = this.cryptoFunc.encodeBase64Url(keyPair[1]);
+
+          this.publicKey = base64PublicKey;
+
+          this.csID = csID;
+          this.ready.next(true);
+        })
+      ).toPromise();
+    });
   }
 
-  load(): Promise<void> {
-    this.loadEphemeralKeyPair();
-    return Promise.all(this.decryptionClients.map(client => client.connect()))
-      .then(() => Promise.all([
-        this.decryptionClients.forEach(client => client.set(w => w.collectiveKeyPublic, this.medcoNetworkService.networkPubKey)),
-        this.decryptionClients.forEach(client => client.set(w => w.keyPairPublic, SerializePoint(this._ephemeralPublicKey))),
-        this.decryptionClients.forEach(client => client.set(w => w.keyPairPrivate, SerializeScalar(this._ephemeralPrivateKey)))
-      ]))
-      .then(() => console.log(`[CRYPTO] Initialised ${CryptoService.nbParallelWorkers} decryption workers.`));
+  public encryptFloatMatrix(floats: number[][], cols: string[]) {
+    return this.cryptoFunc.encryptFloatMatrix(this.csID, floats, cols);
+  }
+
+  public decryptCipherTable(encFloats: Uint8Array) {
+  return this.cryptoFunc.decryptCipherTable(this.csID, encFloats);
+  }
+
+  public decodeBase64Url(data: string) {
+    return this.cryptoFunc.decodeBase64Url(data);
   }
 
   ngOnDestroy() {
-    this.decryptionClients.forEach(client => client.destroy());
   }
 
   /**
    * Generates a random pair of keys for the user to be used during this instance.
    */
-  private loadEphemeralKeyPair(): void {
+  private loadEphemeralKeyPair() {
     [this._ephemeralPrivateKey, this._ephemeralPublicKey] = GenerateKeyPair();
     console.log(`[CRYPTO] Generated the ephemeral pair of keys (public: ${this.ephemeralPublicKey}).`);
   }
@@ -80,9 +123,10 @@ export class CryptoService implements OnDestroy {
    * @param {number} integer to encrypt
    * @returns {string} the integer encrypted with cothority key
    */
-  encryptIntegerWithCothorityKey(integer: number): string {
-    let cothorityKey = DeserializePoint(this.medcoNetworkService.networkPubKey);
-    return EncryptInt(cothorityKey, integer).toString();
+  encryptIntegerWithCothorityKey(integer: number) {
+    // let cothorityKey = DeserializePoint(this.medcoNetworkService.networkPubKey);
+    // return EncryptInt(cothorityKey, integer).toString();
+    return 'test';
   }
 
   /**
@@ -90,7 +134,7 @@ export class CryptoService implements OnDestroy {
    * @returns {number} the integer decrypted with ephemeral key
    * @param encIntegers
    */
-  decryptIntegersWithEphemeralKey(encIntegers: string[]): Observable<number[]> {
+  decryptIntegersWithEphemeralKey(encIntegers: string[]) {
     const start = performance.now()
     const valsPerWorkers = Math.ceil(encIntegers.length / CryptoService.nbParallelWorkers);
 
@@ -109,7 +153,7 @@ export class CryptoService implements OnDestroy {
     );
   }
 
-  get ephemeralPublicKey(): string {
-    return SerializePoint(this._ephemeralPublicKey);
+  get ephemeralPublicKey() {
+    return this.publicKey;
   }
 }
