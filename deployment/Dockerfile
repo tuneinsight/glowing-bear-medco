@@ -1,4 +1,4 @@
-FROM node:12 as dev
+FROM node:16 as dev
 
 # build time env
 ENV GB_SRC="/glowing-bear-src"
@@ -12,7 +12,7 @@ ENTRYPOINT  npm install && \
 
 
 # -------------------------------------------
-FROM node:12 as build
+FROM node:16 as build
 
 # build time env
 ENV GB_SRC="/glowing-bear-src" \
@@ -26,9 +26,14 @@ RUN --mount=type=secret,id=TI_ACCESS_TOKEN export TI_ACCESS_TOKEN=$(cat /run/sec
     npm run package && \
     mv $GB_SRC/dist $GB_DIST
 
+# Remove unecessary files from the build
+RUN rm -rf $GB_DIST/*.map
+RUN rm -rf $GB_DIST/assets/icons/psd/*.psd
 
 # -------------------------------------------
-FROM nginx:latest as release
+FROM nginx:1.21.6-alpine as release
+
+RUN apk add bash
 
 # build time env
 ENV GB_DIST="/glowing-bear-dist" \

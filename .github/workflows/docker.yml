@@ -2,8 +2,7 @@ name: Docker
 on:
   push:
     branches:
-      - 'dev'
-      - 'use-geco-api'
+      - '*'
     tags:
       - '*'
   pull_request:

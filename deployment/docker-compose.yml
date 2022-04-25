@@ -15,7 +15,6 @@ services:
       - TI_ACCESS_TOKEN
 
   glowing-bear-medco:
-    image: medco/glowing-bear-medco:dev
     build:
       context: ..
       dockerfile: ./deployment/Dockerfile
