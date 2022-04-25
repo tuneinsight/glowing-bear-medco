@@ -26,6 +26,7 @@ import { QueryService } from './query.service';
 import { ApiI2b2Panel } from '../models/api-request-models/medco-node/api-i2b2-panel';
 import { ApiQueryDefinition } from '../models/api-request-models/medco-node/api-query-definition';
 import { ApiNodeMetadata } from '../models/api-response-models/medco-network/api-node-metadata';
+import { ErrorHelper } from '../utilities/error-helper';
 
 @Injectable()
 export class CohortService {
