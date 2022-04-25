@@ -7,6 +7,13 @@
  */
 export class ApiSurvivalAnalysisResponse {
   results: {
-    survivalQueryResult: number[][]
+    survivalQueryResult: {
+      type: 'floatMatrix';
+      data: number[][];
+    } | {
+      type: 'ciphertable';
+      value: string;
+      data: number[][];
+    }
   }
 }

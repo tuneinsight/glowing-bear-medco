@@ -5,23 +5,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import { v4 as uuidv4 } from 'uuid';
 import {Injectable} from '@angular/core';
 import {AppConfig} from '../../../config/app.config';
-import {Observable, forkJoin, throwError} from 'rxjs';
-import {timeout, map, tap, exhaust, catchError} from 'rxjs/operators';
+import {Observable, throwError} from 'rxjs';
+import {timeout, map, tap, catchError} from 'rxjs/operators';
 import {ApiI2b2Panel} from '../../../models/api-request-models/medco-node/api-i2b2-panel';
 import {ConstraintMappingService} from '../../constraint-mapping.service';
 import {ApiEndpointService} from '../../api-endpoint.service';
-import {GenomicAnnotationsService} from '../genomic-annotations.service';
 import {MedcoNetworkService} from '../medco-network.service';
 import {ExploreQuery} from '../../../models/query-models/explore-query';
 import {CryptoService} from '../../crypto.service';
-import {ApiNodeMetadata} from '../../../models/api-response-models/medco-network/api-node-metadata';
 import {ApiI2b2Timing} from '../../../models/api-request-models/medco-node/api-i2b2-timing';
 import { KeycloakService } from 'keycloak-angular';
 import { ExploreQueryResult } from 'src/app/models/query-models/explore-query-result';
 import { MessageHelper } from 'src/app/utilities/message-helper';
+import { isCipherFormat } from 'src/app/utilities/is-cipher-format';
 
 @Injectable()
 export class ExploreQueryService {
@@ -48,7 +46,6 @@ export class ExploreQueryService {
   constructor(private config: AppConfig,
     private apiEndpointService: ApiEndpointService,
     private medcoNetworkService: MedcoNetworkService,
-    private genomicAnnotationsService: GenomicAnnotationsService,
     private constraintMappingService: ConstraintMappingService,
     private cryptoService: CryptoService,
     private keycloakService: KeycloakService) { }
@@ -79,7 +76,7 @@ export class ExploreQueryService {
   //   ).pipe(map((expQueryResp) => [node, expQueryResp['result']]));
   // }
 
-  public exploreQuerySingleNode(queryId: string, panels: ApiI2b2Panel[]): Observable<ExploreQueryResult> {
+  public exploreQuerySingleNode(queryId: string, panels: ApiI2b2Panel[], publicKey: string): Observable<ExploreQueryResult> {
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
     return this.apiEndpointService.postCall(
@@ -89,6 +86,7 @@ export class ExploreQueryService {
         operation: 'exploreQuery',
         broadcast: true,
         outputDataObjectsNames: haveRightsForPatientList ? ['patientList', 'count'] : ['count', 'patientList'],
+        targetPublicKey: publicKey,
         parameters: {
           id: queryId,
           definition: {
@@ -98,27 +96,49 @@ export class ExploreQueryService {
       }
     ).pipe(
         catchError((err) => {
-          MessageHelper.alert('error', 'Error while querying datasource.');
+          MessageHelper.alert('error', 'Error while querying the data source.');
           return throwError(err);
         }),
-        map(async (expQueryResp) => {
+        map((expQueryResp) => {
           if (expQueryResp.results) {
             this.lastQueryId = queryId;
             const exploreResult = new ExploreQueryResult();
             exploreResult.queryId = queryId;
             exploreResult.resultInstanceID = [1];
-            const globalCountResponse = expQueryResp.results.patientList?.[0]?.length || expQueryResp.results.count?.[0]?.[0] ||
-             Object.values(expQueryResp.results).reduce(
-              (result, orgResult: any) => {
-                return result + orgResult.count.data[0][0];
-                },
-              0) as number;
-            exploreResult.globalCount = globalCountResponse;
 
-            if (Object.values(expQueryResp.results).length > 1) {
-              const patientListResult = expQueryResp.results.patientList || Object.values(expQueryResp.results).reduce(
+            if (!haveRightsForPatientList) {
+              // global count mode
+              if (expQueryResp.results.count) {
+                const count = expQueryResp.results.count;
+                exploreResult.globalCount = count // If the result is in cleartext we use it as is
+                if (count.type === 'ciphertable') {
+                    const valueInUint8 = this.cryptoService.decodeBase64Url(count.value) as Uint8Array;
+                    const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
+                    if (isCipherFormat(decryptedValue)) {
+                      exploreResult.globalCount = Math.round(decryptedValue.data[0][0]);
+                    } else {
+                      MessageHelper.alert('error', 'Error decrypting the result.');
+                    }
+                }
+              }
+            }
+
+            if (!expQueryResp.results.count) {
+              // patient list mode
+              const patientListResult = expQueryResp.results.patientList?.data?.[0] || Object.values(expQueryResp.results).reduce(
                 (result, orgResult: any) => {
-                  return [[ ...result[0], ...orgResult.patientList.data[0]]];
+                  if (orgResult.patientList.type === 'ciphertable') {
+                    const valueInUint8 = this.cryptoService.decodeBase64Url(orgResult.patientList.value) as Uint8Array;
+                    const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
+                    if (isCipherFormat(decryptedValue)) {
+                      const roundedValues = decryptedValue.data[0].map((value) => Math.round(value));
+                      return [[ ...result[0], ...roundedValues ]];
+                    } else {
+                      return result;
+                    }
+                  } else {
+                    return [[ ...result[0], ...orgResult.patientList.data[0] ]];
+                  }
                 },
                 [[]]) as number[][];
                 exploreResult.patientLists = patientListResult;
@@ -126,9 +146,20 @@ export class ExploreQueryService {
                 if (haveRightsForPatientList) {
                   exploreResult.perSiteCounts = Object.values(expQueryResp.results).reduce(
                     (result: number[], orgResult: any) => {
-                      return [ ...result, orgResult.patientList.data[0].length];
+                      if (orgResult.patientList.type === 'ciphertable') {
+                        const valueInUint8 = this.cryptoService.decodeBase64Url(orgResult.patientList.value) as Uint8Array;
+                        const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
+                        if (isCipherFormat(decryptedValue)) {
+                          return [ ...result, decryptedValue.data[0].length ];
+                        } else {
+                          return result;
+                        }
+                      } else {
+                        return [ ...result, orgResult.patientList.data[0].length ];
+                      }
                     },
                     []) as number[];
+                    exploreResult.globalCount = exploreResult.perSiteCounts.reduce((a, b) => a + b, 0);
               }
             }
             if (exploreResult.globalCount === 0) {
@@ -139,8 +170,7 @@ export class ExploreQueryService {
             MessageHelper.alert('error', 'Error while querying datasource.', expQueryResp.error);
             return throwError(expQueryResp.error);
           }
-      }),
-      exhaust()
+      })
     ) as Observable<ExploreQueryResult>;
   }
 
@@ -168,9 +198,8 @@ export class ExploreQueryService {
 
     this.preparePanelTimings(panels, queryTiming)
 
-    return forkJoin([
-      this.exploreQuerySingleNode(queryId, panels)
-    ]).pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
+    return this.exploreQuerySingleNode(queryId, panels, userPublicKey)
+      .pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
   }
 
     /**
@@ -187,9 +216,8 @@ export class ExploreQueryService {
 
       this.preparePanelTimings(panels, queryTiming)
 
-      return forkJoin(this.medcoNetworkService.nodes.map(
-        (node) => this.exploreQuerySingleNode(queryId, /* userPublicKey,*/ panels)
-      )).pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
+      return this.exploreQuerySingleNode(queryId, panels, userPublicKey)
+        .pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
     }
 
   /**

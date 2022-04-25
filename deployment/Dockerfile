@@ -6,7 +6,9 @@ ENV GB_SRC="/glowing-bear-src"
 VOLUME $GB_SRC
 EXPOSE 4300
 WORKDIR $GB_SRC
-ENTRYPOINT npm install && exec npm start -- --port 4300 --host 0.0.0.0
+ENTRYPOINT  npm install && \
+            cp node_modules/@tuneinsight/geco-cryptolib/geco-cryptolib.wasm src/assets/ && \
+            exec npm start -- --port 4300 --host 0.0.0.0
 
 
 # -------------------------------------------
@@ -17,8 +19,10 @@ ENV GB_SRC="/glowing-bear-src" \
     GB_DIST="/glowing-bear-dist"
 
 COPY . $GB_SRC
-RUN cd $GB_SRC && \
+RUN --mount=type=secret,id=TI_ACCESS_TOKEN export TI_ACCESS_TOKEN=$(cat /run/secrets/TI_ACCESS_TOKEN) && \
+    cd $GB_SRC && \
     npm install && \
+    cp node_modules/@tuneinsight/geco-cryptolib/geco-cryptolib.wasm src/assets/ && \
     npm run package && \
     mv $GB_SRC/dist $GB_DIST
 

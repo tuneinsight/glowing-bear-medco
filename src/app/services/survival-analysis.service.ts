@@ -145,13 +145,12 @@ export class SurvivalService {
     return this.constraintMappingService.mapConstraint(constraint)
   }
 
-  runSurvivalAnalysis(): Observable<ApiSurvivalAnalysisResponse[]> {
+  runSurvivalAnalysis() {
     let apiSurvivalAnalysis = new ApiSurvivalAnalysis()
     let d = new Date()
     apiSurvivalAnalysis.id = uuidv4();
     if (!this.startConcept) {
       throw ErrorHelper.handleNewError('Start event is undefined')
-
     }
     apiSurvivalAnalysis.startConcept = this.startConcept.path
     if (this.startConcept.modifier) {

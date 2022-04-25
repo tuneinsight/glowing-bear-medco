@@ -1,6 +1,6 @@
 {
   "name": "glowing-bear-medco",
-  "version": "0.0.0-dev",
+  "version": "0.1.0-ti4health-spo",
   "license": "MPL-2.0",
   "scripts": {
     "ng": "./node_modules/@angular/cli/bin/ng",
@@ -30,6 +30,7 @@
     "@types/chart.js": "^2.9.34",
     "@types/elliptic": "^6.4.12",
     "@types/file-saver": "^2.0.1",
+    "@tuneinsight/geco-cryptolib": "0.1.0-ti4health-rc.1-wasm-cryptolib-03627bd",
     "angular-web-worker": "^1.0.6",
     "arraybuffer-to-buffer": "0.0.7",
     "base64url": "^3.0.1",
@@ -91,7 +92,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ldsec/glowing-bear-medco.git"
+    "url": "https://github.com/tuneinsight/glowing-bear-medco.git"
   },
-  "homepage": "https://medco.epfl.ch/"
+  "homepage": "https://tuneinsight.com"
 }

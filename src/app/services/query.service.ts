@@ -160,8 +160,6 @@ export class QueryService {
   public execQuery(): void {
     const isLocal = true;
 
-    console.log('this.queryType', this.queryType);
-
     if (!this.constraintService.hasConstraint()) {
       MessageHelper.alert('warn', 'No constraints specified, please correct.');
       return;
@@ -193,10 +191,10 @@ export class QueryService {
       switchMap(() => this.exploreQueryService.exploreLocalQuery(this.query))
     ).subscribe(
       (parsedResults) => {
-        if (parsedResults[0].resultInstanceID) {
-          this._lastSuccessfulSet.next(parsedResults[0].resultInstanceID);
+        if (parsedResults.resultInstanceID) {
+          this._lastSuccessfulSet.next(parsedResults.resultInstanceID);
         }
-        this.queryResults.next(parsedResults[0]);
+        this.queryResults.next(parsedResults);
         this.isUpdating = false;
         this.isDirty = this.constraintService.hasConstraint().valueOf();
       },

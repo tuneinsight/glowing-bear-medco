@@ -9,13 +9,13 @@
 
 import { Injectable } from '@angular/core';
 import { ApiEndpointService } from '../../api-endpoint.service';
-import { MedcoNetworkService } from '../medco-network.service';
 import { CryptoService } from '../../crypto.service';
-import { Observable, forkJoin } from 'rxjs';
-import { timeout } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, timeout } from 'rxjs/operators';
 import {ApiSurvivalAnalysisResponse} from '../../../models/api-response-models/survival-analysis/survival-analysis-response';
 import {ApiSurvivalAnalysis} from '../../../models/api-request-models/survival-analyis/api-survival-analysis';
 import { AppConfig } from 'src/app/config/app.config';
+import { isCipherFormat } from 'src/app/utilities/is-cipher-format';
 
 @Injectable()
 export class ApiSurvivalAnalysisService {
@@ -26,11 +26,12 @@ export class ApiSurvivalAnalysisService {
   private static TIMEOUT_MS = 1000 * 60 * 10;
 
   constructor(private apiEndpointService: ApiEndpointService,
-    private medcoNetworkService: MedcoNetworkService,
     private cryptoService: CryptoService,
     private appConfig: AppConfig) { }
 
   survivalAnalysisSingleNode(apiSurvivalAnalysis: ApiSurvivalAnalysis): Observable<ApiSurvivalAnalysisResponse> {
+    const publicKey = this.cryptoService.ephemeralPublicKey;
+
     return this.apiEndpointService.postCall(
       `projects/${this.appConfig.projectId}/datasource/query`,
       {
@@ -38,19 +39,25 @@ export class ApiSurvivalAnalysisService {
         aggregationType: 'aggregated',
         broadcast: true,
         outputDataObjectsNames: ['survivalQueryResult'],
-        parameters: apiSurvivalAnalysis
+        parameters: apiSurvivalAnalysis,
+        targetPublicKey: publicKey
       }
-    )
+    ).pipe(map((response: ApiSurvivalAnalysisResponse) => {
+      if (response.results.survivalQueryResult.type === 'ciphertable') {
+        const valueInUint8 = this.cryptoService.decodeBase64Url(response.results.survivalQueryResult.value) as Uint8Array;
+        const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
+        if (isCipherFormat(decryptedValue)) {
+          response.results.survivalQueryResult.data = decryptedValue.data;
+        }
+      }
+      response.results.survivalQueryResult.data[0] = response.results.survivalQueryResult.data[0].map((value) => Math.round(value));
+      return response;
+    }))
   }
 
 
-  survivalAnalysisAllNodes(apiSurvivalAnalysis: ApiSurvivalAnalysis): Observable<ApiSurvivalAnalysisResponse[]> {
-    apiSurvivalAnalysis.userPublicKey = this.cryptoService.ephemeralPublicKey
-    return forkJoin(this.medcoNetworkService.nodes.map(
-      () => {
-        return this.survivalAnalysisSingleNode(apiSurvivalAnalysis)
-      }
-    ))
-      .pipe(timeout(ApiSurvivalAnalysisService.TIMEOUT_MS))
+  survivalAnalysisAllNodes(apiSurvivalAnalysis: ApiSurvivalAnalysis) {
+    return this.survivalAnalysisSingleNode(apiSurvivalAnalysis)
+      .pipe(timeout(ApiSurvivalAnalysisService.TIMEOUT_MS));
   }
 }
