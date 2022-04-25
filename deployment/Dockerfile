@@ -1,4 +1,4 @@
-FROM node:12 as dev
+FROM node:16 as dev
 
 # build time env
 ENV GB_SRC="/glowing-bear-src"
@@ -12,7 +12,7 @@ ENTRYPOINT  npm install && \
 
 
 # -------------------------------------------
-FROM node:12 as build
+FROM node:16 as build
 
 # build time env
 ENV GB_SRC="/glowing-bear-src" \
@@ -28,7 +28,7 @@ RUN --mount=type=secret,id=TI_ACCESS_TOKEN export TI_ACCESS_TOKEN=$(cat /run/sec
 
 
 # -------------------------------------------
-FROM nginx:latest as release
+FROM nginx:1.21.6-alpine as release
 
 # build time env
 ENV GB_DIST="/glowing-bear-dist" \
