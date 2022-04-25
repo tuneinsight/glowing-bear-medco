@@ -30,7 +30,7 @@
     "@types/chart.js": "^2.9.34",
     "@types/elliptic": "^6.4.12",
     "@types/file-saver": "^2.0.1",
-    "@tuneinsight/geco-cryptolib": "0.1.0-ti4health-rc.1-wasm-cryptolib-03627bd",
+    "@tuneinsight/geco-cryptolib": "0.1.0-ti4health-rc.1-wasm-cryptolib-04c70ee",
     "angular-web-worker": "^1.0.6",
     "arraybuffer-to-buffer": "0.0.7",
     "base64url": "^3.0.1",
