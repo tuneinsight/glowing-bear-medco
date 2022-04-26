@@ -9,7 +9,7 @@
     "build": "./node_modules/@angular/cli/bin/ng build",
     "package": "./node_modules/@angular/cli/bin/ng build --prod",
     "test": "./node_modules/@angular/cli/bin/ng test",
-    "lint": "./node_modules/@angular/cli/bin/ng lint --fix --type-check",
+    "lint": "./node_modules/@angular/cli/bin/ng lint --type-check",
     "version": "git describe --tags --always",
     "postinstall": "chmod +x ./node_modules/@angular/cli/bin/ng"
   },
