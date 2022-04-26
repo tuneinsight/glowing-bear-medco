@@ -116,7 +116,6 @@
   border: none;
   padding: 2px 1em 2px 1em;
   margin: 0px;
-  height: var(--gb-top-panel-height);
 }
 
 .gb-bottom-panel span {
