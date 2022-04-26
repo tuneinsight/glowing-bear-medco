@@ -134,7 +134,7 @@ export class CohortService {
     }).bind(this))
     this._patternValidation = new RegExp('^\\w+$')
     this._cohorts = new Array<Cohort>()
-    
+
     this.queryService.queryResults.subscribe(
       result => {
         if ((result) && (result.patientLists)) {

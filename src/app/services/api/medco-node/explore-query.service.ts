@@ -134,7 +134,7 @@ export class ExploreQueryService {
                       const roundedValues = decryptedValue.data[0].map((value) => Math.round(value));
                       return [[ ...result[0], ...roundedValues ]];
                     } else {
-                      return result;
+                      MessageHelper.alert('error', 'Error decrypting the result.');
                     }
                   } else {
                     return [[ ...result[0], ...orgResult.patientList.data[0] ]];
@@ -152,7 +152,7 @@ export class ExploreQueryService {
                         if (isCipherFormat(decryptedValue)) {
                           return [ ...result, decryptedValue.data[0].length ];
                         } else {
-                          return result;
+                          MessageHelper.alert('error', 'Error decrypting the result.');
                         }
                       } else {
                         return [ ...result, orgResult.patientList.data[0].length ];

@@ -55,7 +55,7 @@ export class NavbarService {
       { label: OperationType.EXPLORE, routerLink: '/explore' },
 
       // explore statistics tab
-      ...(isBiorefMode ? [{ label: OperationType.EXPLORE_STATISTICS, routerLink: "/explore-statistics" }] : []),
+      ...(isBiorefMode ? [{ label: OperationType.EXPLORE_STATISTICS, routerLink: '/explore-statistics' }] : []),
 
       ...(haveRightsForSurvivalQuery && !isBiorefMode ? [
         // survival analysis tab

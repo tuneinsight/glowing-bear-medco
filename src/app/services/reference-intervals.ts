@@ -1,5 +1,5 @@
-import { ErrorHelper } from "../utilities/error-helper";
-import { ConfidenceInterval, Interval } from "./explore-statistics.service";
+import { ErrorHelper } from '../utilities/error-helper';
+import { ConfidenceInterval, Interval } from './explore-statistics.service';
 
 
 class NumericInterval {
@@ -15,55 +15,13 @@ class NumericInterval {
 }
 
 export class ReferenceIntervalComputer {
-    private intervals: NumericInterval[]
-
-    private _binWidth: number
-
-    constructor(intervals: Interval[]) {
-        this.intervals = intervals.map(i => new NumericInterval(i))
-        this.calcBinWidth()
-    }
-
-
-    private calcBinWidth() {
-        if (this.intervals.length <= 0) {
-            throw ErrorHelper.handleNewError("Empty data impossible to compute the bin width")
-        }
-
-        const first = this.intervals[0]
-        this._binWidth = first.higherBound - first.lowerBound
-    }
 
     public get binWidth() {
         return this._binWidth
     }
+    private intervals: NumericInterval[]
 
-
-    // Input: Vector of the counts per bin
-    // Output: Vector of the density per bin
-    private calculateDensity(): number[] {
-        // Calculate the total sum of all bins (add all counts).
-        const totalCount = this.intervals.reduce((sum, i) => sum + i.count, 0)
-
-        return this.intervals.map(i => i.count / totalCount)
-    }
-
-
-    /*
-    * Implementing a very basic bootstrapping technique using the recreated data set. We recreate the data set
-    * by creating new data points with the value of each Bin Mids and the amount specified in the count variable.
-    *  Input: Frequency table
-    *  Output: Data vector
-    */
-    recreateData(): number[] {
-        /*
-        * given intervals = { lowerBound = [2, 3, 4, 5], count = [4, 2, 0, 1]},
-        * binWidth = 1 it will return [2, 2, 2, 2, 3, 3, 5] + .5 =  [2.5, 2.5, 2.5, 2.5, 3.5, 3.5, 5.5]
-        */
-        return this.intervals.flatMap(i => {
-            return Array(i.count).fill(i.lowerBound + this._binWidth / 2)
-        })
-    }
+    private _binWidth: number
 
     // https://stackoverflow.com/questions/11935175/sampling-a-random-subset-from-an-array
     private static getRandomSubarray<T>(arr: T[], size: number) {
@@ -130,7 +88,7 @@ export class ReferenceIntervalComputer {
 
     static mean(arr: number[]) {
         if (arr.length <= 0) {
-            throw ErrorHelper.handleNewError("empty array passed as input to mean function")
+            throw ErrorHelper.handleNewError('empty array passed as input to mean function')
         }
 
         return arr.reduce((s, x) => s + x, 0) / arr.length
@@ -148,6 +106,48 @@ export class ReferenceIntervalComputer {
 
     }
 
+    constructor(intervals: Interval[]) {
+        this.intervals = intervals.map(i => new NumericInterval(i))
+        this.calcBinWidth()
+    }
+
+
+    private calcBinWidth() {
+        if (this.intervals.length <= 0) {
+            throw ErrorHelper.handleNewError('Empty data impossible to compute the bin width')
+        }
+
+        const first = this.intervals[0]
+        this._binWidth = first.higherBound - first.lowerBound
+    }
+
+
+    // Input: Vector of the counts per bin
+    // Output: Vector of the density per bin
+    private calculateDensity(): number[] {
+        // Calculate the total sum of all bins (add all counts).
+        const totalCount = this.intervals.reduce((sum, i) => sum + i.count, 0)
+
+        return this.intervals.map(i => i.count / totalCount)
+    }
+
+
+    /*
+    * Implementing a very basic bootstrapping technique using the recreated data set. We recreate the data set
+    * by creating new data points with the value of each Bin Mids and the amount specified in the count variable.
+    *  Input: Frequency table
+    *  Output: Data vector
+    */
+    recreateData(): number[] {
+        /*
+        * given intervals = { lowerBound = [2, 3, 4, 5], count = [4, 2, 0, 1]},
+        * binWidth = 1 it will return [2, 2, 2, 2, 3, 3, 5] + .5 =  [2.5, 2.5, 2.5, 2.5, 3.5, 3.5, 5.5]
+        */
+        return this.intervals.flatMap(i => {
+            return Array(i.count).fill(i.lowerBound + this._binWidth / 2)
+        })
+    }
+
 
 
     compute(): [ConfidenceInterval, ConfidenceInterval] {
@@ -155,7 +155,7 @@ export class ReferenceIntervalComputer {
         const bootstrapping = ReferenceIntervalComputer.bootstrapReferenceInterval(fullData)
         const CILow = ReferenceIntervalComputer.calcBootRI(bootstrapping.RILow)
         const CIHigh = ReferenceIntervalComputer.calcBootRI(bootstrapping.RIHigh)
-        console.log("Computed RI: ", CILow, CIHigh)
+        console.log('Computed RI: ', CILow, CIHigh)
         return [CILow, CIHigh]
     }
 

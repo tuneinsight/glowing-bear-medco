@@ -9,7 +9,7 @@
 export class ApiValueMetadata {
   creationDateTime: string;
   dataType: string;
-  okToUseValues: "Y" | "N";
+  okToUseValues: 'Y' | 'N';
   testID: string;
   testName: string;
   version: string;

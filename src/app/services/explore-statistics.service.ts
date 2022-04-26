@@ -250,7 +250,7 @@ export class ExploreStatisticsService {
         }
 
         // the analytes split into two groups: modifiers and concepts
-        const { conceptsPaths, modifiers }/*: { conceptsPaths: string[]; modifiers: ModifierApiObjet[]; }*/ =
+        const { conceptsPaths, modifiers } /*: { conceptsPaths: string[]; modifiers: ModifierApiObjet[]; }*/ =
             this.extractConceptsAndModifiers(analytes);
 
         this._lastCohortDefintion = this.constraintMappingService.mapConstraint(cohortConstraint)
@@ -261,15 +261,15 @@ export class ExploreStatisticsService {
             (cohortConstraint instanceof CombinationConstraint) && (cohortConstraint as CombinationConstraint).children.length === 0
         )
 
-        const apiRequest/*: ApiExploreStatistics*/ = {
+        const apiRequest /*: ApiExploreStatistics*/ = {
             id: ExploreStatisticsService.getNewQueryID(),
-            //concepts: conceptsPaths,
+            // concepts: conceptsPaths,
             analytes: [...modifiers],
 //            modifiers: modifiers,
             userPublicKey: this.cryptoService.ephemeralPublicKey,
             bucketSize,
             minObservations,
-            //timing: this._lastQueryTiming,
+            // timing: this._lastQueryTiming,
             panels: this._lastCohortDefintion,
             isPanelEmpty: panelEmpty
         };
@@ -301,10 +301,6 @@ export class ExploreStatisticsService {
             throw ErrorHelper.handleNewError('Error with the servers. Empty result in explore-statistics.');
         }
 
-        if (this.queryService.queryType === ExploreQueryType.PATIENT_LIST) {
-        //    this.parseCohortFromAnswer(answers);
-        }
-
         // query IDs of the cohort built from the constraints and saved in the backend nodes' DB
         const patientQueryIDs = answers.map(a => a.cohortQueryID);
         this.cohortService.lastSuccessfulSet = patientQueryIDs
@@ -319,12 +315,8 @@ export class ExploreStatisticsService {
 
         const chartsInformations =
             serverResponse.results.map((result: ApiExploreStatisticResult) => {
-
-            //const encCounts: string[] = result.intervals.map((i: ApiInterval) => i.encCount);
-
-            //const decryptedCounts = this.cryptoService.decryptIntegersWithEphemeralKey(encCounts);
-            const intervals = result.intervals.map((i) => 
-                new Interval(i.lowerBound, i.higherBound, parseInt(i.count))
+            const intervals = result.intervals.map((i) =>
+                new Interval(i.lowerBound, i.higherBound, parseInt(i.count, 10))
             );
 
             return new ChartInformation(intervals, result.unit, result.analyteName, cohortConstraint.textRepresentation);
@@ -336,20 +328,14 @@ export class ExploreStatisticsService {
         this.displayLoadingIcon.next(false);
     }
 
-    private formatStatisticsQuery(results: number[][]) {
-        const t = results.map((result) => result.map((innerResult) => innerResult));
-        console.log('t', t);
-        return "";
-    }
-
     private sendRequest(apiRequest: ApiExploreStatistics): Observable<ApiExploreStatisticsResponse[]> {
         const publicKey = this.cryptoService.ephemeralPublicKey;
 
         return this.apiEndpointService.postCall(
             `projects/${this.config.projectId}/datasource/query`,
             {
-              operation: "statisticsQuery",
-              aggregationType: "aggregated",
+              operation: 'statisticsQuery',
+              aggregationType: 'aggregated',
               broadcast: true,
               outputDataObjectsNames: Object.keys(this._analytes),
               parameters: apiRequest,
@@ -379,7 +365,7 @@ export class ExploreStatisticsService {
                                   higherBound: `${bounds[1]}.00000`
                                 };
                           }),
-                          unit: " test value 2",
+                          unit: ' test value 2',
                           timers: []
                         };
                   });
@@ -389,7 +375,7 @@ export class ExploreStatisticsService {
                       results: formattedResults,
                       cohortQueryID: 0,
                       patientSetID: 0
-                      //cohortQueryID:
+                      // cohortQueryID:
                     }];
                 })
             )
@@ -403,7 +389,7 @@ export class ExploreStatisticsService {
 
 
 
-        const modifiers/*: Array<ModifierApiObjet>*/ = analytes.filter(node => node.isModifier()).map(node => {
+        const modifiers /*: Array<ModifierApiObjet>*/ = analytes.filter(node => node.isModifier()).map(node => {
             return {
                 queryTerm: node.appliedConcept.path,
                 modifier: {
