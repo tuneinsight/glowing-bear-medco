@@ -26,6 +26,7 @@ import { QueryService } from './query.service';
 import { AppConfig } from '../config/app.config';
 import { ExploreQueryService } from './api/medco-node/explore-query.service';
 import { ReferenceIntervalComputer } from './reference-intervals';
+import { isCipherFormat } from 'src/app/utilities/is-cipher-format';
 
 export class ConfidenceInterval {
     constructor(public readonly lowerBound: number, public readonly middle: number, public readonly higherBound: number) {
@@ -342,6 +343,8 @@ export class ExploreStatisticsService {
     }
 
     private sendRequest(apiRequest: ApiExploreStatistics): Observable<ApiExploreStatisticsResponse[]> {
+        const publicKey = this.cryptoService.ephemeralPublicKey;
+
         return this.apiEndpointService.postCall(
             `projects/${this.config.projectId}/datasource/query`,
             {
@@ -349,14 +352,23 @@ export class ExploreStatisticsService {
               aggregationType: "aggregated",
               broadcast: true,
               outputDataObjectsNames: Object.keys(this._analytes),
-              parameters: apiRequest
+              parameters: apiRequest,
+              targetPublicKey: publicKey
             }
           )
           .pipe(
-              map((e) => {
-                  const resultsArr = Object.values(e.results);
+              map((exploreStatsResponse) => {
+                  const resultsArr = Object.values(exploreStatsResponse.results);
 
                   const formattedResults = resultsArr.map((value: any, index) => {
+                      if (value.type === 'ciphertable') {
+                        const valueInUint8 = this.cryptoService.decodeBase64Url(value.value) as Uint8Array;
+                        const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
+                        if (isCipherFormat(decryptedValue)) {
+                            value.data = decryptedValue.data;
+                        }
+                        value.type = 'floatMatrix';
+                      }
                       return {
                           analyteName: this._analytes[index].displayName,
                           intervals: value.data[0].map((dataValue, dataIndex) => {
