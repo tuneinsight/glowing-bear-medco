@@ -230,7 +230,7 @@ export class GbSurvivalResultsComponent implements OnInit {
 
     let pdfDoc = new PDF()
 
-    pdfDoc.addImage(svg, can, 0, 0, 240, 120)
+    pdfDoc.addImage(svg, can, -20, 0, 220, 120)
     pdfDoc.addOneLineText('Settings')
     tables = this.inputParameters.mainSettingsToTable()
     pdfDoc.addTableFromObjects(tables.headers, tables.data)

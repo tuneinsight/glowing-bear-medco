@@ -106,11 +106,11 @@ export class ExploreStatisticsService {
     // 1 minute timeout
 
     private _lastQueryTiming: ApiI2b2Timing;
-    private _lastCohortDefintion: ApiI2b2Panel[] = []
+    private _lastCohortDefinition: ApiI2b2Panel[] = []
     // Sends the result of the latest query when is is available
     @Output() chartsDataSubject: Subject<ChartInformation[]> = new ReplaySubject(1)
 
-    // Emits whenever the explore statitistics query has been launched.
+    // Emits whenever the explore statistics query has been launched.
     @Output() displayLoadingIcon: Subject<boolean> = new ReplaySubject(1)
 
     private _analytes: Array<TreeNode> = []
@@ -173,7 +173,7 @@ export class ExploreStatisticsService {
     /*
      * This function is called when the user wants to execute an explore statistics from the explore tab.
      * This function sends an explore statistics query to all running back-end nodes.
-     *  When the answer is received it is processed and transformed
+     * When the answer is received it is processed and transformed
      * into a list of chart informations. Each chart information is used to build a new chart in the front end.
      */
     executeQueryFromExplore(bucketSize: number, minObservation: number) {
@@ -253,7 +253,7 @@ export class ExploreStatisticsService {
         const { conceptsPaths, modifiers } /*: { conceptsPaths: string[]; modifiers: ModifierApiObjet[]; }*/ =
             this.extractConceptsAndModifiers(analytes);
 
-        this._lastCohortDefintion = this.constraintMappingService.mapConstraint(cohortConstraint)
+        this._lastCohortDefinition = this.constraintMappingService.mapConstraint(cohortConstraint)
         this._lastQueryTiming = this.queryService.lastTiming
 
 
@@ -270,7 +270,7 @@ export class ExploreStatisticsService {
             bucketSize,
             minObservations,
             // timing: this._lastQueryTiming,
-            panels: this._lastCohortDefintion,
+            panels: this._lastCohortDefinition,
             isPanelEmpty: panelEmpty
         };
 
@@ -285,7 +285,7 @@ export class ExploreStatisticsService {
 
         }, err => {
             if (err.error === undefined) {
-                ErrorHelper.handleNewError('An unknown error occured during the request execution.')
+                ErrorHelper.handleNewError('An unknown error occurred during the request execution.')
             } else {
                 ErrorHelper.handleNewError(err.error.message)
             }
@@ -432,7 +432,7 @@ export class ExploreStatisticsService {
     }
 
     get lastCohortDefinition(): ApiI2b2Panel[] {
-        return this._lastCohortDefintion
+        return this._lastCohortDefinition
     }
 
     get lastQueryTiming(): ApiI2b2Timing {

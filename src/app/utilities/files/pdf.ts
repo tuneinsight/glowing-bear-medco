@@ -28,7 +28,7 @@ export class PDF {
 
     this.columnsLastElementY = []
     for (let i = 0; i < nbOfColumns; i++) {
-      this.columnsLastElementY.push(this.topMargin) // initiliazing the space occupied in each column.
+      this.columnsLastElementY.push(this.topMargin) // initializing the space occupied in each column.
     }
 
     this._jsPDF = new jsPDF.jsPDF()
@@ -96,7 +96,7 @@ export class PDF {
   }
 
 
-  /* This method verifief if a new element fit in the current page.
+  /* This method verifies if a new element fit in the current page.
   * If the new element position is greater than the page size the code
   * resets the columns height to zero and add a new page to the output pdf.
   * @param yEnd: the bottom vertical position of the new element.
@@ -119,7 +119,7 @@ export class PDF {
     try {
       svgSerialized = serializer.serializeToString(sourceSVGRef);
     } catch (err) {
-      throw ErrorHelper.handleError('during serialzation of SVG data', err)
+      throw ErrorHelper.handleError('during serialization of SVG data', err)
     }
 
 
