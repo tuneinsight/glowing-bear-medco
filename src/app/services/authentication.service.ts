@@ -19,7 +19,7 @@ export class AuthenticationService {
   static readonly GECO_PATIENT_LIST_ROLE = 'patient_list';
   static readonly GECO_GLOBAL_COUNT_ROLE = 'global_count';
   static readonly GECO_SURVIVAL_ANALYSIS_ROLE = 'project_creator';
-  static readonly GECO_EXPLORE_STATS_ROLE = 'explore-statistics';
+  static readonly GECO_EXPLORE_STATS_ROLE = 'explore_statistics';
 
   constructor(private config: AppConfig,
               private keycloakService: KeycloakService) { }
@@ -54,7 +54,7 @@ export class AuthenticationService {
   }
 
   public hasExploreStatsRole(): boolean {
-    return true || this.userRoles.includes(AuthenticationService.GECO_EXPLORE_STATS_ROLE)
+    return this.userRoles.includes(AuthenticationService.GECO_EXPLORE_STATS_ROLE);
   }
 
   /**
@@ -63,6 +63,7 @@ export class AuthenticationService {
   public hasMinimumRoles(): boolean {
     return  this.userRoles.includes(AuthenticationService.GECO_PROJECT_CREATOR_ROLE) ||
             this.userRoles.includes(AuthenticationService.GECO_PATIENT_LIST_ROLE) ||
+            this.userRoles.includes(AuthenticationService.GECO_EXPLORE_STATS_ROLE) ||
             this.userRoles.includes(AuthenticationService.GECO_GLOBAL_COUNT_ROLE);
   }
 

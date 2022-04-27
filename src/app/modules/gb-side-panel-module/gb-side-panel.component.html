@@ -1,11 +1,11 @@
 <div>
   <p-accordion [multiple]="true">
 
-    <!-- <div>
+    <div>
       <p-accordionTab header="Latest explore query" [selected]="true">
         <gb-summary></gb-summary>
       </p-accordionTab>
-    </div> -->
+    </div>
 
     <div *ngIf="navbarService.isExplore ||  navbarService.isAnalysis">
       <p-accordionTab header="Ontology" [selected]="true">
