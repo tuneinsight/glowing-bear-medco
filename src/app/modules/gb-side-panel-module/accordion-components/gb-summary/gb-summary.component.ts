@@ -12,6 +12,7 @@ import { FormatHelper } from '../../../../utilities/format-helper';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {ExploreQueryResult} from '../../../../models/query-models/explore-query-result';
+import { MedcoNetworkService } from 'src/app/services/api/medco-network.service';
 
 @Component({
   selector: 'gb-summary',
@@ -20,7 +21,8 @@ import {ExploreQueryResult} from '../../../../models/query-models/explore-query-
 })
 export class GbSummaryComponent {
 
-  constructor(private queryService: QueryService) {
+  constructor(private queryService: QueryService,
+              private medcoNetworkService: MedcoNetworkService,) {
   }
 
 
@@ -36,5 +38,9 @@ export class GbSummaryComponent {
 
   get queryResults(): Observable<ExploreQueryResult> {
     return this.queryService.queryResults;
+  }
+
+  get getNodes() {
+    return this.medcoNetworkService.nodes;
   }
 }
