@@ -38,6 +38,10 @@ export class AppConfig {
     return value != null ? value : defaultValue;
   }
 
+  public setConfig(key: string, value: any = null) {
+    this.config[key] = value;
+  }
+
   /**
    * Use to get the data found in the first file (env file)
    */
@@ -62,6 +66,7 @@ export class AppConfig {
           this.http.get(AppConfig.path + 'config.' + this.getEnv() + '.json')
             .subscribe((responseData) => {
               this.config = responseData;
+
               console.log('Successfully retrieved config: ', this.config);
               resolve();
             }, (err) => {

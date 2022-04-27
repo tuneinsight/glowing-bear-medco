@@ -1,0 +1,39 @@
+.ui-button-secondary{
+    float:right;
+}
+
+
+
+.ui-card-body {
+    padding: 0.3em !important;
+}
+
+.description {
+    padding :0.3em;
+    background-color:#339C90;
+    color:#ffffff ;
+    border-radius: 0.2em;
+    white-space: nowrap;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.non-visible {
+  max-height: 0 !important;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.fade-in-fade-out {
+  max-height: 500px;
+  transition: max-height 0.75s ease-in;
+}
+ 

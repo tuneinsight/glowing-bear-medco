@@ -1,0 +1,33 @@
+h1 {
+  font-size: medium;
+}
+
+.reference-interval-chart-container {
+  margin-right: 3em;
+  margin-left: 3em;
+}
+
+.reference-interval {
+  border:#8080802e .1em solid;
+  border-radius: .2em;
+  padding-left: 2em;
+  padding-top: 2em;
+  padding-right: 1em;
+  padding-bottom: 1em;
+}
+
+.reference-interval-stat {
+  display: inline-block;
+  background-color: #80808017;
+  padding: .7em;
+  padding-bottom: .0em;
+  border: #80808075 solid .1em;
+  border-radius: .2em;
+  margin-left: 2em;
+}
+
+
+.gb-delete-button {
+  color: lightgray;
+  border-color: lightgray;
+}

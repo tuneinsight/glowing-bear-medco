@@ -9,7 +9,7 @@
 
 export enum ValueType {
   CATEGORICAL = 'CATEGORICAL',
-  NUMERICAL = 'NUMERIC',
+  NUMERICAL = 'NUMBER',
   DATE = 'DATE',
   TEXT = 'TEXT',
   SIMPLE = 'SIMPLE'

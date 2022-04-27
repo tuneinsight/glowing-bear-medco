@@ -9,6 +9,7 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { BrowserModule } from '@angular/platform-browser';
 import { TabMenuModule } from 'primeng';
 import { GbSidePanelComponent } from './gb-side-panel.component';
 import { AccordionModule } from 'primeng';
@@ -27,11 +28,14 @@ import { TooltipModule } from 'primeng';
 import { ConfirmDialogModule } from 'primeng';
 import { RadioButtonModule } from 'primeng';
 import { GbCohortsComponent } from './accordion-components/gb-cohorts/gb-cohorts.component';
+import { GbUtilsModule } from '../gb-utils-module/gb-utils.module';
 
 import { ToggleButtonModule } from 'primeng'
 import {SurvivalService} from '../../services/survival-analysis.service';
 import {SavedCohortsPatientListService} from '../../services/saved-cohorts-patient-list.service';
 import {ExploreCohortsService} from '../../services/api/medco-node/explore-cohorts.service';
+import { GbCohortDefinitionComponent } from './accordion-components/gb-cohort-definition/gb-cohort-definition.component';
+import { CombinationConstraintSummaryComponent, SimpleConceptSummaryComponent } from './accordion-components/gb-cohort-definition/constraintVisitor/htmlExportVisitor';
 
 @NgModule({
   imports: [
@@ -49,13 +53,18 @@ import {ExploreCohortsService} from '../../services/api/medco-node/explore-cohor
     TooltipModule,
     ConfirmDialogModule,
     RadioButtonModule,
-    TabMenuModule
+    TabMenuModule,
+    BrowserModule,
+    GbUtilsModule
   ],
   declarations: [
     GbSidePanelComponent,
     GbTreeNodesComponent,
     GbSummaryComponent,
-    GbCohortsComponent
+    GbCohortsComponent,
+    GbCohortDefinitionComponent,
+    SimpleConceptSummaryComponent,
+    CombinationConstraintSummaryComponent,
   ],
   providers: [TreeDragDropService, ConfirmationService, SurvivalService, ExploreCohortsService, SavedCohortsPatientListService],
   exports: [GbSidePanelComponent]

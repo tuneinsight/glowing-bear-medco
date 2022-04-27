@@ -8,77 +8,89 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-export class Constraint {
+ import { ConstraintVisitor } from './constraintVisitor';
 
-  // The textual representation of this constraint
-  protected _textRepresentation: string;
-  // The parent constraint
-  protected _parentConstraint: Constraint;
-  // i2b2 timing policiy
-  protected _panelTimingSameInstance?: boolean;
-  // If this is an inclusion or exclusion criteria
-  protected _excluded: boolean;
+ export class Constraint {
 
-  /**
-   *  inputValueValidity check that all values needed values are defined for concept with textual or numerical constraint.
-   *  Parent class Constraint does not have such field and is by default valid, hence returns a empty string
-   */
+   // The textual representation of this constraint
+   protected _textRepresentation: string;
+   // The parent constraint
+   protected _parentConstraint: Constraint;
+   // i2b2 timing policiy
+   protected _panelTimingSameInstance?: boolean;
+   // If this is an inclusion or exclusion criteria
+   protected _excluded: boolean;
 
-  inputValueValidity(): string {
-    return ''
-  }
+   /**
+    *  inputValueValidity check that all values needed values are defined for concept with textual or numerical constraint.
+    *  Parent class Constraint does not have such field and is by default valid, hence returns a empty string
+    */
 
-
-  constructor() {
-    this.textRepresentation = '';
-    this.parentConstraint = null;
-    this._panelTimingSameInstance = null;
-    this.excluded = false;
-  }
-
-  get textRepresentation(): string {
-    return this._textRepresentation;
-  }
-
-  set textRepresentation(value: string) {
-    this._textRepresentation = value;
-  }
-
-  get parentConstraint(): Constraint {
-    return this._parentConstraint;
-  }
-
-  set parentConstraint(value: Constraint) {
-    this._parentConstraint = value;
-  }
-
-  get excluded(): boolean {
-    return this._excluded
-  }
-
-  set excluded(exclusionFlag: boolean) {
-    this._excluded = exclusionFlag
-  }
-
-  get className(): string {
-    return 'Constraint';
-  }
-  clone(): Constraint {
-    let ret = new Constraint()
-    ret.textRepresentation = this.textRepresentation
-    ret.panelTimingSameInstance = this.panelTimingSameInstance
-    ret.excluded = this.excluded
-
-    ret.parentConstraint = (this._parentConstraint) ? this._parentConstraint : null
-    return ret
-  }
-  set panelTimingSameInstance(val: boolean) {
-    this._panelTimingSameInstance = val
-  }
-
-  get panelTimingSameInstance(): boolean {
-    return this._panelTimingSameInstance
-  }
+   inputValueValidity(): string {
+     return ''
+   }
 
 
-}
+   constructor() {
+     this.textRepresentation = '';
+     this.parentConstraint = null;
+     this._panelTimingSameInstance = null;
+     this.excluded = false;
+   }
+
+
+   // visitor pattern https://refactoring.guru/design-patterns/visitor
+   accept<T>(v: ConstraintVisitor<T>): T {
+     return v.visitConstraint(this)
+   }
+
+   get textRepresentation(): string {
+     return this._textRepresentation;
+   }
+
+   set textRepresentation(value: string) {
+     this._textRepresentation = value;
+
+   }
+
+
+   get parentConstraint(): Constraint {
+     return this._parentConstraint;
+   }
+
+   set parentConstraint(value: Constraint) {
+     this._parentConstraint = value;
+   }
+
+   get excluded(): boolean {
+     return this._excluded
+   }
+
+   set excluded(exclusionFlag: boolean) {
+     this._excluded = exclusionFlag
+   }
+
+   get className(): string {
+     return 'Constraint';
+   }
+   clone(): Constraint {
+     let ret = new Constraint()
+     ret.textRepresentation = this.textRepresentation
+     ret.panelTimingSameInstance = this.panelTimingSameInstance
+     ret.excluded = this.excluded
+
+     ret.parentConstraint = (this._parentConstraint) ? this._parentConstraint : null
+     return ret
+   }
+   set panelTimingSameInstance(val: boolean) {
+     this._panelTimingSameInstance = val
+   }
+
+   get panelTimingSameInstance(): boolean {
+     return this._panelTimingSameInstance
+   }
+
+
+
+ }
+

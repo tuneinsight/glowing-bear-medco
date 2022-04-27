@@ -23,37 +23,62 @@
           </button>
         </span>
       </span>
-      <span style="display: flex; align-items: center;">
+        <span style="display: flex; align-items: center; margin-left: 2em;">
 
-        <!-- display of explore query type -->
-        <span *ngIf="queryType; else noAuthorization" class="float-right gb-data-selection-text">
-          Allowed Result Type: <b>{{queryType.name}}</b>
-        </span>
-        <ng-template #noAuthorization>
-          <span class="float-right">No authorization for explore query.</span>
-        </ng-template>
-
-        <span>
-          <!-- disabled button during query -->
-          <button *ngIf="!isUpdating && hasConstraint; else disabledButton" type="button"
-            (click)="execQuery($event)" class="btn btn-outline-primary btn-sm gb-data-selection-update-btn
-            {{isDirty? 'gb-explore-query-btn-dirty' : ''}}">
-            Run
-          </button>
-          <ng-template #disabledButton>
-            <button type="button" disabled class="btn btn-outline-primary btn-sm gb-data-selection-update-btn">
-              Run
-            </button>
+          <!-- display of explore query type -->
+          <span *ngIf="queryType; else noAuthorization" class="float-right gb-data-selection-text">
+            Allowed Result Type: <b>{{queryType.name}}</b>
+          </span>
+          <ng-template #noAuthorization>
+            <span class="float-right">No authorization for explore query.</span>
           </ng-template>
 
-          <i *ngIf="isUpdating" class="fa fa-circle-o-notch fa-spin" style="padding-left: .5em; padding-right: .5em;"></i>
+          <span>
+            <!-- disabled button during query -->
+            <button *ngIf="!isUpdating && hasConstraint; else disabledButton" type="button" (click)="execQuery($event)"
+              class="btn btn-outline-primary btn-sm gb-data-selection-update-btn
+              {{isDirty? 'gb-explore-query-btn-dirty' : ''}}">
+              Run
+            </button>
+            <ng-template #disabledButton>
+              <button type="button" disabled class="btn btn-outline-primary btn-sm gb-data-selection-update-btn">
+                Run
+              </button>
+            </ng-template>
+
+            <i *ngIf="isBiorefMode && isUpdating" class="fa fa-circle-o-notch fa-spin"
+              style="padding-left: .5em; padding-right: .5em;"></i>
+          </span>
+          <gb-generic-tooltip *ngIf="isBiorefMode" [infos]="'To estimate personalized reference intervals, only three easy steps are required:
+
+          1) Drag & drop the laboratory analyte(s) of interest from the ontology sidebar into the box in the Analytes field
+
+          2) Select the cohort definitions (like AdministrativeSex, Age or Predetermined conditions) in the preloaded fields or construct them from the ontology as needed
+
+          3) Start the analysis by pressing the “Run”-button.'"></gb-generic-tooltip>
         </span>
-      </span>
+      </div>
+  </div>
+
+  
+
+  <div *ngIf="isBiorefMode" #analytesDropzones class="input-label-wrapper small-font analytes-explore-container">
+    <div>
+      <label class="title-label">
+        Analytes:
+      </label>
     </div>
+    <gb-analytes-dropzones></gb-analytes-dropzones>
   </div>
 
   <div style="margin-top: 1em;">
+    <div *ngIf="isBiorefMode" class="title-label">
+      Cohort definition:
+    </div>
     <gb-selection [operationType]="OperationType.EXPLORE"></gb-selection>
   </div>
+
+
+
 
 </div>

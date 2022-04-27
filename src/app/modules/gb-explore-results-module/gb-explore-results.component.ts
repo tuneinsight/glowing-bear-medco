@@ -52,10 +52,14 @@ export class GbExploreResultsComponent implements OnInit {
         }]
       },
       options: {
-        legend: {
-          position: 'right',
-          labels: {
-            fontSize: 20
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              font: {
+                size: 20
+              }
+            }
           }
         }
       }

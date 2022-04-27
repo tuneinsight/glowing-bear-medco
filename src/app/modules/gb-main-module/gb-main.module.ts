@@ -17,6 +17,7 @@ import { RouterModule } from '@angular/router';
 import {CohortService} from '../../services/cohort.service';
 import {ConstraintReverseMappingService} from '../../services/constraint-reverse-mapping.service';
 import {SurvivalResultsService} from '../../services/survival-results.service';
+import { ButtonModule, DialogModule } from 'primeng';
 
 @NgModule({
   imports: [
@@ -24,6 +25,8 @@ import {SurvivalResultsService} from '../../services/survival-results.service';
     routing,
     GbNavBarModule,
     GbSidePanelModule,
+    DialogModule,
+    ButtonModule
   ],
   declarations: [GbMainComponent],
   exports: [GbMainComponent, RouterModule],

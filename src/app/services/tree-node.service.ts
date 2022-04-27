@@ -26,6 +26,8 @@ import {
 import { Modifier } from '../models/constraint-models/modifier';
 import { ConfirmationService } from 'primeng';
 import { KeycloakService } from 'keycloak-angular';
+import { MessageHelper } from '../utilities/message-helper';
+import { AuthenticationService } from './authentication.service';
 
 @Injectable()
 export class TreeNodeService {
@@ -78,6 +80,7 @@ export class TreeNodeService {
 
               this.processTreeNodes(treeNodes, this.constraintService);
               treeNodes.forEach((node) => this.rootTreeNodes.push(node));
+              this.config.setConfig('isBiorefMode', this.keycloakService.isUserInRole(AuthenticationService.GECO_EXPLORE_STATS_ROLE));
               this._isLoading = false;
               resolve();
             },
@@ -248,7 +251,7 @@ export class TreeNodeService {
     let concept = new Concept();
     concept.label = `${treeNode.displayName} (${treeNode.path})`;
     concept.path = treeNode.path;
-    concept.type = treeNode.valueType;
+    concept.type = treeNode.type;
     if (treeNode.metadata) {
       this.processMetadata(concept, treeNode.metadata);
     }
@@ -262,12 +265,12 @@ export class TreeNodeService {
   }
 
   private processMetadata(target: Concept, metadata: ApiValueMetadata) {
-    if (metadata.ValueMetadata) {
-      if (metadata.ValueMetadata.UnitValues) {
-        target.unit = metadata.ValueMetadata.UnitValues.NormalUnits;
+    if (metadata) {
+      if (metadata.unitValues) {
+        target.unit = metadata.unitValues['normalUnits'];
       }
-      if (metadata.ValueMetadata.DataType) {
-        switch (metadata.ValueMetadata.DataType) {
+      if (metadata.dataType) {
+        switch (metadata.dataType) {
           case DataType.POS_INTEGER:
             target.isInteger = true;
             target.isPositive = true;
@@ -330,7 +333,7 @@ export class TreeNodeService {
     concept.path = `${concept.path}${modifierPath}`;
     concept.label = `${treeNode.displayName} (${concept.path})`;
     concept.modifier = modifier;
-    concept.type = treeNode.valueType;
+    concept.type = treeNode.type;
     if (treeNode.metadata) {
       this.processMetadata(concept, treeNode.metadata);
     }
@@ -626,6 +629,35 @@ export class TreeNodeService {
 
   get rootTreeNodes(): TreeNode[] {
     return this._rootTreeNodes;
+  }
+
+  processSelectedConstraint(): Concept {
+    let node = this.selectedTreeNode
+    if (!node) {
+      return null
+    }
+
+
+    if (node.encryptionDescriptor.encrypted) {
+      MessageHelper.alert('warn', 'Cannot select this concept as it is encrypted')
+      return
+    }
+
+    switch (node.nodeType) {
+      case TreeNodeType.CONCEPT:
+      case TreeNodeType.CONCEPT_FOLDER:
+      case TreeNodeType.MODIFIER:
+      case TreeNodeType.MODIFIER_FOLDER:
+        let constraint = this.constraintService.generateConstraintFromTreeNode(node, node ? node.dropMode : null)
+        let concept = (<ConceptConstraint>constraint).clone().concept
+        return concept
+      case TreeNodeType.CONCEPT_CONTAINER:
+      case TreeNodeType.MODIFIER_CONTAINER:
+        MessageHelper.alert('warn', `${node.displayName} is a container and cannot be used`)
+        break;
+      default:
+        break;
+    }
   }
 
   get selectedTreeNode(): TreeNode {

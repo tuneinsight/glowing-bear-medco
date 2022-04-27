@@ -15,6 +15,7 @@ import { AuthenticationService } from './authentication.service';
 import { Router } from '@angular/router'
 import {OperationType} from '../models/operation-models/operation-types';
 import { KeycloakService } from 'keycloak-angular';
+import { AppConfig } from '../config/app.config';
 
 @Injectable()
 export class NavbarService {
@@ -28,6 +29,7 @@ export class NavbarService {
   private _activeResultItem: MenuItem;
 
   private _isExplore = true;
+  private _isExploreStatistics = false;
   private _isExploreResults = false;
   private _isAnalysis = false;
   private _isResults = false;
@@ -35,27 +37,34 @@ export class NavbarService {
 
   private _lastSuccessfulSurvival: number;
 
-  private EXPLORE_INDEX = 0;
-  private ANALYSIS_INDEX = 1;
-  private RESULTS_INDEX = 2;
-
-  constructor(private authService: AuthenticationService, private keycloakService: KeycloakService, private router: Router) {
+  constructor(private authService: AuthenticationService,
+    private keycloakService: KeycloakService,
+    private router: Router,
+    private appConfig: AppConfig) {
     const haveRightsForSurvivalQuery = !!this.keycloakService.getUserRoles().find((role) => role === 'survival_query');
     this._selectedSurvivalId = new Subject<number>()
     this._selectedSurvivalIDtoDelete = new Subject<number>()
+
+    const isBiorefMode = this.appConfig.getConfig('isBiorefMode');
+
+    console.log('isBiorefMode', isBiorefMode);
+
     this.items = [
 
-      // 0: explore tab, default page
+      // explore tab, default page
       { label: OperationType.EXPLORE, routerLink: '/explore' },
 
-      ...(haveRightsForSurvivalQuery ? [
-        // 1: survival analysis tab
+      // explore statistics tab
+      ...(isBiorefMode ? [{ label: OperationType.EXPLORE_STATISTICS, routerLink: '/explore-statistics' }] : []),
+
+      ...(haveRightsForSurvivalQuery && !isBiorefMode ? [
+        // survival analysis tab
         { label: OperationType.ANALYSIS, routerLink: '/analysis', visible: this.authService.hasAnalysisAuth },
 
-        // 2: results tab
-        { label: 'Results', routerLink: '/results', visible: this.authService.hasAnalysisAuth }
+        // results tab
+        { label: OperationType.RESULTS, routerLink: '/results', visible: this.authService.hasAnalysisAuth }
       ] : [])
-    ]
+    ].map((item, index) => ({...item, label: `${index + 1}. ${item.label}`}));
 
     this.resultItems = []
     this._lastSuccessfulSurvival = 0
@@ -63,9 +72,10 @@ export class NavbarService {
 
   updateNavbar(routerLink: string) {
     this.isExplore = (routerLink === '/explore' || routerLink === '');
+    this.isExploreStatistics = (routerLink === '/explore-statistics');
     this.isAnalysis = (routerLink === '/analysis');
     this.isResults = (routerLink === '/results');
-    this.isSurvivalRes = false
+    this.isSurvivalRes = false;
     for (let i = 0; i < this.resultItems.length; i++) {
       if (routerLink === this.resultItems[i].routerLink.toString()) {
         this.isSurvivalRes = true
@@ -75,14 +85,16 @@ export class NavbarService {
     console.log('Updated router link: ', routerLink)
 
     if (this.isExplore) {
-      this.activeItem = this.items[this.EXPLORE_INDEX];
+      this.activeItem = this.items.find((item) => item.label === OperationType.EXPLORE);
+    } else if (this.isExploreStatistics) {
+      this.activeItem = this.items.find((item) => item.label === OperationType.EXPLORE_STATISTICS);
     } else if (this.isAnalysis) {
-      this.activeItem = this.items[this.ANALYSIS_INDEX];
+      this.activeItem = this.items.find((item) => item.label === OperationType.ANALYSIS);
     } else if (this.isResults) {
-      this.activeItem = this.items[this.RESULTS_INDEX];
+      this.activeItem = this.items.find((item) => item.label === OperationType.RESULTS);
     } else {
       if (this.isSurvivalRes) {
-        this.activeItem = this.items[this.RESULTS_INDEX]
+        this.activeItem = this.items.find((item) => item.label === OperationType.RESULTS);
         for (let j = 0; j < this.resultItems.length; j++) {
           if (this.resultItems[j].routerLink.toString() === routerLink) {
             this.activeResultItem = this.resultItems[j]
@@ -113,6 +125,10 @@ export class NavbarService {
       this.activeResultItem = this.resultItems[index - 1]
       this.router.navigateByUrl(this.activeResultItem.routerLink.toString())
     }
+  }
+
+  navigateToExploreTab() {
+    this.router.navigateByUrl('/explore-statistics');
   }
 
   navigateToNewResults() {
@@ -157,6 +173,14 @@ export class NavbarService {
 
   set isExplore(value: boolean) {
     this._isExplore = value;
+  }
+
+  get isExploreStatistics(): boolean {
+    return this._isExploreStatistics;
+  }
+
+  set isExploreStatistics(value: boolean) {
+    this._isExploreStatistics = value;
   }
 
   get isExploreResults(): boolean {

@@ -37,7 +37,7 @@ import {GbExploreModule} from './modules/gb-explore-module/gb-explore.module';
 import {GbExploreResultsModule} from './modules/gb-explore-results-module/gb-explore-results.module';
 import {ConstraintMappingService} from './services/constraint-mapping.service';
 import {KeycloakAngularModule, KeycloakService} from 'keycloak-angular';
-
+import {ExploreStatisticsService} from './services/explore-statistics.service';
 import {GbAnalysisModule} from './modules/gb-analysis-module/gb-analysis.module';
 import {GbSurvivalResultsModule} from './modules/gb-survival-results-module/gb-survival-results.module';
 import {GbResultsModule} from './modules/gb-results-module/gb-results.module';
@@ -45,6 +45,7 @@ import {WorkerModule} from 'angular-web-worker/angular';
 import {DecryptionWorker} from '../decryption.worker';
 import {ToastrModule} from 'ngx-toastr';
 import {DeviceDetectorService} from 'ngx-device-detector';
+import { GbUtilsModule } from './modules/gb-utils-module/gb-utils.module';
 
 export function loadServices(config: AppConfig,
                              authService: AuthenticationService,
@@ -83,6 +84,7 @@ export function loadServices(config: AppConfig,
     GbExploreResultsModule,
     GbAnalysisModule,
     GbResultsModule,
+    GbUtilsModule,
     GbSurvivalResultsModule,
     GbNavBarModule,
     GbSidePanelModule,
@@ -94,6 +96,7 @@ export function loadServices(config: AppConfig,
     ApiEndpointService,
     TreeNodeService,
     MedcoNetworkService,
+    ExploreStatisticsService,
     ExploreQueryService,
     ExploreSearchService,
     GenomicAnnotationsService,

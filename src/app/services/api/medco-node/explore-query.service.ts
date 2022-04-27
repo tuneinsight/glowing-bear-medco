@@ -134,7 +134,7 @@ export class ExploreQueryService {
                       const roundedValues = decryptedValue.data[0].map((value) => Math.round(value));
                       return [[ ...result[0], ...roundedValues ]];
                     } else {
-                      return result;
+                      MessageHelper.alert('error', 'Error decrypting the result.');
                     }
                   } else {
                     return [[ ...result[0], ...orgResult.patientList.data[0] ]];
@@ -152,7 +152,7 @@ export class ExploreQueryService {
                         if (isCipherFormat(decryptedValue)) {
                           return [ ...result, decryptedValue.data[0].length ];
                         } else {
-                          return result;
+                          MessageHelper.alert('error', 'Error decrypting the result.');
                         }
                       } else {
                         return [ ...result, orgResult.patientList.data[0].length ];
@@ -263,7 +263,7 @@ export class ExploreQueryService {
   private preparePanelTimings(panels: ApiI2b2Panel[], queryTiming: ApiI2b2Timing): void {
     if (queryTiming === ApiI2b2Timing.any) {
       panels.forEach(panel => {
-        panel.panelTiming = ApiI2b2Timing.any
+        panel.timing = ApiI2b2Timing.any
       })
     }
   }

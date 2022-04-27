@@ -6,13 +6,20 @@
     <div class="input-field-margin" style="margin-left: 0;">
         <p-dropdown
         [style]="{'min-width':'25em'}"
-        dropdownIcon="pi pi-caret-down"
+        dropdownIcon="pi pi-caret-down white-color"
         [(ngModel)]="queryTiming" [options]="timings" [ngStyle]="{'margin-bottom':'1em'}"></p-dropdown>
+        <gb-generic-tooltip *ngIf="isBiorefMode" [infos]="'In general a cohort definition is defined like: (sub-constraint 1) AND (sub-constraint 2) AND ...
+
+        The chosen counting method determines which patients are present in the cohort.
+
+        _ `Treat groups independently`: A patient is included in the cohort if for each sub-constraint there is a medical event (linked to the patient) for which the sub-constraint is true.
+
+        _ `Selected groups occur within the same instance`: A patient is included in the cohort if there is at least a medical event  (linked to the patient) for which all sub-constraints in the cohort definition are true. Same instance means same medical event.'"></gb-generic-tooltip>
     </div>
   </div>
 
   <div #criteriaBox
-       class="criteria-box input-label-wrapper">
+      class="criteria-box input-label-wrapper">
     <p>Criteria:</p>
     <gb-constraint #rootConstraintComponent
                 [constraint]="rootConstraint"

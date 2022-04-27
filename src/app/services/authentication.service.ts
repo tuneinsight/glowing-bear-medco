@@ -19,6 +19,7 @@ export class AuthenticationService {
   static readonly GECO_PATIENT_LIST_ROLE = 'patient_list';
   static readonly GECO_GLOBAL_COUNT_ROLE = 'global_count';
   static readonly GECO_SURVIVAL_ANALYSIS_ROLE = 'project_creator';
+  static readonly GECO_EXPLORE_STATS_ROLE = 'statistics_query';
 
   constructor(private config: AppConfig,
               private keycloakService: KeycloakService) { }
@@ -52,12 +53,17 @@ export class AuthenticationService {
     }))
   }
 
+  public hasExploreStatsRole(): boolean {
+    return this.userRoles.includes(AuthenticationService.GECO_EXPLORE_STATS_ROLE);
+  }
+
   /**
    * Returns true if the user has the minimum set of roles needed for the basic operation of MedCo.
    */
   public hasMinimumRoles(): boolean {
     return  this.userRoles.includes(AuthenticationService.GECO_PROJECT_CREATOR_ROLE) ||
             this.userRoles.includes(AuthenticationService.GECO_PATIENT_LIST_ROLE) ||
+            this.userRoles.includes(AuthenticationService.GECO_EXPLORE_STATS_ROLE) ||
             this.userRoles.includes(AuthenticationService.GECO_GLOBAL_COUNT_ROLE);
   }
 
