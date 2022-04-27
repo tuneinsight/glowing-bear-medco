@@ -22,7 +22,7 @@ import { MedcoNetworkService } from 'src/app/services/api/medco-network.service'
 export class GbSummaryComponent {
 
   constructor(private queryService: QueryService,
-              private medcoNetworkService: MedcoNetworkService,) {
+              private medcoNetworkService: MedcoNetworkService) {
   }
 
 
