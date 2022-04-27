@@ -360,7 +360,7 @@ export class ExploreStatisticsService {
                           intervals: value.data[0].map((dataValue, dataIndex) => {
                               const bounds = JSON.parse(value.columns[dataIndex]);
                               return {
-                                  count: dataValue,
+                                  count: Math.abs(Math.round(dataValue)),
                                   lowerBound : `${bounds[0]}.00000`,
                                   higherBound: `${bounds[1]}.00000`
                                 };
@@ -375,7 +375,6 @@ export class ExploreStatisticsService {
                       results: formattedResults,
                       cohortQueryID: 0,
                       patientSetID: 0
-                      // cohortQueryID:
                     }];
                 })
             )

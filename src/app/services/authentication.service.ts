@@ -19,7 +19,7 @@ export class AuthenticationService {
   static readonly GECO_PATIENT_LIST_ROLE = 'patient_list';
   static readonly GECO_GLOBAL_COUNT_ROLE = 'global_count';
   static readonly GECO_SURVIVAL_ANALYSIS_ROLE = 'project_creator';
-  static readonly GECO_EXPLORE_STATS_ROLE = 'explore_statistics';
+  static readonly GECO_EXPLORE_STATS_ROLE = 'statistics_query';
 
   constructor(private config: AppConfig,
               private keycloakService: KeycloakService) { }

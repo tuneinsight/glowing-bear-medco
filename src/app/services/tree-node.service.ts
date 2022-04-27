@@ -27,6 +27,7 @@ import { Modifier } from '../models/constraint-models/modifier';
 import { ConfirmationService } from 'primeng';
 import { KeycloakService } from 'keycloak-angular';
 import { MessageHelper } from '../utilities/message-helper';
+import { AuthenticationService } from './authentication.service';
 
 @Injectable()
 export class TreeNodeService {
@@ -79,7 +80,7 @@ export class TreeNodeService {
 
               this.processTreeNodes(treeNodes, this.constraintService);
               treeNodes.forEach((node) => this.rootTreeNodes.push(node));
-              this.config.setConfig('isBiorefMode', this.keycloakService.isUserInRole('statistics_query'));
+              this.config.setConfig('isBiorefMode', AuthenticationService.GECO_EXPLORE_STATS_ROLE);
               this._isLoading = false;
               resolve();
             },
