@@ -64,6 +64,11 @@ export class TreeNodeService {
       this._isLoading = true;
 
       this.apiEndpointService.getCall('projects').subscribe((projectsList) => {
+        if (!Array.isArray(projectsList)) {
+          alert(`Error while getting projects from your node (${this.config.getConfig('medco-node-url')}). It is correctly configured?`);
+          this.keycloakService.logout();
+        }
+
         const i2b2Project = projectsList
           .reverse()
           .find((project) => project.name === 'i2b2');
