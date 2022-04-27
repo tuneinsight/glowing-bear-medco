@@ -16,6 +16,7 @@ import { CalendarModule } from 'primeng';
 import { PanelModule } from 'primeng';
 import { MultiSelectModule } from 'primeng';
 import { GbTooltipComponent } from '../constraint-components/gb-concept-constraint/gb-tooltip/gb-tooltip.component';
+import { GbUtilsModule } from '../../gb-utils-module/gb-utils.module';
 
 
 
@@ -41,6 +42,7 @@ import { GbTooltipComponent } from '../constraint-components/gb-concept-constrai
     PanelModule,
     MultiSelectModule,
     TooltipModule,
+    GbUtilsModule
   ],
   exports: [
     GbCombinationConstraintComponent,

@@ -28,6 +28,7 @@ export class GbMainComponent implements OnInit {
   isGutterDragged: boolean;
   x_pos: number; // Stores x coordinate of the mouse pointer
   x_gap: number; // Stores x gap (edge) between mouse and gutter
+  displayBasic = false;
 
   constructor(public authenticationService: AuthenticationService,
     private treeNodeService: TreeNodeService,
@@ -35,6 +36,11 @@ export class GbMainComponent implements OnInit {
     private queryService: QueryService,
     private config: AppConfig) {
   }
+
+  showBasicDialog() {
+    this.displayBasic = true;
+  }
+
 
   ngOnInit() {
     const parentContainerElm = this.parentContainer.nativeElement;
@@ -105,6 +111,10 @@ export class GbMainComponent implements OnInit {
   get footerText(): string {
     let footerText = this.config.getConfig('footer-text');
     return footerText ? footerText : '';
+  }
+
+  get isBiorefMode(): boolean {
+    return this.config.getConfig('isBiorefMode');
   }
 
 }

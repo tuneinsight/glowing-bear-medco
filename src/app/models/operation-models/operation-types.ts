@@ -8,12 +8,16 @@
 export class OperationType {
 
 
-  static readonly EXPLORE: string = 'Explore'
-  static readonly ANALYSIS: string = 'Analysis'
+  static readonly EXPLORE = 'Cohort Selection'
+  static readonly EXPLORE_STATISTICS = 'Reference Interval Estimation'
+  static readonly ANALYSIS = 'Analysis'
+  static readonly RESULTS = 'Results'
 
   static readonly ALL_TYPES = [
     OperationType.EXPLORE,
-    OperationType.ANALYSIS
+    OperationType.EXPLORE_STATISTICS,
+    OperationType.ANALYSIS,
+    OperationType.RESULTS
   ]
 
 }

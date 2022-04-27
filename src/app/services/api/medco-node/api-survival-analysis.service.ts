@@ -16,6 +16,7 @@ import {ApiSurvivalAnalysisResponse} from '../../../models/api-response-models/s
 import {ApiSurvivalAnalysis} from '../../../models/api-request-models/survival-analyis/api-survival-analysis';
 import { AppConfig } from 'src/app/config/app.config';
 import { isCipherFormat } from 'src/app/utilities/is-cipher-format';
+import { MessageHelper } from 'src/app/utilities/message-helper';
 
 @Injectable()
 export class ApiSurvivalAnalysisService {
@@ -48,6 +49,8 @@ export class ApiSurvivalAnalysisService {
         const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
         if (isCipherFormat(decryptedValue)) {
           response.results.survivalQueryResult.data = decryptedValue.data;
+        } else {
+          MessageHelper.alert('error', 'Error decrypting the result.');
         }
       }
       response.results.survivalQueryResult.data[0] = response.results.survivalQueryResult.data[0].map((value) => Math.round(value));

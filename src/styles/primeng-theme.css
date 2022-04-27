@@ -128,6 +128,10 @@ body .ui-dropdown-trigger:hover {
   color: var(--gb-ti-main-color);
 }
 
+body .gb-bottom-panel .ui-button:hover {
+  color: var(--gb-navbar-bg-color) !important;
+}
+
 body .ui-button:enabled:active {
   background-color: #025aa5;
   -moz-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);

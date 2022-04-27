@@ -7,20 +7,13 @@
  */
 
 export class ApiValueMetadata {
-  ValueMetadata: {
-    Version: string
-    EncryptedType: string
-    ChildrenEncryptIDs: string
-    NodeEncryptID: string
-    CreationDateTime: string
-    TestID: string
-    TestName: string
-    DataType: DataType
-    Flagstouse: string
-    Oktousevalues: string
-    UnitValues: UnitValues
-    EnumValues: string
-  }
+  creationDateTime: string;
+  dataType: string;
+  okToUseValues: 'Y' | 'N';
+  testID: string;
+  testName: string;
+  version: string;
+  unitValues: UnitValues[];
 }
 
 export enum DataType {
@@ -33,15 +26,14 @@ export enum DataType {
 }
 
 class UnitValues {
-  NormalUnits: string
-  EqualUnits: string[]
-  ConvertingUnits: ConvertingUnit[]
-  ExcludingUnits: string[]
+  normalUnits: string
+  equalUnits: string[]
+  convertingUnits: ConvertingUnit[]
+  excludingUnits: string[]
 
 }
 
 class ConvertingUnit {
-  MultiplyingFactor: string
-  Units: string
-
+  multiplyingFactor: string
+  units: string
 }
