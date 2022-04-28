@@ -26,7 +26,7 @@ export class AuthenticationService {
   /**
    * Init the keycloak service with proper parameters.
    */
-  public load(): Promise<void> {
+  public load() {
     return this.keycloakService.init({
       config: {
         url: this.config.getConfig('keycloak-url'),
@@ -41,15 +41,13 @@ export class AuthenticationService {
       bearerPrefix: 'Bearer',
       bearerExcludedUrls: ['/assets', '/app'],
       loadUserProfileAtStartUp: true
-    }).then((success) => new Promise((resolve, reject) => {
-      if (!success || !this.hasMinimumRoles()) {
+    }).finally(() => {
+      if (!this.hasMinimumRoles()) {
         console.error('Authentication or authorization failed. Roles: ', this.userRoles)
         alert('Authentication has failed or authorizations are insufficient. Please login with a different account or contact an administrator. You will now be logged out.')
-        reject(this.logout);
-      } else {
-        resolve();
+        this.keycloakService.logout();
       }
-    }))
+    });
   }
 
   /**
@@ -89,12 +87,5 @@ export class AuthenticationService {
    */
   get userLoggedIn(): Observable<boolean> {
     return from(this.keycloakService.isLoggedIn());
-  }
-
-  /**
-   * Initiate logout.
-   */
-  get logout(): Promise<void> {
-    return this.keycloakService.logout();
   }
 }
