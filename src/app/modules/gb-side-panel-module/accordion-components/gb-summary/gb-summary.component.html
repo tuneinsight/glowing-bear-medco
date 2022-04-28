@@ -1,8 +1,9 @@
 <div>
-  <div>{{globalCount | async}} subjects</div>
-  <ul *ngIf="hasPerSiteCounts && queryResults|async">
-    <li *ngFor="let node of (queryResults|async).nodes; let nodeIdx = index">
-      {{node.name}}: {{(queryResults|async).perSiteCounts[nodeIdx]}} subjects
+  <span>Connected participants:</span>
+  <ul>
+    <li *ngFor="let node of getNodes; let nodeIdx = index" title="{{node.url}} | {{node.organization.country}}">
+      {{node.name}}<span *ngIf="hasPerSiteCounts && queryResults|async">: {{(queryResults|async).perSiteCounts[nodeIdx]}} subjects</span>
     </li>
   </ul>
+  <div>Total: {{globalCount | async}} subjects</div>
 </div>
