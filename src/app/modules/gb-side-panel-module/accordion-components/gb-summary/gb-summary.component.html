@@ -1,4 +1,5 @@
 <div>
+  <span>Connected participants:</span>
   <ul>
     <li *ngFor="let node of getNodes; let nodeIdx = index" title="{{node.url}} | {{node.organization.country}}">
       {{node.name}}<span *ngIf="hasPerSiteCounts && queryResults|async">: {{(queryResults|async).perSiteCounts[nodeIdx]}} subjects</span>
