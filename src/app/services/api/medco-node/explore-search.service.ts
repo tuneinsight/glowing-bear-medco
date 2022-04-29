@@ -44,7 +44,8 @@ export class ExploreSearchService {
 
     private mapSearchResults(searchResp) {
       if (this.treeNodeService.isLoading && searchResp.error) {
-        alert(`Error while getting inital tree. Maybe i2b2 service is not running? Please contact an administrator. You will now be logged out.`);
+        console.error(searchResp.error);
+        alert(`Error while getting initial tree. Maybe i2b2 service is not running? Please contact an administrator. You will now be logged out.`);
         this.keycloakService.logout();
       }
       return (searchResp.results.searchResult || []).map((treeNodeObj) => {

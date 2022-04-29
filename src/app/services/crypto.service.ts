@@ -74,7 +74,8 @@ export class CryptoService implements OnDestroy {
         'params'
       ).pipe(
         catchError((err) => {
-          alert('Error while getting crypto params');
+          console.error(err);
+          alert('Error while getting the crypto params');
           this.keycloakService.logout();
           return throwError(err);
         }),

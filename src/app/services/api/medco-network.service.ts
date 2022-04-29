@@ -47,6 +47,7 @@ export class MedcoNetworkService {
 
       }, (err) => {
         if (err.status === 0) {
+          console.error(err);
           alert(`Your node (${this.config.getConfig('medco-node-url')}) is not reachable. Please contact an administrator. You will now be logged out.`);
           this.keycloakService.logout();
         }

@@ -65,6 +65,7 @@ export class TreeNodeService {
 
       this.apiEndpointService.getCall('projects').subscribe((projectsList) => {
         if (!Array.isArray(projectsList)) {
+          console.error(projectsList);
           alert(`Error while getting projects from your node (${this.config.getConfig('medco-node-url')}). It is correctly configured?`);
           this.keycloakService.logout();
         }
