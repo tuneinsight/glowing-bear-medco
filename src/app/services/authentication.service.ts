@@ -88,4 +88,11 @@ export class AuthenticationService {
   get userLoggedIn(): Observable<boolean> {
     return from(this.keycloakService.isLoggedIn());
   }
+
+  /**
+   * Initiate logout.
+   */
+   get logout(): Promise<void> {
+    return this.keycloakService.logout();
+  }
 }
