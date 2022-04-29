@@ -21,6 +21,7 @@ import { ApiEndpointService } from '../../api-endpoint.service';
 import {ApiValueMetadata, DataType} from '../../../models/api-response-models/medco-node/api-value-metadata';
 import {MessageHelper} from '../../../utilities/message-helper';
 import { KeycloakService } from 'keycloak-angular';
+import { TreeNodeService } from '../../tree-node.service';
 
 @Injectable()
 export class ExploreSearchService {
@@ -38,9 +39,14 @@ export class ExploreSearchService {
     private medcoNetworkService: MedcoNetworkService,
     private apiEndpointService: ApiEndpointService,
     private injector: Injector,
-    private keycloakService: KeycloakService) { }
+    private keycloakService: KeycloakService,
+    private treeNodeService: TreeNodeService) { }
 
     private mapSearchResults(searchResp) {
+      if (this.treeNodeService.isLoading && searchResp.error) {
+        alert(`Error while getting inital tree. Maybe i2b2 service is not running? Please contact an administrator. You will now be logged out.`);
+        this.keycloakService.logout();
+      }
       return (searchResp.results.searchResult || []).map((treeNodeObj) => {
         let treeNode = new TreeNode();
         treeNode.path = treeNodeObj['path'];
