@@ -70,12 +70,13 @@ export class CryptoService implements OnDestroy {
       this.keycloakService = this.injector.get(KeycloakService);
       this.apiEndpointService = this.injector.get(ApiEndpointService);
       this.cryptoFunc = globalThis.GeCoCryptoLib;
-      const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
       await this.apiEndpointService.getCall(
         'params'
       ).pipe(
         catchError((err) => {
-          MessageHelper.alert('error', 'Error while getting crypto params.');
+          console.error(err);
+          alert('Error while getting the crypto params');
+          this.keycloakService.logout();
           return throwError(err);
         }),
         map((paramsResponse) => {

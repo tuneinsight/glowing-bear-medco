@@ -13,6 +13,7 @@ import {ApiEndpointService} from '../api-endpoint.service';
 import {ApiNetworkMetadata} from '../../models/api-response-models/medco-network/api-network-metadata';
 import {ApiNodeMetadata} from '../../models/api-response-models/medco-network/api-node-metadata';
 import {ErrorHelper} from '../../utilities/error-helper';
+import { KeycloakService } from 'keycloak-angular';
 
 @Injectable()
 export class MedcoNetworkService {
@@ -30,7 +31,8 @@ export class MedcoNetworkService {
   private config: AppConfig;
   private apiEndpointService: ApiEndpointService;
 
-  constructor(private injector: Injector) { }
+  constructor(private injector: Injector,
+              private keycloakService: KeycloakService) { }
 
   load(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -44,6 +46,11 @@ export class MedcoNetworkService {
         resolve();
 
       }, (err) => {
+        if (err.status === 0) {
+          console.error(err);
+          alert(`Your node (${this.config.getConfig('medco-node-url')}) is not reachable. Please contact an administrator. You will now be logged out.`);
+          this.keycloakService.logout();
+        }
         ErrorHelper.handleError('Failed to load network metadata', err);
         reject(err);
       });
@@ -67,6 +74,6 @@ export class MedcoNetworkService {
    */
   getNetwork(): Observable<ApiNetworkMetadata> {
     const urlPart = 'network';
-    return this.apiEndpointService.getCall(urlPart, false);
+    return this.apiEndpointService.getCall(urlPart, false, undefined, false);
   }
 }

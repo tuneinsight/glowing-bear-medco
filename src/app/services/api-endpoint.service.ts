@@ -41,13 +41,18 @@ export class ApiEndpointService {
    * @param urlPart - the part used in baseUrl/urlPart
    * @param additionalParam
    * @param apiUrl
+   * @param noCatch
    * @returns {Observable<any | any>}
    */
-  getCall(urlPart, additionalParam?, apiUrl?): Observable<any> {
+  getCall(urlPart, additionalParam?, apiUrl?, isErrorCatched = true): Observable<any> {
     const url = apiUrl ? `${apiUrl}/${urlPart}` : `${this.endpointUrl}/${urlPart}`;
-    return this.http.get(url, additionalParam).pipe(
-      catchError(ErrorHelper.handleHTTPError)
-    );
+    if (isErrorCatched) {
+      return this.http.get(url, additionalParam).pipe(
+        catchError(ErrorHelper.handleHTTPError)
+      );
+    } else {
+      return this.http.get(url, additionalParam);
+    }
   }
 
   /**
