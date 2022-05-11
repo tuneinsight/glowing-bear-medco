@@ -59,7 +59,7 @@ export class AppComponent implements OnInit {
     ) {
       MessageHelper.alert('warn',
         `This app has not been tested with your browser (${this.deviceService.browser} ${this.deviceService.browser_version})`
-        + ', we advise to use a recent version of Chrome of Firefox.'
+        + ', we advise to use a recent version of Chrome or Firefox.'
       );
     }
   }
