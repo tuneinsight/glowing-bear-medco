@@ -74,8 +74,7 @@ export class GbExploreComponent implements AfterViewChecked {
 
 
     if (this.userHasExploreStatsRole()) {
-      this.execExploreStatisticsQuery(event)
-      return
+      this.execExploreStatisticsQuery(event);
     }
 
 
