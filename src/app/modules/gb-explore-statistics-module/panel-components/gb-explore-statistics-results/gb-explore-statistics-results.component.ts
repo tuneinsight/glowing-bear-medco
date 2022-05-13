@@ -249,12 +249,16 @@ export abstract class ReferenceIntervalComponent implements OnDestroy {
   @Input()
   middleCI1: number
   @Input()
+  middleCI1_full: number
+  @Input()
   lowBoundCI1: number
   @Input()
   highBoundCI1: number
 
   @Input()
   middleCI2: number
+  @Input()
+  middleCI2_full: number
   @Input()
   lowBoundCI2: number
   @Input()
@@ -288,10 +292,12 @@ export abstract class ReferenceIntervalComponent implements OnDestroy {
     const CI2 = chartInfo.CI2
 
     this.middleCI1 = parseFloat(CI1.middle.toFixed(2));
+    this.middleCI1_full = CI1.middle;
     this.lowBoundCI1 = CI1.lowerBound
     this.highBoundCI1 = CI1.higherBound
 
     this.middleCI2 = parseFloat(CI2.middle.toFixed(2));
+    this.middleCI2_full = CI2.middle;
     this.lowBoundCI2 = CI2.lowerBound
     this.highBoundCI2 = CI2.higherBound
   }
