@@ -30,7 +30,7 @@ export class GbMainComponent implements OnInit {
   isModeSelected = false;
   _modes = [
     { label: 'SPO', value: 'spo' },
-    { label: 'Bioref', value: 'bioref' }
+    { label: 'BioRef', value: 'bioref' }
   ];
   _actualMode = this.modes[0];
 
