@@ -46,7 +46,7 @@ export class GbMainComponent implements OnInit {
   onHandleModeDropdownChange(event) {
     this._actualMode = this.modes.find((mode) => mode.value === event.value);
   }
-  
+
   onSelectActualMode() {
     this.config.setConfig('isBiorefMode', this.actualMode.value === 'bioref');
     this.navbarService.init();
@@ -141,7 +141,7 @@ export class GbMainComponent implements OnInit {
   set needToChooseRoles(_) {
     this.isModeSelected = true;
   }
-  
+
   get modes() {
     return this._modes;
   }
