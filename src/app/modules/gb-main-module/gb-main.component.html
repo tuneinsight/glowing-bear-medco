@@ -1,4 +1,4 @@
-<div #parentContainer class="gb-container">
+<div #parentContainer class="gb-container" [ngStyle]="{'filter': needToChooseRoles ? 'blur(8px)' : 'unset'}">
   <div class="gb-container">
     <!-- Top panel -->
     <div class="gb-top-panel">
@@ -60,10 +60,25 @@
           BMG) with the participation of the ICD Working Group of the Board of Trustees for Questions of Classification
           in Health Care (KKG)"
         </p>
-        <ng-template pTemplate="footer">
-          <p-button icon="pi pi-check" (click)="displayBasic=false" label="Ok" styleClass="p-button-text p-button-sm"></p-button>
-        </ng-template>
       </p-dialog>
     </div>
   </div>
+</div>
+
+<div *ngIf="needToChooseRoles">
+  <p-dialog header="Choose TI4Health mode" class="select-mode-dialog" [(visible)]="needToChooseRoles" [style]="{'max-width': '50vw'}">
+    <p>
+      You have 2 roles. Choose the interface you want to use.
+    </p>
+
+    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+      <p-dropdown
+          [style]="{'min-width':'25em'}"
+          dropdownIcon="pi pi-caret-down white-color"
+          [(ngModel)]="actualMode" [options]="modes"
+          (onChange)="onHandleModeDropdownChange($event)"></p-dropdown>
+
+      <p-button icon="pi pi-check" (click)="onSelectActualMode()" label="Ok" styleClass="p-button-text p-button-sm"></p-button>
+    </div>
+  </p-dialog>
 </div>

@@ -2187,6 +2187,14 @@ body .ui-slidemenu .ui-slidemenu-backward {
   border-top-right-radius: 0;
 }
 
+.select-mode-dialog .ui-dialog-content {
+  overflow: visible;
+}
+
+.select-mode-dialog .ui-dialog-mask {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
 /* Validation */
 .ui-inputtext.ng-dirty.ng-invalid,
 p-dropdown.ng-dirty.ng-invalid > .ui-dropdown,

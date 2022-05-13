@@ -8,10 +8,8 @@
 
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { AuthenticationService } from '../../services/authentication.service';
-import { ConstraintService } from '../../services/constraint.service';
-import { TreeNodeService } from '../../services/tree-node.service';
-import { QueryService } from '../../services/query.service';
 import { AppConfig } from '../../config/app.config';
+import { NavbarService } from 'src/app/services/navbar.service';
 
 @Component({
   selector: 'gb-main',
@@ -29,20 +27,33 @@ export class GbMainComponent implements OnInit {
   x_pos: number; // Stores x coordinate of the mouse pointer
   x_gap: number; // Stores x gap (edge) between mouse and gutter
   displayBasic = false;
+  isModeSelected = false;
+  _modes = [
+    { label: 'SPO', value: 'spo' },
+    { label: 'BioRef', value: 'bioref' }
+  ];
+  _actualMode = this.modes[0];
 
   constructor(public authenticationService: AuthenticationService,
-    private treeNodeService: TreeNodeService,
-    private constraintService: ConstraintService,
-    private queryService: QueryService,
-    private config: AppConfig) {
+    private config: AppConfig,
+    private navbarService: NavbarService) {
   }
 
   showBasicDialog() {
     this.displayBasic = true;
   }
 
+  onHandleModeDropdownChange(event) {
+    this._actualMode = this.modes.find((mode) => mode.value === event.value);
+  }
 
-  ngOnInit() {
+  onSelectActualMode() {
+    this.config.setConfig('isBiorefMode', this.actualMode.value === 'bioref');
+    this.navbarService.init();
+    this.isModeSelected = true;
+  }
+
+  init() {
     const parentContainerElm = this.parentContainer.nativeElement;
     this.isGutterDragged = false;
     this.x_pos = 0;
@@ -52,6 +63,10 @@ export class GbMainComponent implements OnInit {
     parentContainerElm.addEventListener('mousemove', this.onMouseMove.bind(this));
     parentContainerElm.addEventListener('mouseup', this.onMouseUp.bind(this));
     window.addEventListener('resize', this.onResize.bind(this));
+  }
+
+  ngOnInit() {
+    this.init();
   }
 
   onMouseDown = function (event) {
@@ -115,6 +130,24 @@ export class GbMainComponent implements OnInit {
 
   get isBiorefMode(): boolean {
     return this.config.getConfig('isBiorefMode');
+  }
+
+  get needToChooseRoles(): boolean {
+    return  this.authenticationService.hasAnalysisAuth &&
+            this.authenticationService.hasExploreStatsRole() &&
+            !this.isModeSelected;
+  }
+
+  set needToChooseRoles(_) {
+    this.isModeSelected = true;
+  }
+
+  get modes() {
+    return this._modes;
+  }
+
+  get actualMode() {
+    return this._actualMode;
   }
 
 }

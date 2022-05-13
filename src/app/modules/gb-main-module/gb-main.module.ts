@@ -10,6 +10,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GbMainComponent } from './gb-main.component';
+import { DropdownModule } from 'primeng';
 import { GbNavBarModule } from '../gb-navbar-module/gb-navbar.module';
 import { GbSidePanelModule } from '../gb-side-panel-module/gb-side-panel.module';
 import { routing } from './gb-main.routing';
@@ -26,7 +27,8 @@ import { ButtonModule, DialogModule } from 'primeng';
     GbNavBarModule,
     GbSidePanelModule,
     DialogModule,
-    ButtonModule
+    ButtonModule,
+    DropdownModule
   ],
   declarations: [GbMainComponent],
   exports: [GbMainComponent, RouterModule],
