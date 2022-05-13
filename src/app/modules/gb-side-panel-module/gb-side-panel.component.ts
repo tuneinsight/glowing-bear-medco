@@ -48,7 +48,7 @@ export class GbSidePanelComponent {
     }
 
     get isGlobalCountOrPatientList(): boolean {
-      return this.keycloakService.isUserInRole('global_count') || 
+      return this.keycloakService.isUserInRole('global_count') ||
               this.keycloakService.isUserInRole('patient_list');
     }
 
