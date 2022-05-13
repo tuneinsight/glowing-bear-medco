@@ -12,6 +12,8 @@ import {TermSearchService} from '../../services/term-search.service';
 import {OntologyNavbarService} from '../../services/ontology-navbar.service';
 import {SavedCohortsPatientListService} from '../../services/saved-cohorts-patient-list.service';
 import {AccordionTab} from 'primeng';
+import { AppConfig } from 'src/app/config/app.config';
+import { KeycloakService } from 'keycloak-angular';
 
 @Component({
   selector: 'gb-side-panel',
@@ -25,7 +27,9 @@ export class GbSidePanelComponent {
               public savedCohortsPatientListService: SavedCohortsPatientListService,
               public ontologyNavbarService: OntologyNavbarService,
               public termSearchService: TermSearchService,
-              public renderer: Renderer2) { }
+              public renderer: Renderer2,
+              private config: AppConfig,
+              private keycloakService: KeycloakService) { }
 
     ngAfterViewInit() {
       this.termSearchService.searchResultObservable.subscribe(searchResults => {
@@ -41,5 +45,14 @@ export class GbSidePanelComponent {
           });
         }, 0);
       });
+    }
+
+    get isGlobalCountOrPatientList(): boolean {
+      return this.keycloakService.isUserInRole('global_count') || 
+              this.keycloakService.isUserInRole('patient_list');
+    }
+
+    get isBiorefMode(): boolean {
+      return this.config.getConfig('isBiorefMode');
     }
 }

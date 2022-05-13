@@ -86,7 +86,7 @@ export class TreeNodeService {
 
               this.processTreeNodes(treeNodes, this.constraintService);
               treeNodes.forEach((node) => this.rootTreeNodes.push(node));
-              this.config.setConfig('isBiorefMode', this.keycloakService.isUserInRole(AuthenticationService.GECO_EXPLORE_STATS_ROLE));
+              this.config.setConfig('isBiorefMode', !this.keycloakService.isUserInRole(AuthenticationService.GECO_SURVIVAL_ANALYSIS_ROLE));
               this._isLoading = false;
               resolve();
             },

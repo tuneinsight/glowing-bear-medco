@@ -34,7 +34,7 @@
       </p-accordionTab>
     </div>
 
-    <div>
+    <div *ngIf="!isBiorefMode && isGlobalCountOrPatientList">
       <p-accordionTab header="Saved Cohorts" [selected]="true">
         <gb-cohorts></gb-cohorts>
       </p-accordionTab>
