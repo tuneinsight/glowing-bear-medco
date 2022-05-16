@@ -14,7 +14,6 @@ import { Subject, Observable } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
 import { Router } from '@angular/router'
 import {OperationType} from '../models/operation-models/operation-types';
-import { KeycloakService } from 'keycloak-angular';
 import { AppConfig } from '../config/app.config';
 
 @Injectable()
@@ -38,7 +37,6 @@ export class NavbarService {
   private _lastSuccessfulSurvival: number;
 
   constructor(private authService: AuthenticationService,
-    private keycloakService: KeycloakService,
     private router: Router,
     private appConfig: AppConfig) {
     this._selectedSurvivalId = new Subject<number>()
@@ -48,7 +46,6 @@ export class NavbarService {
   }
 
   init() {
-    const haveRightsForSurvivalQuery = !!this.authService.hasExploreStatsRole();
     const isBiorefMode = this.appConfig.getConfig('isBiorefMode');
 
     this.items = [
@@ -57,15 +54,13 @@ export class NavbarService {
       { label: OperationType.EXPLORE, routerLink: '/explore' },
 
       // explore statistics tab
-      ...(isBiorefMode ? [{ label: OperationType.EXPLORE_STATISTICS, routerLink: '/explore-statistics' }] : []),
-
-      ...(haveRightsForSurvivalQuery && !isBiorefMode ? [
+      ...(isBiorefMode ? [{ label: OperationType.EXPLORE_STATISTICS, routerLink: '/explore-statistics' }] : [
         // survival analysis tab
-        { label: OperationType.ANALYSIS, routerLink: '/analysis', visible: this.authService.hasAnalysisAuth },
+        { label: OperationType.ANALYSIS, routerLink: '/analysis' },
 
         // results tab
-        { label: OperationType.RESULTS, routerLink: '/results', visible: this.authService.hasAnalysisAuth }
-      ] : [])
+        { label: OperationType.RESULTS, routerLink: '/results' }
+      ])
     ].map((item, index) => ({...item, label: `${index + 1}. ${item.label}`}));
 
     this.resultItems = [];
