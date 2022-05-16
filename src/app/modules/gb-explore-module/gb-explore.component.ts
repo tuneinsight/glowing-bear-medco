@@ -66,16 +66,11 @@ export class GbExploreComponent implements AfterViewChecked {
     this.exploreStatisticsService.executeQueryFromExplore(this.bucketSize, this.minObservation)
   }
 
-
-  userHasExploreStatsRole(): boolean {
-    return this.authService.hasExploreStatsRole()
-  }
-
   execQuery(event) {
     event.stopPropagation();
 
 
-    if (this.userHasExploreStatsRole()) {
+    if (this.config.getConfig('isBiorefMode')) {
       this.execExploreStatisticsQuery(event);
     }
 
