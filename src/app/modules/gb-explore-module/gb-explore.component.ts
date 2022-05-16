@@ -9,6 +9,7 @@
  */
 
 import { AfterViewChecked, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { KeycloakService } from 'keycloak-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppConfig } from 'src/app/config/app.config';
@@ -46,7 +47,8 @@ export class GbExploreComponent implements AfterViewChecked {
     private cohortService: CohortService,
     public constraintService: ConstraintService,
     private changeDetectorRef: ChangeDetectorRef,
-    private exploreStatisticsService: ExploreStatisticsService) {
+    private exploreStatisticsService: ExploreStatisticsService,
+    private keycloakService: KeycloakService) {
     this.queryService.lastSuccessfulSet.subscribe(resIDs => {
       this.lastSuccessfulSet = resIDs
     })
@@ -74,8 +76,7 @@ export class GbExploreComponent implements AfterViewChecked {
 
 
     if (this.userHasExploreStatsRole()) {
-      this.execExploreStatisticsQuery(event)
-      return
+      this.execExploreStatisticsQuery(event);
     }
 
 
@@ -134,6 +135,11 @@ export class GbExploreComponent implements AfterViewChecked {
 
   get isBiorefMode(): boolean {
     return this.config.getConfig('isBiorefMode');
+  }
+
+  get isGlobalCountOrPatientList(): boolean {
+    return this.keycloakService.isUserInRole('global_count') ||
+            this.keycloakService.isUserInRole('patient_list');
   }
 
 

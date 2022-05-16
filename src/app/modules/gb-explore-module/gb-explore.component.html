@@ -11,7 +11,7 @@
         <span class="gb-data-selection-accordion-sub-header-3 float-left">
           <span class="gb-data-selection-emphasis-text">{{globalCount | async}} subjects</span>
         </span>
-        <span id="save-box">
+        <span id="save-box" *ngIf="!isBiorefMode && isGlobalCountOrPatientList">
           <input [(ngModel)]="cohortName" pInputText (keydown)="saveIfEnter($event)" placeholder="Cohort name" (drop)="preventDefault($event)"/>
           <span>&nbsp;</span>
           <button
