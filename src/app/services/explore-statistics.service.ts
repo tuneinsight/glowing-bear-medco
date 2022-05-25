@@ -324,7 +324,10 @@ export class ExploreStatisticsService {
                 );
 
                 if (intervals.length) {
-                    return [ ...responseResult, new ChartInformation(intervals, result.unit, result.analyteName, cohortConstraint.textRepresentation) ];
+                    return [
+                        ...responseResult,
+                        new ChartInformation(intervals, result.unit, result.analyteName, cohortConstraint.textRepresentation)
+                    ];
                 }
                 return responseResult;
             }, []);
