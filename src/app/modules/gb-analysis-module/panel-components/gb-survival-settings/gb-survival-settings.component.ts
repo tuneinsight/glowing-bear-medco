@@ -59,9 +59,7 @@ export class GbSurvivalSettingsComponent implements OnInit {
     private treeNodeService: TreeNodeService) { }
 
   ngOnInit() {
-    this.changedEventConcepts.emit(
-      this.survivalService.startConcept !== undefined && this.survivalService.endConcept !== undefined
-    )
+    this.changedEventConcepts.emit(this.isFormValid())
   }
 
   searchStart(event) {
@@ -78,6 +76,15 @@ export class GbSurvivalSettingsComponent implements OnInit {
       .map(constraint => (constraint as ConceptConstraint).concept);
     UIHelper.removePrimeNgLoaderIcon(this.element, 200)
   }
+
+  isFormValid() {
+    return this.survivalService.startConcept !== undefined && this.survivalService.endConcept !== undefined;
+  }
+
+  onChangeTimeLimit() {
+    this.changedEventConcepts.emit(this.isFormValid());
+  }
+
   onStartDragOver(event: DragEvent) {
     event.preventDefault()
     this.startEventHovering = true
@@ -201,18 +208,14 @@ export class GbSurvivalSettingsComponent implements OnInit {
   }
   set startConcept(concept: Concept) {
     this.survivalService.startConcept = concept
-    this.changedEventConcepts.emit(
-      this.survivalService.startConcept !== undefined && this.survivalService.endConcept !== undefined
-    )
+    this.changedEventConcepts.emit(this.isFormValid())
   }
   get startConcept(): Concept {
     return this.survivalService.startConcept
   }
   set endConcept(concept: Concept) {
     this.survivalService.endConcept = concept
-    this.changedEventConcepts.emit(
-      this.survivalService.startConcept !== undefined && this.survivalService.endConcept !== undefined
-    )
+    this.changedEventConcepts.emit(this.isFormValid())
   }
   get endConcept(): Concept {
     return this.survivalService.endConcept
