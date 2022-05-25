@@ -8,7 +8,7 @@
 
 // This class describes an interval from a histogram.
 export class ApiInterval {
-  count: string // the encrypted count of observations that fall within this interval
+  count: number // the encrypted count of observations that fall within this interval
   higherBound: string
   lowerBound: string
 }
