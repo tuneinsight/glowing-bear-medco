@@ -46,12 +46,16 @@ export class MedcoNetworkService {
         resolve();
 
       }, (err) => {
+        console.error(err);
+        let errMessage = 'Undefined error when checking network.';
         if (err.status === 0) {
-          console.error(err);
-          alert(`Your node (${this.config.getConfig('medco-node-url')}) is not reachable. Please contact an administrator. You will now be logged out.`);
-          this.keycloakService.logout();
+          errMessage = `Your node (${this.config.getConfig('medco-node-url')}) is not reachable.`;
+        } else if (err.status === 403) {
+          errMessage = `Unauthorized access to your node (${this.config.getConfig('medco-node-url')}).`;
         }
+        alert(`${errMessage} Please contact an administrator. You will now be logged out.`);
         ErrorHelper.handleError('Failed to load network metadata', err);
+        this.keycloakService.logout();
         reject(err);
       });
     });
