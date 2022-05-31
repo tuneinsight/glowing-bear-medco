@@ -27,6 +27,7 @@ import { AppConfig } from '../config/app.config';
 import { ExploreQueryService } from './api/medco-node/explore-query.service';
 import { ReferenceIntervalComputer } from './reference-intervals';
 import { isCipherFormat } from 'src/app/utilities/is-cipher-format';
+import { MessageHelper } from '../utilities/message-helper';
 
 export class ConfidenceInterval {
     constructor(public readonly lowerBound: number, public readonly middle: number, public readonly higherBound: number) {
@@ -316,20 +317,25 @@ export class ExploreStatisticsService {
         const chartsInformations =
             serverResponse.results.reduce((responseResult, result: ApiExploreStatisticResult) => {
                 const intervals = result.intervals.reduce((intervalsResult, i) => {
-                        if (i.count === 0) {
-                            return intervalsResult;
-                        }
                         return [ ...intervalsResult, new Interval(i.lowerBound, i.higherBound, i.count) ];
                     }, []
                 );
 
-                if (intervals.length) {
+                const newChartInformation = new ChartInformation(
+                    intervals,
+                    result.unit,
+                    result.analyteName,
+                    cohortConstraint.textRepresentation);
+
+                if (newChartInformation.numberOfObservations() > 0) {
                     return [
                         ...responseResult,
-                        new ChartInformation(intervals, result.unit, result.analyteName, cohortConstraint.textRepresentation)
+                        newChartInformation
                     ];
+                } else {
+                    MessageHelper.alert('info', `0 observations for the ${result.analyteName} analyte.`);
+                    return responseResult;
                 }
-                return responseResult;
             }, []);
 
 
