@@ -125,6 +125,10 @@ export class NavbarService {
   }
 
   navigateToExploreTab() {
+    this.router.navigateByUrl('/explore');
+  }
+
+  navigateToExploreStatisticsTab() {
     this.router.navigateByUrl('/explore-statistics');
   }
 

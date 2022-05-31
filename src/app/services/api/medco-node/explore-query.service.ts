@@ -20,6 +20,7 @@ import { KeycloakService } from 'keycloak-angular';
 import { ExploreQueryResult } from 'src/app/models/query-models/explore-query-result';
 import { MessageHelper } from 'src/app/utilities/message-helper';
 import { isCipherFormat } from 'src/app/utilities/is-cipher-format';
+import { NavbarService } from '../../navbar.service';
 
 @Injectable()
 export class ExploreQueryService {
@@ -48,7 +49,8 @@ export class ExploreQueryService {
     private medcoNetworkService: MedcoNetworkService,
     private constraintMappingService: ConstraintMappingService,
     private cryptoService: CryptoService,
-    private keycloakService: KeycloakService) { }
+    private keycloakService: KeycloakService,
+    private navbarService: NavbarService) { }
 
   //  ------------------- api calls ----------------------
 
@@ -164,6 +166,7 @@ export class ExploreQueryService {
             }
             if (exploreResult.globalCount === 0) {
               MessageHelper.alert('info', '0 subjects found for this query.');
+              this.navbarService.navigateToExploreTab();
             }
             return exploreResult;
           } else {

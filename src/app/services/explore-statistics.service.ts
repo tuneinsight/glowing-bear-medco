@@ -278,7 +278,7 @@ export class ExploreStatisticsService {
 
         const observableRequest = this.sendRequest(apiRequest as any);
 
-        this.navbarService.navigateToExploreTab();
+        this.navbarService.navigateToExploreStatisticsTab();
 
         observableRequest.subscribe((answers: ApiExploreStatisticsResponse[]) => {
             this.handleAnswer(answers, cohortConstraint);
@@ -314,17 +314,29 @@ export class ExploreStatisticsService {
         }
 
         const chartsInformations =
-            serverResponse.results.map((result: ApiExploreStatisticResult) => {
-            const intervals = result.intervals.map((i) =>
-                new Interval(i.lowerBound, i.higherBound, parseInt(i.count, 10))
-            );
+            serverResponse.results.reduce((responseResult, result: ApiExploreStatisticResult) => {
+                const intervals = result.intervals.reduce((intervalsResult, i) => {
+                        if (i.count === 0) {
+                            return intervalsResult;
+                        }
+                        return [ ...intervalsResult, new Interval(i.lowerBound, i.higherBound, i.count) ];
+                    }, []
+                );
 
-            return new ChartInformation(intervals, result.unit, result.analyteName, cohortConstraint.textRepresentation);
-        });
+                if (intervals.length) {
+                    return [
+                        ...responseResult,
+                        new ChartInformation(intervals, result.unit, result.analyteName, cohortConstraint.textRepresentation)
+                    ];
+                }
+                return responseResult;
+            }, []);
 
 
-        // waiting for the intervals to be decrypted by the crypto service to emit the chart information to external listeners.
-        this.chartsDataSubject.next(chartsInformations);
+        if (chartsInformations.length) {
+            // waiting for the intervals to be decrypted by the crypto service to emit the chart information to external listeners.
+            this.chartsDataSubject.next(chartsInformations);
+        }
         this.displayLoadingIcon.next(false);
     }
 
