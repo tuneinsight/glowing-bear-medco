@@ -54,7 +54,6 @@ export class MedcoNetworkService {
           errMessage = `Unauthorized access to your node (${this.config.getConfig('medco-node-url')}).`;
         }
         alert(`${errMessage} Please contact an administrator. You will now be logged out.`);
-        ErrorHelper.handleError('Failed to load network metadata', err);
         this.keycloakService.logout();
         reject(err);
       });
