@@ -7,9 +7,9 @@ export class ExploreQueryType {
     new ExploreQueryType('count_per_site_shuffled', 40, 'Count per site (shuffled)');
   static readonly COUNT_PER_SITE_SHUFFLED_OBFUSCATED =
     new ExploreQueryType('count_per_site_shuffled_obfuscated', 30, 'Count per site (shuffled & obfuscated)');
-  static readonly COUNT_GLOBAL = new ExploreQueryType('count_global', 20, 'Global count');
+  static readonly COUNT_GLOBAL = new ExploreQueryType('global_count', 20, 'Global count');
   static readonly COUNT_GLOBAL_OBFUSCATED =
-    new ExploreQueryType('count_global_obfuscated', 10, 'Global count (obfuscated)');
+    new ExploreQueryType('global_count_obfuscated', 10, 'Global count (obfuscated)');
 
   static readonly ALL_TYPES = [
     ExploreQueryType.PATIENT_LIST,
