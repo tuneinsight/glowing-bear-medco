@@ -91,8 +91,10 @@ export class TreeNodeService {
               resolve();
             },
             (err) => {
-              ErrorHelper.handleError('Error during initial tree loading', err);
-              this._isLoading = false;
+              console.error(err);
+              let errMessage = 'Undefined error when checking network.';
+              alert(`${errMessage} Please contact an administrator. You will now be logged out.`);
+              this.keycloakService.logout();
               reject(err);
             }
           );
