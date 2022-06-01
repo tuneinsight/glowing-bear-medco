@@ -218,8 +218,7 @@ export class ExploreStatisticsService {
         }
 
         // the analytes split into two groups: modifiers and concepts
-        const { modifiers } : { modifiers: ModifierApiObjet[]; } =
-            this.extractConceptsAndModifiers(analytes);
+        const { modifiers } = this.extractConceptsAndModifiers(analytes);
 
         this._lastCohortDefinition = this.constraintMappingService.mapConstraint(cohortConstraint)
         this._lastQueryTiming = this.queryService.lastTiming
@@ -229,7 +228,7 @@ export class ExploreStatisticsService {
             (cohortConstraint instanceof CombinationConstraint) && (cohortConstraint as CombinationConstraint).children.length === 0
         )
 
-        const apiRequest : ApiExploreStatistics = {
+        const apiRequest: ApiExploreStatistics = {
             id: ExploreStatisticsService.getNewQueryID(),
             analytes: [...modifiers],
             userPublicKey: this.cryptoService.ephemeralPublicKey,
