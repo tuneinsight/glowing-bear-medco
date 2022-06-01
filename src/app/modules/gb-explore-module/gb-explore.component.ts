@@ -125,7 +125,11 @@ export class GbExploreComponent implements AfterViewChecked {
   }
 
   get hasConstraint(): boolean {
-    return this.constraintService.hasConstraint().valueOf()
+    if (this.isBiorefMode) {
+      return this.exploreStatisticsService.analytes.length > 0
+    } else {
+      return this.constraintService.hasConstraint().valueOf()
+    }
   }
 
   get isBiorefMode(): boolean {

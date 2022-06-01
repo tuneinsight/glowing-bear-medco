@@ -23,6 +23,7 @@ import { GenomicAnnotation } from '../models/constraint-models/genomic-annotatio
 import { ErrorHelper } from '../utilities/error-helper';
 import { OperationType } from '../models/operation-models/operation-types';
 import { MessageHelper } from '../utilities/message-helper';
+import { AppConfig } from '../config/app.config';
 
 /**
  * This service concerns with
@@ -68,7 +69,8 @@ export class ConstraintService {
     return depth;
   }
 
-  constructor(private treeNodeService: TreeNodeService) {
+  constructor(private treeNodeService: TreeNodeService,
+              private config: AppConfig) {
     // Initialize the root constraints in the 1st step
     this.rootConstraint = new CombinationConstraint();
     this.rootConstraint.isRoot = true;
@@ -126,7 +128,7 @@ export class ConstraintService {
    * Generate the constraint corresponding to the query.
    */
    public generateConstraint(): CombinationConstraint {
-    if (!this.hasConstraint()) {
+    if (!this.hasConstraint() && !this.config.getConfig('isBiorefMode')) {
       throw ErrorHelper.handleNewError('Empty constraints');
     }
     return this.rootConstraint;

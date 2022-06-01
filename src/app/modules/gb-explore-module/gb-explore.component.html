@@ -37,7 +37,7 @@
             <!-- disabled button during query -->
             <button *ngIf="!isUpdating && hasConstraint; else disabledButton" type="button" (click)="execQuery($event)"
               class="btn btn-outline-primary btn-sm gb-data-selection-update-btn
-              {{isDirty? 'gb-explore-query-btn-dirty' : ''}}">
+              {{ isDirty || isBiorefMode ? 'gb-explore-query-btn-dirty' : '' }}">
               Run
             </button>
             <ng-template #disabledButton>
