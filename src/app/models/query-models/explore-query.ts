@@ -29,15 +29,6 @@ export class ExploreQuery {
    * Generates a new unique ID for this query.
    */
   generateUniqueId(): void {
-    // let d = new Date();
-    // let id = `MedCo_Explore_Query_${d.getUTCFullYear()}${d.getUTCMonth()}${d.getUTCDate()}${d.getUTCHours()}` +
-    //   `${d.getUTCMinutes()}${d.getUTCSeconds()}${d.getUTCMilliseconds()}`;
-
-    // if (this.name) {
-    //   // embed name without whitespaces if defined
-    //   id = `${id}_${this.name.replace(/\s/g, '_')}`;
-    // }
-
     this.uniqueId = uuidv4();
   }
 

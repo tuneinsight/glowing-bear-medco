@@ -5,7 +5,7 @@ import { Observable, of, ReplaySubject, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiI2b2Panel } from '../models/api-request-models/medco-node/api-i2b2-panel';
 import { ApiI2b2Timing } from '../models/api-request-models/medco-node/api-i2b2-timing';
-import { ApiExploreStatistics} from '../models/api-request-models/survival-analyis/api-explore-statistics';
+import { ApiExploreStatistics, ModifierApiObjet} from '../models/api-request-models/survival-analyis/api-explore-statistics';
 import { ApiExploreStatisticResult, ApiExploreStatisticsResponse } from '../models/api-response-models/explore-statistics/explore-statistics-response';
 import { ApiNodeMetadata } from '../models/api-response-models/medco-network/api-node-metadata';
 import { ApiExploreQueryResult } from '../models/api-response-models/medco-node/api-explore-query-result';
@@ -192,38 +192,6 @@ export class ExploreStatisticsService {
 
     }
 
-    /*the explore statistics servers answers contains the patient list for the cohort
-    * and the count per site in case the user is authorized to see such information
-    */
-    private parseCohortFromAnswer(answers: ApiExploreStatisticsResponse[]) {
-
-        if (this.queryService.queryType !== ExploreQueryType.PATIENT_LIST) {
-            throw ErrorHelper.handleNewError('Unable parse the cohort content of the statistics query. User is not authorized to see the patient list.')
-        }
-        const nodes = this.medcoNetworkService.nodes;
-        const exploreResults: ApiExploreQueryResult[] = answers.map(statAnswer => {
-            const exploreResult = new ApiExploreQueryResult();
-            exploreResult.status = 'available';
-            exploreResult.queryID = statAnswer.cohortQueryID;
-
-            return exploreResult;
-        })
-
-        // if (nodes.length !== exploreResults.length) {
-        //     throw ErrorHelper.handleNewError('Different number of server nodes and server responses received')
-        // }
-
-        const zipped: [ApiNodeMetadata, ApiExploreQueryResult][] = []
-        for (let i = 0; i < nodes.length; i++) {
-            zipped.push([nodes[i], exploreResults[i]])
-        }
-
-
-        const resultObserver = this.queryService.getExploreResultObserver()
-        this.queryService.parseExploreQueryResults(zipped).subscribe(resultObserver)
-    }
-
-
     private processQuery(bucketSize: number, minObservations: number) {
 
 
@@ -251,8 +219,7 @@ export class ExploreStatisticsService {
         }
 
         // the analytes split into two groups: modifiers and concepts
-        const { conceptsPaths, modifiers } /*: { conceptsPaths: string[]; modifiers: ModifierApiObjet[]; }*/ =
-            this.extractConceptsAndModifiers(analytes);
+        const { modifiers } = this.extractConceptsAndModifiers(analytes);
 
         this._lastCohortDefinition = this.constraintMappingService.mapConstraint(cohortConstraint)
         this._lastQueryTiming = this.queryService.lastTiming
@@ -262,22 +229,19 @@ export class ExploreStatisticsService {
             (cohortConstraint instanceof CombinationConstraint) && (cohortConstraint as CombinationConstraint).children.length === 0
         )
 
-        const apiRequest /*: ApiExploreStatistics*/ = {
+        const apiRequest: ApiExploreStatistics = {
             id: ExploreStatisticsService.getNewQueryID(),
-            // concepts: conceptsPaths,
             analytes: [...modifiers],
-//            modifiers: modifiers,
             userPublicKey: this.cryptoService.ephemeralPublicKey,
             bucketSize,
             minObservations,
-            // timing: this._lastQueryTiming,
             panels: this._lastCohortDefinition,
             isPanelEmpty: panelEmpty
         };
 
         this.displayLoadingIcon.next(true);
 
-        const observableRequest = this.sendRequest(apiRequest as any);
+        const observableRequest = this.sendRequest(apiRequest);
 
         this.navbarService.navigateToExploreStatisticsTab();
 
@@ -293,9 +257,6 @@ export class ExploreStatisticsService {
             this.displayLoadingIcon.next(false);
         });
     }
-
-
-
 
     private handleAnswer(answers: ApiExploreStatisticsResponse[], cohortConstraint: Constraint) {
         if (answers === undefined || answers.length === 0) {
@@ -406,7 +367,7 @@ export class ExploreStatisticsService {
 
 
 
-        const modifiers /*: Array<ModifierApiObjet>*/ = analytes.filter(node => node.isModifier()).map(node => {
+        const modifiers: ModifierApiObjet[] = analytes.filter(node => node.isModifier()).map(node => {
             return {
                 queryTerm: node.appliedConcept.path,
                 modifier: {

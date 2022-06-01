@@ -10,18 +10,19 @@ import { ApiI2b2Panel } from '../medco-node/api-i2b2-panel'
 import { ApiI2b2Timing } from '../medco-node/api-i2b2-timing'
 
 export class ModifierApiObjet {
-  ParentConceptPath: string
-  ModifierKey: string
-  AppliedPath: string
+  modifier: {
+    appliedPath: string
+    key: string
+  }
+  queryTerm: string
 }
 
 export class ApiExploreStatistics {
   id: string
   userPublicKey: string
 
-  // analytes: concepts and modifiers whose distribution will be computed.
-  concepts: Array<string>
-  modifiers?: Array<ModifierApiObjet>
+  // analytes: modifiers whose distribution will be computed.
+  analytes?: Array<ModifierApiObjet>
 
   bucketSize: number // size of a bucket in the histogram that will be returned to the user.
   minObservations: number /* This limit defines the threshold above which observations for analytes must be.
@@ -37,6 +38,5 @@ export class ApiExploreStatistics {
   * the population upon which the explore statistic is run.
   */
   panels: ApiI2b2Panel[];
-  timing: ApiI2b2Timing;
   isPanelEmpty: boolean;
 }
