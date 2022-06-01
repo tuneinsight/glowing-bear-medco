@@ -40,6 +40,15 @@
       </p-accordionTab>
     </div>
 
+    <div *ngIf="inExploreStatsTab()">
+      <p-accordionTab header="Generate PDF report" [selected]="true">
+        <button type="button" (click)="exportStatsPDF()" alt="generate a pdf report with the statistical informations"
+          class="btn btn-outline-primary btn-sm gb-data-selection-overview-panel-btn">
+          <span>Export</span>
+        </button>
+      </p-accordionTab>
+    </div>
+
   </p-accordion>
 
   <br>

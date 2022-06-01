@@ -14,6 +14,7 @@ import {SavedCohortsPatientListService} from '../../services/saved-cohorts-patie
 import {AccordionTab} from 'primeng';
 import { AppConfig } from 'src/app/config/app.config';
 import { KeycloakService } from 'keycloak-angular';
+import { ExploreStatisticsService } from 'src/app/services/explore-statistics.service';
 
 @Component({
   selector: 'gb-side-panel',
@@ -29,7 +30,16 @@ export class GbSidePanelComponent {
               public termSearchService: TermSearchService,
               public renderer: Renderer2,
               private config: AppConfig,
-              private keycloakService: KeycloakService) { }
+              private keycloakService: KeycloakService,
+              private exploreStatsService: ExploreStatisticsService) { }
+
+    inExploreStatsTab(): boolean {
+      return this.navbarService.isExploreStatistics
+    }
+
+    exportStatsPDF(): void {
+      this.exploreStatsService.sendExportAsPDFSignal()
+    }
 
     ngAfterViewInit() {
       this.termSearchService.searchResultObservable.subscribe(searchResults => {
