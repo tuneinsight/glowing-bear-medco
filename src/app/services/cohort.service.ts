@@ -366,11 +366,6 @@ export class CohortService {
     this.postCohort(cohort);
     MessageHelper.alert('success', 'Cohort successfully saved.');
 
-    // handle patient list locally
-    // if (this._lastPatientList) {
-    //   this.savedCohortsPatientListService.insertPatientList(this.cohortName, this._lastPatientList[0], this._lastPatientList[1])
-    //   this.savedCohortsPatientListService.statusStorage.set(this.cohortName, OperationStatus.done)
-    // }
     this.cohortName = ''
   }
 }
