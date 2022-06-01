@@ -5,6 +5,8 @@
       [ngClass]="{'selected': selected==analysisType}" [disabled]="!analysisType.implemented"></button>
     <span pTooltip="You must select a cohort, an analysis, and start and end events (for survival analysis)."
       [tooltipDisabled]="ready" style="float: right;">
+      <i *ngIf="operationStatus === OperationStatus.waitOnAPI || operationStatus === OperationStatus.decryption" class="fa fa-circle-o-notch fa-spin"
+              style="padding-left: .5em; padding-right: .5em;"></i>
       <button pButton label="Run" [disabled]="!ready || selectedCohort === undefined" (click)="runAnalysis()"></button>
     </span>
   </div>
