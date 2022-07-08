@@ -18,9 +18,11 @@ FROM node:16 as build
 ENV GB_SRC="/glowing-bear-src" \
     GB_DIST="/glowing-bear-dist"
 
+ARG TI_ACCESS_TOKEN
+ENV TI_ACCESS_TOKEN=$TI_ACCESS_TOKEN
+
 COPY . $GB_SRC
-RUN --mount=type=secret,id=TI_ACCESS_TOKEN export TI_ACCESS_TOKEN=$(cat /run/secrets/TI_ACCESS_TOKEN) && \
-    cd $GB_SRC && \
+RUN cd $GB_SRC && \
     npm install --force && \
     cp node_modules/@tuneinsight/geco-cryptolib/geco-cryptolib.wasm src/assets/ && \
     npm run package && \
