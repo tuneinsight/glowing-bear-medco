@@ -6,7 +6,7 @@ ENV GB_SRC="/glowing-bear-src"
 VOLUME $GB_SRC
 EXPOSE 4300
 WORKDIR $GB_SRC
-ENTRYPOINT  npm install && \
+ENTRYPOINT  npm install --force && \
             cp node_modules/@tuneinsight/geco-cryptolib/geco-cryptolib.wasm src/assets/ && \
             exec npm start -- --port 4300 --host 0.0.0.0
 
@@ -18,10 +18,12 @@ FROM node:16 as build
 ENV GB_SRC="/glowing-bear-src" \
     GB_DIST="/glowing-bear-dist"
 
+ARG TI_ACCESS_TOKEN
+
 COPY . $GB_SRC
-RUN --mount=type=secret,id=TI_ACCESS_TOKEN export TI_ACCESS_TOKEN=$(cat /run/secrets/TI_ACCESS_TOKEN) && \
+RUN --mount=type=secret,id=TI_ACCESS_TOKEN export TI_ACCESS_TOKEN=$(cat /run/secrets/TI_ACCESS_TOKEN || echo $TI_ACCESS_TOKEN) && \
     cd $GB_SRC && \
-    npm install && \
+    npm install --force && \
     cp node_modules/@tuneinsight/geco-cryptolib/geco-cryptolib.wasm src/assets/ && \
     npm run package && \
     mv $GB_SRC/dist $GB_DIST
@@ -31,7 +33,7 @@ RUN rm -rf $GB_DIST/*.map
 RUN rm -rf $GB_DIST/assets/icons/psd/*.psd
 
 # -------------------------------------------
-FROM nginx:1.21.6-alpine as release
+FROM nginx:1.23.0-alpine as release
 
 RUN apk add bash
 

@@ -3,5 +3,4 @@
 .angular
 dist
 node_modules
-deployment
 cypress
