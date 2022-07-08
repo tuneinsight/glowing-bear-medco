@@ -6,7 +6,7 @@ ENV GB_SRC="/glowing-bear-src"
 VOLUME $GB_SRC
 EXPOSE 4300
 WORKDIR $GB_SRC
-ENTRYPOINT  npm install && \
+ENTRYPOINT  npm install --force && \
             cp node_modules/@tuneinsight/geco-cryptolib/geco-cryptolib.wasm src/assets/ && \
             exec npm start -- --port 4300 --host 0.0.0.0
 
