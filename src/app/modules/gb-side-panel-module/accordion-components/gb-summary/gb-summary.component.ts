@@ -43,4 +43,8 @@ export class GbSummaryComponent {
   get getNodes() {
     return this.medcoNetworkService.nodes;
   }
+
+  onChangeNode(e) {
+    this.medcoNetworkService.setNodeChecked(e.srcElement.name, e.srcElement.checked);
+  }
 }

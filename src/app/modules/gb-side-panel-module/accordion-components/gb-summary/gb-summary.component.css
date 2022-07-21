@@ -1,1 +1,10 @@
+.participant-node {
+    color: lightgrey;
+    margin-top: 4px;
+    padding-left: 16px;
+    width: fit-content;
+}
 
+.node_is_up {
+    color: black;
+}

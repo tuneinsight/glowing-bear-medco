@@ -12,7 +12,6 @@ import {Observable} from 'rxjs';
 import {ApiEndpointService} from '../api-endpoint.service';
 import {ApiNetworkMetadata} from '../../models/api-response-models/medco-network/api-network-metadata';
 import {ApiNodeMetadata} from '../../models/api-response-models/medco-network/api-node-metadata';
-import {ErrorHelper} from '../../utilities/error-helper';
 import { KeycloakService } from 'keycloak-angular';
 
 @Injectable()
@@ -41,7 +40,25 @@ export class MedcoNetworkService {
 
       this.getNetwork().subscribe((metadata: ApiNetworkMetadata) => {
         this._networkPubKey = metadata['public-key'];
-        this._nodes = metadata.nodes.sort(({ current }) => +current);
+        this._nodes = metadata.nodes
+        .sort(({ current }) => +current)
+        .map((node) => {
+          const isUp = node.name !== "Organization_C";
+          return {
+            ...node,
+            isUp,
+            isChecked: isUp
+          }});
+
+        metadata.nodes.forEach((node) => {
+          const nodeUrl = node.url;
+          const url = "health";
+
+          // this.apiEndpointService.getCall(url, {}, nodeUrl).subscribe((ret) => {
+          //   console.log("nodeUrl", ret);
+          // });
+        });
+
         console.log(`Loaded nodes: ${metadata.nodes.map((a) => a.name).join(', ')}`);
         resolve();
 
@@ -69,7 +86,17 @@ export class MedcoNetworkService {
     return this._nodes;
   }
 
+  
   //  ------------------- others ----------------------
+  
+  public setNodeChecked(name: string, isChecked: boolean) {
+    this._nodes = this._nodes.map((node) => ({
+      ...node,
+      ...(node.name === name ? {
+        isChecked
+      } : {})
+    }));
+  }
 
   /**
    * Returns the MedCo network metadata.
