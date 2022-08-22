@@ -27,7 +27,8 @@ export class NavbarService {
   private _resultItems: MenuItem[];
   private _activeResultItem: MenuItem;
 
-  private _isExplore = true;
+  private _isSelectProject = true;
+  private _isExplore = false;
   private _isExploreStatistics = false;
   private _isExploreResults = false;
   private _isAnalysis = false;
@@ -50,6 +51,9 @@ export class NavbarService {
 
     this.items = [
 
+      // select project tab
+      { label: OperationType.SELECT_PROJECT, routerLink: '/select-project' },
+
       // explore tab, default page
       { label: OperationType.EXPLORE, routerLink: '/explore' },
 
@@ -61,14 +65,17 @@ export class NavbarService {
         // results tab
         { label: OperationType.RESULTS, routerLink: '/results' }
       ])
-    ].map((item, index) => ({...item, label: `${index + 1}. ${item.label}`}));
+    ].map((item, index) => ({ ...item, label: `${index + 1}. ${item.label}` }));
 
     this.resultItems = [];
     this._lastSuccessfulSurvival = 0;
+
+    this.navigateToSelectProjectTab();
   }
 
   updateNavbar(routerLink: string) {
-    this.isExplore = (routerLink === '/explore' || routerLink === '');
+    this.isSelectProject = (routerLink === '/select-project' || routerLink === '');
+    this.isExplore = (routerLink === '/explore');
     this.isExploreStatistics = (routerLink === '/explore-statistics');
     this.isAnalysis = (routerLink === '/analysis');
     this.isResults = (routerLink === '/results');
@@ -79,9 +86,12 @@ export class NavbarService {
         break
       }
     }
+
     console.log('Updated router link: ', routerLink)
 
-    if (this.isExplore) {
+    if (this.isSelectProject) {
+      this.activeItem = this.items.find((item) => item.label.indexOf(OperationType.SELECT_PROJECT) !== -1);
+    } else if (this.isExplore) {
       this.activeItem = this.items.find((item) => item.label.indexOf(OperationType.EXPLORE) !== -1);
     } else if (this.isExploreStatistics) {
       this.activeItem = this.items.find((item) => item.label.indexOf(OperationType.EXPLORE_STATISTICS) !== -1);
@@ -100,6 +110,10 @@ export class NavbarService {
           }
         }
       }
+    }
+
+    if (!this.isSelectProject && !this.appConfig.projectId) {
+      this.navigateToSelectProjectTab();
     }
   }
 
@@ -122,6 +136,10 @@ export class NavbarService {
       this.activeResultItem = this.resultItems[index - 1]
       this.router.navigateByUrl(this.activeResultItem.routerLink.toString())
     }
+  }
+
+  navigateToSelectProjectTab() {
+    this.router.navigateByUrl('/select-project');
   }
 
   navigateToExploreTab() {
@@ -166,6 +184,14 @@ export class NavbarService {
 
   set activeResultItem(value: MenuItem) {
     this._activeResultItem = value;
+  }
+
+  get isSelectProject(): boolean {
+    return this._isSelectProject;
+  }
+
+  set isSelectProject(value: boolean) {
+    this._isSelectProject = value;
   }
 
   get isExplore(): boolean {

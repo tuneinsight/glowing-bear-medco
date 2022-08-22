@@ -1,0 +1,20 @@
+<div>
+    <div class="gb-data-selection-accordion-header">
+        <div class="gb-data-selection-accordion-sub-header-1">
+            Select your project<br />
+        </div>
+        Project's name must start with "i2b2"
+    </div>
+    <br />
+    
+    <select (change)="onChangeProject($event.target.value)" name="projectId">
+        <option [value]="projectIdx" value="tata" *ngFor="let project of getProjectList(); let projectIdx = index">
+            {{project.name}}
+        </option>
+    </select>
+
+    <br />
+    <br />
+
+    <button (click)="onValidateProject()" class="btn btn-outline-primary btn-sm">Validate</button>
+</div>

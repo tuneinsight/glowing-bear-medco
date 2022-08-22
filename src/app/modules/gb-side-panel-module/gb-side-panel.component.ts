@@ -37,6 +37,10 @@ export class GbSidePanelComponent {
       return this.navbarService.isExploreStatistics
     }
 
+    inSelectProjectTab(): boolean {
+      return this.navbarService.isSelectProject
+    }
+
     exportStatsPDF(): void {
       this.exploreStatsService.sendExportAsPDFSignal()
     }
