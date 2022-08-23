@@ -55,15 +55,15 @@ export class NavbarService {
       { label: OperationType.SELECT_PROJECT, routerLink: '/select-project' },
 
       // explore tab, default page
-      { label: OperationType.EXPLORE, routerLink: '/explore' },
+      { label: OperationType.EXPLORE, routerLink: '/explore', disabled: true },
 
       // explore statistics tab
-      ...(isBiorefMode ? [{ label: OperationType.EXPLORE_STATISTICS, routerLink: '/explore-statistics' }] : [
+      ...(isBiorefMode ? [{ label: OperationType.EXPLORE_STATISTICS, routerLink: '/explore-statistics', disabled: true }] : [
         // survival analysis tab
-        { label: OperationType.ANALYSIS, routerLink: '/analysis' },
+        { label: OperationType.ANALYSIS, routerLink: '/analysis', disabled: true },
 
         // results tab
-        { label: OperationType.RESULTS, routerLink: '/results' }
+        { label: OperationType.RESULTS, routerLink: '/results', disabled: true }
       ])
     ].map((item, index) => ({ ...item, label: `${index + 1}. ${item.label}` }));
 
@@ -143,6 +143,7 @@ export class NavbarService {
   }
 
   navigateToExploreTab() {
+    this.items = this.items.map((item) => ({ ...item, disabled: false }));
     this.router.navigateByUrl('/explore');
   }
 

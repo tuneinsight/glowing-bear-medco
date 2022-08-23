@@ -15,7 +15,7 @@ import { NavbarService } from 'src/app/services/navbar.service';
 import { TreeNodeService } from 'src/app/services/tree-node.service';
 
 type Project = {
-  name: string;
+  dataSourceId: string;
   uniqueId: string;
 }
 
@@ -26,7 +26,7 @@ type Project = {
 })
 export class GbSelectProjectComponent {
   private projectList: Project[] = [];
-  private selectedProjectIndex = 0;
+  private _selectedProjectIndex = -1;
 
   constructor(
     private config: AppConfig,
@@ -37,23 +37,30 @@ export class GbSelectProjectComponent {
   }
 
   async ngOnInit() {
-    const projects = await this.apiEndpointService.getCall("/projects").toPromise();
-    const i2b2Projects = projects.filter((project) => project.name.startsWith("i2b2")); 
-    this.projectList = i2b2Projects;
+    const projects = await this.apiEndpointService.getCall("projects").toPromise();
+    projects.forEach(async (project) => {
+      if (!project.dataSourceId) {
+        return false;
+      }
+      const datasource = await this.apiEndpointService.getCall(`datasources/${project.dataSourceId}`).toPromise();
+      if (datasource.type === 'i2b2') {
+        this.projectList.push(project);
+      }
+    })
   }
   
   onChangeProject(index) {
-    this.selectedProjectIndex = index;
-  }
-
-  onValidateProject() {
-    this.config.projectId = this.projectList[this.selectedProjectIndex].uniqueId;
-
-    this.navbarService.navigateToExploreTab();
+    this._selectedProjectIndex = index;
+    this.config.projectId = this.projectList[this._selectedProjectIndex].uniqueId;
     this.treeNodeService.exploreTreeNode();
+    this.navbarService.navigateToExploreTab();
   }
 
   public getProjectList() {
     return this.projectList;
+  }
+
+  get selectedProjectIndex() {
+    return this._selectedProjectIndex;
   }
 }
