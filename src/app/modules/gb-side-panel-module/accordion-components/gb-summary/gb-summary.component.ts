@@ -44,6 +44,24 @@ export class GbSummaryComponent {
     return this.medcoNetworkService.nodes;
   }
 
+  getTooltipMessage(nodeName: string) {
+    const node = this.getNodes.find((e) => e.name === nodeName);
+
+    if (!node.isUp) {
+      return `This node (${node.name} | ${node.url} | ${node.organization.country}) seems to be down`
+    }
+
+    const networkStatus = this.medcoNetworkService.networkStatus?.find((e) => e.from === nodeName);
+    let titleStr = `${nodeName} (${node.url} | ${node.organization.country})`;
+    
+    if (networkStatus) {
+      titleStr += ` is connected to:\n  \
+              ${networkStatus.statuses.reduce((result, status) => `${result}\n${status.node}: ${status.status}`, "")}
+      `;
+    }
+    return titleStr;
+  }
+
   onChangeNode(e) {
     this.medcoNetworkService.setNodeChecked(e.srcElement.name, e.srcElement.checked);
   }

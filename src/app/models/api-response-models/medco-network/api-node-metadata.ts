@@ -4,4 +4,7 @@ export class ApiNodeMetadata {
   current: boolean;
   isUp?: boolean;
   isChecked?: boolean;
+  organization: {
+    country: string;
+  }
 }

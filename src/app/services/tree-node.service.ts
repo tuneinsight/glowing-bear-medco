@@ -28,6 +28,7 @@ import { ConfirmationService } from 'primeng';
 import { KeycloakService } from 'keycloak-angular';
 import { MessageHelper } from '../utilities/message-helper';
 import { AuthenticationService } from './authentication.service';
+import { MedcoNetworkService } from './api/medco-network.service';
 
 @Injectable()
 export class TreeNodeService {
@@ -45,6 +46,7 @@ export class TreeNodeService {
   private apiEndpointService: ApiEndpointService;
   private confirmationService: ConfirmationService;
   private keycloakService: KeycloakService;
+  private medcoNetworkService: MedcoNetworkService;
 
   constructor(private injector: Injector) {}
 
@@ -59,6 +61,7 @@ export class TreeNodeService {
       this.constraintService = this.injector.get(ConstraintService);
       this.apiEndpointService = this.injector.get(ApiEndpointService);
       this.confirmationService = this.injector.get(ConfirmationService);
+      this.medcoNetworkService = this.injector.get(MedcoNetworkService);
 
       this.constraintService.conceptLabels = [];
 
@@ -78,6 +81,7 @@ export class TreeNodeService {
         if (i2b2Project && i2b2Project.dataSourceId) {
           console.log('Found project id', i2b2Project.uniqueId);
           this.config.projectId = i2b2Project.uniqueId;
+          this.medcoNetworkService.getNetworkStatus();
           this.exploreSearchService.exploreSearchConceptChildren('/').subscribe(
             (treeNodes: TreeNode[]) => {
               // reset concepts and concept constraints

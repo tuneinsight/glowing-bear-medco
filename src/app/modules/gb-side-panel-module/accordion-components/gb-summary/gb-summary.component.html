@@ -1,7 +1,7 @@
 <div>
   <span>Connected participants:</span>
-  <div *ngFor="let node of getNodes; let nodeIdx = index" [pTooltip]="!node.isUp ? 'This node seems to be down' : null" class="participant-node" [ngClass]="{'node_is_up': !!node.isUp}" title="{{node.url}} | {{node.organization.country}}">
-    <input (click)="onChangeNode($event)" type="checkbox" name="{{node.name}}" [attr.checked]="node.isChecked ? true : null" [attr.disabled]="!node.isUp || node.current ? true : null" />
+  <div *ngFor="let node of getNodes; let nodeIdx = index" [pTooltip]="getTooltipMessage(node.name)" class="participant-node" [ngClass]="{'node_is_up': !!node.isUp}">
+    <input (click)="onChangeNode($event)" type="checkbox" name="{{node.name}}" [attr.checked]="node.isChecked ? true : null" [attr.disabled]="node.checkboxDisabled" />
     {{node.name}}
     <span *ngIf="node.current"> (you)</span>
     <span *ngIf="hasPerSiteCounts && queryResults|async">: {{(queryResults|async).perSiteCounts[nodeIdx]}} subjects</span>

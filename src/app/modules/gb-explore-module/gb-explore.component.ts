@@ -13,7 +13,7 @@ import { KeycloakService } from 'keycloak-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppConfig } from 'src/app/config/app.config';
-import { Cohort } from 'src/app/models/cohort-models/cohort';
+import { MedcoNetworkService } from 'src/app/services/api/medco-network.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { ExploreStatisticsService } from 'src/app/services/explore-statistics.service';
 import { OperationType } from '../../models/operation-models/operation-types';
@@ -48,6 +48,7 @@ export class GbExploreComponent implements AfterViewChecked {
     public constraintService: ConstraintService,
     private changeDetectorRef: ChangeDetectorRef,
     private exploreStatisticsService: ExploreStatisticsService,
+    private medcoNetworkService: MedcoNetworkService,
     private keycloakService: KeycloakService) {
     this.queryService.lastSuccessfulSet.subscribe(resIDs => {
       this.lastSuccessfulSet = resIDs
@@ -126,6 +127,10 @@ export class GbExploreComponent implements AfterViewChecked {
 
   get hasConstraint(): boolean {
     return this.constraintService.hasConstraint().valueOf()
+  }
+
+  get allNodesIsUp(): boolean {
+    return this.medcoNetworkService.nodes.every((e) => e.isUp)
   }
 
   get isBiorefMode(): boolean {
