@@ -11,12 +11,18 @@
 import { Component } from '@angular/core';
 import { AppConfig } from 'src/app/config/app.config';
 import { ApiEndpointService } from 'src/app/services/api-endpoint.service';
+import { MedcoNetworkService } from 'src/app/services/api/medco-network.service';
 import { NavbarService } from 'src/app/services/navbar.service';
 import { TreeNodeService } from 'src/app/services/tree-node.service';
 
 type Project = {
   dataSourceId: string;
   uniqueId: string;
+  participants: {
+    node: {
+      name: string;
+    }
+  }[];
 }
 
 @Component({
@@ -32,7 +38,8 @@ export class GbSelectProjectComponent {
     private config: AppConfig,
     private apiEndpointService: ApiEndpointService,
     private navbarService: NavbarService,
-    private treeNodeService: TreeNodeService) {
+    private treeNodeService: TreeNodeService,
+    private medcoNetworkService: MedcoNetworkService) {
 
   }
 
@@ -51,7 +58,9 @@ export class GbSelectProjectComponent {
   
   onChangeProject(index) {
     this._selectedProjectIndex = index;
-    this.config.projectId = this.projectList[this._selectedProjectIndex].uniqueId;
+    const selectedProject = this.projectList[this._selectedProjectIndex];
+    this.config.projectId = selectedProject.uniqueId;
+    this.medcoNetworkService.projectNodes = selectedProject.participants.map((participant) => participant.node.name);
     this.treeNodeService.exploreTreeNode();
     this.navbarService.navigateToExploreTab();
   }

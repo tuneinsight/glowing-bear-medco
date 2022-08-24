@@ -43,4 +43,8 @@ export class GbSummaryComponent {
   get getNodes() {
     return this.medcoNetworkService.nodes;
   }
+
+  isNodeNotInProject(nodeName: string) {
+    return !this.medcoNetworkService.projectNodes.find((projectNodeName) => projectNodeName === nodeName);
+  }
 }

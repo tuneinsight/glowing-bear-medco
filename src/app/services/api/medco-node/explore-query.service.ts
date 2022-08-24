@@ -161,6 +161,7 @@ export class ExploreQueryService {
                       }
                     },
                     []) as number[];
+                    console.log('exploreResult.perSiteCounts', exploreResult.perSiteCounts);
                     exploreResult.globalCount = exploreResult.perSiteCounts.reduce((a, b) => a + b, 0);
               }
             }

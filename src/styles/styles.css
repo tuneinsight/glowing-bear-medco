@@ -382,6 +382,10 @@ gb-side-panel .ui-accordion .ui-accordion-content {
   padding: 1em;
 }
 
+.not-in-project {
+  opacity: 0.35;
+}
+
 p-accordiontab[ng-reflect-header="Ontology"] > .ui-accordion-content-wrapper > .ui-accordion-content {
   padding-top: 0px;
 }
