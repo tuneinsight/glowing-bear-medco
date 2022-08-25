@@ -13,9 +13,11 @@ import { AppConfig } from 'src/app/config/app.config';
 import { ApiEndpointService } from 'src/app/services/api-endpoint.service';
 import { MedcoNetworkService } from 'src/app/services/api/medco-network.service';
 import { NavbarService } from 'src/app/services/navbar.service';
+import { QueryService } from 'src/app/services/query.service';
 import { TreeNodeService } from 'src/app/services/tree-node.service';
 
 type Project = {
+  name: string;
   dataSourceId: string;
   uniqueId: string;
   participants: {
@@ -39,21 +41,36 @@ export class GbSelectProjectComponent {
     private apiEndpointService: ApiEndpointService,
     private navbarService: NavbarService,
     private treeNodeService: TreeNodeService,
-    private medcoNetworkService: MedcoNetworkService) {
+    private medcoNetworkService: MedcoNetworkService,
+    private queryService: QueryService) {
 
   }
 
   async ngOnInit() {
     const projects = await this.apiEndpointService.getCall("projects").toPromise();
-    projects.forEach(async (project) => {
+
+    const getIndexOfProject = (projectName: string) => {
+      return projects.findIndex(project => project.name === projectName);
+    };
+
+    let tmpProjects = [];
+    for (let index = 0; index < projects.length; index++) {
+      const project = projects[index];
+
       if (!project.dataSourceId) {
         return false;
       }
       const datasource = await this.apiEndpointService.getCall(`datasources/${project.dataSourceId}`).toPromise();
       if (datasource.type === 'i2b2') {
-        this.projectList.push(project);
+        tmpProjects.push(project);
       }
-    })
+    }
+
+    this.projectList = tmpProjects.sort((a, b) => getIndexOfProject(a.name) - getIndexOfProject(b.name));
+
+    if (this.navbarService.items[1].disabled) {
+      this.onChangeProject(0);
+    }
   }
   
   onChangeProject(index) {
@@ -61,6 +78,7 @@ export class GbSelectProjectComponent {
     const selectedProject = this.projectList[this._selectedProjectIndex];
     this.config.projectId = selectedProject.uniqueId;
     this.medcoNetworkService.projectNodes = selectedProject.participants.map((participant) => participant.node.name);
+    this.queryService.clearAll();
     this.treeNodeService.exploreTreeNode();
     this.navbarService.navigateToExploreTab();
   }
