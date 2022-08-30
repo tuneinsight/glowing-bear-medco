@@ -44,6 +44,7 @@ export class ExploreCohortsService {
         aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
         operation: 'getCohorts',
         parameters: {
+          projectID: this.config.projectId,
           limit: 10
         },
         outputDataObjectsSharedIDs: {
@@ -65,6 +66,7 @@ export class ExploreCohortsService {
         broadcast: true,
         parameters: {
           name: cohortName,
+          projectID: this.config.projectId,
           exploreQueryID: exploreQueryID
         }
       }
