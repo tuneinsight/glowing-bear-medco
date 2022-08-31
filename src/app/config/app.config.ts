@@ -21,8 +21,17 @@ export class AppConfig {
     this._projectId = value;
   }
 
+  get projectName() {
+    return this._projectName;
+  }
+
+  set projectName(value: string) {
+    this._projectName = value;
+  }
+
   static path = 'app/config/';
   private _projectId: string;
+  private _projectName: string;
   config: Object = null;
   env: Object = null;
 

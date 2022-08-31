@@ -36,6 +36,7 @@ type Project = {
 export class GbSelectProjectComponent {
   private projectList: Project[] = [];
   private _selectedProjectIndex = -1;
+  private _projectName;
 
   constructor(
     private config: AppConfig,
@@ -82,6 +83,7 @@ export class GbSelectProjectComponent {
     this._selectedProjectIndex = index;
     const selectedProject = this.projectList[this._selectedProjectIndex];
     this.config.projectId = selectedProject.uniqueId;
+    this.config.projectName = selectedProject.name;
     this.medcoNetworkService.projectNodes = selectedProject.participants.map((participant) => participant.node.name);
     this.cohortService.clearAll();
     this.queryService.clearAll();

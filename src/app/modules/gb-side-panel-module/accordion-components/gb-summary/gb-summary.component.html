@@ -1,4 +1,7 @@
 <div>
+  <span>Project: {{projectName}}</span>
+  <br />
+  <br />
   <span>Connected participants:</span>
   <ul>
     <li *ngFor="let node of getNodes; let nodeIdx = index" [ngClass]="{'not-in-project': isNodeNotInProject(node.name) }" title="{{node.url}} | {{node.organization.country}}">
