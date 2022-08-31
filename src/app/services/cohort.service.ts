@@ -368,4 +368,8 @@ export class CohortService {
 
     this.cohortName = ''
   }
+
+  clearAll() {
+    this.cohorts = [];
+  }
 }

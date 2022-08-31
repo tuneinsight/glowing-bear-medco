@@ -27,6 +27,7 @@ export class MedcoNetworkService {
    * Contains the list of nodes and their metadata.
    */
   private _nodes: ApiNodeMetadata[];
+  private _projectNodes: string[] = [];
 
   private config: AppConfig;
   private apiEndpointService: ApiEndpointService;
@@ -67,6 +68,14 @@ export class MedcoNetworkService {
 
   get nodes(): ApiNodeMetadata[] {
     return this._nodes;
+  }
+
+  get projectNodes() {
+    return this._projectNodes;
+  }
+
+  set projectNodes(value: string[]) {
+    this._projectNodes = value;
   }
 
   //  ------------------- others ----------------------

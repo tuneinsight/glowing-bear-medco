@@ -13,6 +13,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {ExploreQueryResult} from '../../../../models/query-models/explore-query-result';
 import { MedcoNetworkService } from 'src/app/services/api/medco-network.service';
+import { AppConfig } from 'src/app/config/app.config';
 
 @Component({
   selector: 'gb-summary',
@@ -22,7 +23,12 @@ import { MedcoNetworkService } from 'src/app/services/api/medco-network.service'
 export class GbSummaryComponent {
 
   constructor(private queryService: QueryService,
-              private medcoNetworkService: MedcoNetworkService) {
+              private medcoNetworkService: MedcoNetworkService,
+              private config: AppConfig) {
+  }
+
+  get projectName() {
+    return this.config.projectName;
   }
 
 
@@ -42,5 +48,9 @@ export class GbSummaryComponent {
 
   get getNodes() {
     return this.medcoNetworkService.nodes;
+  }
+
+  isNodeNotInProject(nodeName: string) {
+    return !this.medcoNetworkService.projectNodes.find((projectNodeName) => projectNodeName === nodeName);
   }
 }

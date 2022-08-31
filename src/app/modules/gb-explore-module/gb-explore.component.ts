@@ -13,9 +13,9 @@ import { KeycloakService } from 'keycloak-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppConfig } from 'src/app/config/app.config';
-import { Cohort } from 'src/app/models/cohort-models/cohort';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { ExploreStatisticsService } from 'src/app/services/explore-statistics.service';
+import { TreeNodeService } from 'src/app/services/tree-node.service';
 import { OperationType } from '../../models/operation-models/operation-types';
 import { ExploreQueryType } from '../../models/query-models/explore-query-type';
 import { CohortService } from '../../services/cohort.service';
@@ -42,7 +42,6 @@ export class GbExploreComponent implements AfterViewChecked {
 
   constructor(
     private config: AppConfig,
-    private authService: AuthenticationService,
     private queryService: QueryService,
     private cohortService: CohortService,
     public constraintService: ConstraintService,
