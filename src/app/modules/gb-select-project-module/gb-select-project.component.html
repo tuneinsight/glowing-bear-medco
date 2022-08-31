@@ -8,7 +8,7 @@
     
     <select (change)="onChangeProject($event.target.value)" name="projectId">
         <option disabled [selected]="selectedProjectIndex === -1" value> -- select an option -- </option>
-        <option [value]="projectIdx" value="tata" *ngFor="let project of getProjectList(); let projectIdx = index">
+        <option [value]="projectIdx" value="tata" *ngFor="let project of getProjectList(); let projectIdx = index" [selected]="selectedProjectIndex === projectIdx">
             {{project.name}}
         </option>
     </select>
