@@ -17,7 +17,7 @@ import { NavbarService } from 'src/app/services/navbar.service';
 import { QueryService } from 'src/app/services/query.service';
 import { TreeNodeService } from 'src/app/services/tree-node.service';
 
-type Project = {
+interface Project {
   name: string;
   dataSourceId: string;
   uniqueId: string;
@@ -50,7 +50,7 @@ export class GbSelectProjectComponent {
   }
 
   async ngOnInit() {
-    const projects = await this.apiEndpointService.getCall("projects").toPromise();
+    const projects = await this.apiEndpointService.getCall('projects').toPromise();
 
     const getIndexOfProject = (projectName: string) => {
       return projects.findIndex(project => project.name === projectName);
@@ -78,7 +78,7 @@ export class GbSelectProjectComponent {
       this._selectedProjectIndex = currentProjectIndex;
     }
   }
-  
+
   onChangeProject(index) {
     this._selectedProjectIndex = index;
     const selectedProject = this.projectList[this._selectedProjectIndex];
