@@ -14,8 +14,12 @@ import {GbResultsComponent} from '../gb-results-module/gb-results.component';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/explore',
+    redirectTo: '/select-project',
     pathMatch: 'full'
+  },
+  {
+    path: 'select-project',
+    loadChildren: () => import('../gb-select-project-module/gb-select-project.module').then(m => m.GbSelectProjectModule)
   },
   {
     path: 'explore',

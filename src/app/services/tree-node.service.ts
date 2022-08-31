@@ -29,6 +29,7 @@ import { KeycloakService } from 'keycloak-angular';
 import { MessageHelper } from '../utilities/message-helper';
 import { AuthenticationService } from './authentication.service';
 import { MedcoNetworkService } from './api/medco-network.service';
+import { NavbarService } from './navbar.service';
 
 @Injectable()
 export class TreeNodeService {
@@ -47,6 +48,7 @@ export class TreeNodeService {
   private confirmationService: ConfirmationService;
   private keycloakService: KeycloakService;
   private medcoNetworkService: MedcoNetworkService;
+  private navbarService: NavbarService;
 
   constructor(private injector: Injector) {}
 
@@ -62,6 +64,7 @@ export class TreeNodeService {
       this.apiEndpointService = this.injector.get(ApiEndpointService);
       this.confirmationService = this.injector.get(ConfirmationService);
       this.medcoNetworkService = this.injector.get(MedcoNetworkService);
+      this.navbarService = this.injector.get(NavbarService);
 
       this.constraintService.conceptLabels = [];
 
@@ -80,28 +83,8 @@ export class TreeNodeService {
           .find((project) => project.name === 'i2b2');
         if (i2b2Project && i2b2Project.dataSourceId) {
           console.log('Found project id', i2b2Project.uniqueId);
-          this.config.projectId = i2b2Project.uniqueId;
           this.medcoNetworkService.getNetworkStatus();
-          this.exploreSearchService.exploreSearchConceptChildren('/').subscribe(
-            (treeNodes: TreeNode[]) => {
-              // reset concepts and concept constraints
-              this.constraintService.concepts = [];
-              this.constraintService.conceptConstraints = [];
-
-              this.processTreeNodes(treeNodes, this.constraintService);
-              treeNodes.forEach((node) => this.rootTreeNodes.push(node));
-              this.config.setConfig('isBiorefMode', !this.keycloakService.isUserInRole(AuthenticationService.GECO_SURVIVAL_ANALYSIS_ROLE));
-              this._isLoading = false;
-              resolve();
-            },
-            (err) => {
-              console.error(err);
-              let errMessage = 'Undefined error when checking network.';
-              alert(`${errMessage} Please contact an administrator. You will now be logged out.`);
-              this.keycloakService.logout();
-              reject(err);
-            }
-          );
+          resolve();
         } else {
           this._isNoi2b2Datasource = true;
           alert('Cannot find i2b2 project, please create one with the name "i2b2", with a valid i2b2 datasource and login again.');
@@ -109,6 +92,33 @@ export class TreeNodeService {
         }
       });
     });
+  }
+
+  exploreTreeNode() {
+    this._isLoading = true;
+    this._rootTreeNodes = [];
+    this.exploreSearchService.exploreSearchConceptChildren('/').subscribe(
+      (treeNodes: TreeNode[]) => {
+        // reset concepts and concept constraints
+        this.constraintService.concepts = [];
+        this.constraintService.conceptConstraints = [];
+
+        this.processTreeNodes(treeNodes, this.constraintService);
+        treeNodes.forEach((node) => this.rootTreeNodes.push(node));
+        this.config.setConfig('isBiorefMode', !this.keycloakService.isUserInRole(AuthenticationService.GECO_SURVIVAL_ANALYSIS_ROLE));
+        this._isLoading = false;
+      },
+      (err) => {
+        if (!this.config.projectId) {
+          this.navbarService.navigateToSelectProjectTab();
+        } else {
+          console.error(err);
+          let errMessage = 'Undefined error when checking network.';
+          alert(`${errMessage} Please contact an administrator. You will now be logged out.`);
+          this.keycloakService.logout();
+        }
+      }
+    );
   }
 
   /**

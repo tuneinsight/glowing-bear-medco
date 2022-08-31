@@ -28,6 +28,7 @@ export class MedcoNetworkService {
    */
   private _nodes: ApiNodeMetadata[];
   private _networkStatus: ApiNetworkStatusMetadata;
+  private _projectNodes: string[] = [];
 
   private config: AppConfig;
   private apiEndpointService: ApiEndpointService;
@@ -84,6 +85,13 @@ export class MedcoNetworkService {
     return this._networkStatus;
   }
 
+  get projectNodes() {
+    return this._projectNodes;
+  }
+
+  set projectNodes(value: string[]) {
+    this._projectNodes = value;
+  }
 
   //  ------------------- others ----------------------
 

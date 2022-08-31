@@ -1,10 +1,13 @@
 <div>
+  <span>Project: {{projectName}}</span>
+  <br />
+  <br />
   <span>Connected participants:</span>
-  <div *ngFor="let node of getNodes; let nodeIdx = index" [pTooltip]="getTooltipMessage(node.name)" class="participant-node" [ngClass]="{'node_is_up': !!node.isUp}">
-    <input (click)="onChangeNode($event)" type="checkbox" name="{{node.name}}" [attr.checked]="node.isChecked ? true : null" [attr.disabled]="node.checkboxDisabled" />
+  <div *ngFor="let node of getNodes; let nodeIdx = index" [pTooltip]="getTooltipMessage(node.name)" class="participant-node" [ngClass]="{'node_is_up': !!node.isUp, 'not-in-project': !isNodeInProject(node.name)}">
+    <input (click)="onChangeNode($event)" type="checkbox" name="{{node.name}}" [attr.checked]="node.isChecked && isNodeInProject(node.name) ? true : null" [attr.disabled]="node.checkboxDisabled" />
     {{node.name}}
     <span *ngIf="node.current"> (you)</span>
-    <span *ngIf="hasPerSiteCounts && queryResults|async">: {{(queryResults|async).perSiteCounts[nodeIdx]}} subjects</span>
+    <span *ngIf="isNodeInProject(node.name) && hasPerSiteCounts && queryResults|async">: {{(queryResults|async).perSiteCounts[nodeIdx]}} subjects</span>
   </div>
   <div style="margin-top: 16px;">Total: {{globalCount | async}} subjects</div>
 </div>

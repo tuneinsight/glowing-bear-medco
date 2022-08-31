@@ -14,7 +14,6 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppConfig } from 'src/app/config/app.config';
 import { MedcoNetworkService } from 'src/app/services/api/medco-network.service';
-import { AuthenticationService } from 'src/app/services/authentication.service';
 import { ExploreStatisticsService } from 'src/app/services/explore-statistics.service';
 import { OperationType } from '../../models/operation-models/operation-types';
 import { ExploreQueryType } from '../../models/query-models/explore-query-type';
@@ -42,7 +41,6 @@ export class GbExploreComponent implements AfterViewChecked {
 
   constructor(
     private config: AppConfig,
-    private authService: AuthenticationService,
     private queryService: QueryService,
     private cohortService: CohortService,
     public constraintService: ConstraintService,
