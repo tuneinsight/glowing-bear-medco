@@ -57,19 +57,27 @@ export class GbSummaryComponent {
       return `This node (${node.name} | ${node.url} | ${node.organization.country}) seems to be down`
     }
 
-    const networkStatus = this.medcoNetworkService.networkStatus?.find((e) => e.from === nodeName);
     let titleStr = `${nodeName} (${node.url} | ${node.organization.country})`;
+
+    const networkStatus = this.medcoNetworkService.networkStatus?.find((e) => e.from === nodeName);
 
     if (networkStatus) {
       titleStr += ` is connected to:\n  \
               ${networkStatus.statuses.reduce((result, status) => `${result}\n${status.node}: ${status.status}`, '')}
       `;
+    } else {
+      titleStr += " seems to be down."
     }
     return titleStr;
   }
 
+  
   onChangeNode(e) {
     this.medcoNetworkService.setNodeChecked(e.srcElement.name, e.srcElement.checked);
+  }
+
+  isNodeUp(nodeName: string) {
+    return !!this.medcoNetworkService.networkStatus?.find((e) => e.from === nodeName).statuses;
   }
 
   isNodeInProject(nodeName: string) {

@@ -83,7 +83,6 @@ export class TreeNodeService {
           .find((project) => project.name === 'i2b2');
         if (i2b2Project && i2b2Project.dataSourceId) {
           console.log('Found project id', i2b2Project.uniqueId);
-          this.medcoNetworkService.getNetworkStatus();
           resolve();
         } else {
           this._isNoi2b2Datasource = true;

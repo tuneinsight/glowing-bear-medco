@@ -43,17 +43,7 @@ export class MedcoNetworkService {
 
       this.getNetwork().subscribe((metadata) => {
         this._networkPubKey = metadata['public-key'];
-        this._nodes = metadata.nodes
-          .sort(({ current }) => +current)
-          .map((node) => {
-            const isUp = true;
-            const checkboxDisabled = true;
-            return {
-              ...node,
-              checkboxDisabled,
-              isUp,
-              isChecked: isUp
-            }});
+        this._nodes = metadata.nodes.sort(({ current }) => +current);
 
         console.log(`Loaded nodes: ${metadata.nodes.map((a) => a.name).join(', ')}`);
         resolve();

@@ -36,7 +36,6 @@ interface Project {
 export class GbSelectProjectComponent {
   private projectList: Project[] = [];
   private _selectedProjectIndex = -1;
-  private _projectName;
 
   constructor(
     private config: AppConfig,
@@ -89,6 +88,7 @@ export class GbSelectProjectComponent {
     this.queryService.clearAll();
     this.treeNodeService.exploreTreeNode();
     this.navbarService.navigateToExploreTab();
+    this.medcoNetworkService.getNetworkStatus();
   }
 
   public getProjectList() {
