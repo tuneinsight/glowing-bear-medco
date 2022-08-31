@@ -66,12 +66,12 @@ export class GbSummaryComponent {
               ${networkStatus.statuses.reduce((result, status) => `${result}\n${status.node}: ${status.status}`, '')}
       `;
     } else {
-      titleStr += " seems to be down."
+      titleStr += ' seems to be down.'
     }
     return titleStr;
   }
 
-  
+
   onChangeNode(e) {
     this.medcoNetworkService.setNodeChecked(e.srcElement.name, e.srcElement.checked);
   }
