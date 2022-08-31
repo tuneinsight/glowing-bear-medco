@@ -53,7 +53,7 @@ export class MedcoNetworkService {
               isUp,
               isChecked: isUp
             }});
-            
+
         console.log(`Loaded nodes: ${metadata.nodes.map((a) => a.name).join(', ')}`);
         resolve();
       }, (err) => {
@@ -84,9 +84,9 @@ export class MedcoNetworkService {
     return this._networkStatus;
   }
 
-  
+
   //  ------------------- others ----------------------
-  
+
   public setNodeChecked(name: string, isChecked: boolean) {
     this._nodes = this._nodes.map((node) => ({
       ...node,

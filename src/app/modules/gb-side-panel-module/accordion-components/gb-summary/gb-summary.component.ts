@@ -53,10 +53,10 @@ export class GbSummaryComponent {
 
     const networkStatus = this.medcoNetworkService.networkStatus?.find((e) => e.from === nodeName);
     let titleStr = `${nodeName} (${node.url} | ${node.organization.country})`;
-    
+
     if (networkStatus) {
       titleStr += ` is connected to:\n  \
-              ${networkStatus.statuses.reduce((result, status) => `${result}\n${status.node}: ${status.status}`, "")}
+              ${networkStatus.statuses.reduce((result, status) => `${result}\n${status.node}: ${status.status}`, '')}
       `;
     }
     return titleStr;

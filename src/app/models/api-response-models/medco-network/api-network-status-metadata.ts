@@ -1,11 +1,11 @@
-type NodeStatus = {
+interface NodeStatus {
   node: string;
-  status: "ok" | "nok"
-};
+  status: 'ok' | 'nok'
+}
 
-type FromNodeReturn = {
+interface FromNodeReturn {
   from: string;
   statuses: NodeStatus[];
-};
+}
 
 export type ApiNetworkStatusMetadata = FromNodeReturn[];
