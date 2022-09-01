@@ -57,7 +57,7 @@ export class GbSummaryComponent {
 
     const networkStatus = this.medcoNetworkService.networkStatus?.find((e) => e.from === nodeName);
 
-    if (networkStatus) {
+    if (networkStatus?.statuses) {
       titleStr += ` is connected to:\n  \
               ${networkStatus.statuses.reduce((result, status) => `${result}\n${status.node}: ${status.status}`, '')}
       `;
