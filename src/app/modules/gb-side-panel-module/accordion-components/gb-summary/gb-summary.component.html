@@ -2,7 +2,12 @@
   <span>Project: {{projectName}}</span>
   <br />
   <br />
-  <span>Connected participants:</span>
+  <span>Connected participants
+    <button pButton class="ui-button-secondary no-background" [disabled]="isRefreshingNodes"
+      [ngStyle]="{'color': isRefreshingNodes ? 'var(--gb-light-light-clinical-green)':'var(--gb-ti-main-color)'}"
+      type="button" pTooltip="Refresh participants" tooltipPosition="top" (click)="refreshNodes()" icon="fa fa-refresh">
+  </button>
+  </span>
   <ul>
     <li *ngFor="let node of getNodes; let nodeIdx = index" [pTooltip]="getTooltipMessage(node.name)" class="participant-node" [ngClass]="{'node_is_up': isNodeUp(node.name), 'not-in-project': !isNodeInProject(node.name)}">
       {{node.name}}

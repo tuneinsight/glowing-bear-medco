@@ -96,7 +96,7 @@ export class GbSelectProjectComponent {
     this.medcoNetworkService.getNetworkStatus();
     this._setIntervalTimeout = setInterval(() => {
       this.medcoNetworkService.getNetworkStatus();
-    }, 1000 * 60) 
+    }, 1000 * 60);
   }
 
   public getProjectList() {

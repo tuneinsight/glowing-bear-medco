@@ -7,3 +7,8 @@
 .node_is_up {
     color: black;
 }
+
+.ui-button-secondary.no-background {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}

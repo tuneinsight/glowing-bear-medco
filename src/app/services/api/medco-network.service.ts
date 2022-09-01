@@ -107,9 +107,12 @@ export class MedcoNetworkService {
    * Sets the MedCo network status metadata.
    */
   getNetworkStatus() {
-    const urlPart = `projects/${this.config.projectId}/network-status`;
-    this.apiEndpointService.getCall(urlPart, false, undefined, false).subscribe((metadata) => {
-      this._networkStatus = metadata;
+    return new Promise<void>((resolve, reject) => {
+      const urlPart = `projects/${this.config.projectId}/network-status`;
+      this.apiEndpointService.getCall(urlPart, false, undefined, false).subscribe((metadata) => {
+        this._networkStatus = metadata;
+        resolve();
+      });
     });
   }
 }

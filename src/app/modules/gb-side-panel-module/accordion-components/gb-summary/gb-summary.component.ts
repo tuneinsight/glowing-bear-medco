@@ -22,6 +22,8 @@ import { AppConfig } from 'src/app/config/app.config';
 })
 export class GbSummaryComponent {
 
+  private _isRefreshingNodes = false;
+
   constructor(private queryService: QueryService,
               private medcoNetworkService: MedcoNetworkService,
               private config: AppConfig) {
@@ -50,6 +52,14 @@ export class GbSummaryComponent {
     return this.medcoNetworkService.nodes;
   }
 
+  get isRefreshingNodes() {
+    return this._isRefreshingNodes;
+  }
+
+  set isRefreshingNodes(value: boolean) {
+    this._isRefreshingNodes = value;
+  }
+
   getTooltipMessage(nodeName: string) {
     const node = this.getNodes.find((e) => e.name === nodeName);
 
@@ -65,6 +75,13 @@ export class GbSummaryComponent {
       titleStr += ' seems to be down.'
     }
     return titleStr;
+  }
+
+  refreshNodes() {
+    this.isRefreshingNodes = true;
+    this.medcoNetworkService.getNetworkStatus().then(() => {
+      this.isRefreshingNodes = false;
+    });
   }
 
 

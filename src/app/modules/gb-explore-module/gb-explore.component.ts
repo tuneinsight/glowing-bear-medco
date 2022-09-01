@@ -15,6 +15,7 @@ import { map } from 'rxjs/operators';
 import { AppConfig } from 'src/app/config/app.config';
 import { MedcoNetworkService } from 'src/app/services/api/medco-network.service';
 import { ExploreStatisticsService } from 'src/app/services/explore-statistics.service';
+import { ErrorHelper } from 'src/app/utilities/error-helper';
 import { OperationType } from '../../models/operation-models/operation-types';
 import { ExploreQueryType } from '../../models/query-models/explore-query-type';
 import { CohortService } from '../../services/cohort.service';
@@ -64,9 +65,25 @@ export class GbExploreComponent implements AfterViewChecked {
 
     this.exploreStatisticsService.executeQueryFromExplore(this.bucketSize, this.minObservation)
   }
-
-  execQuery(event) {
+  async execQuery(event) {
     event.stopPropagation();
+
+    this.queryService.isUpdating = true;
+
+    await this.medcoNetworkService.getNetworkStatus();
+
+    const isOneNodeDown = this.medcoNetworkService.networkStatus.reduce((result, value) => {
+      if (result || (this.medcoNetworkService.projectNodes.find((p) => p === value.from) && !value.statuses)) {
+        return true;
+      }
+      return false;
+    }, false);
+
+    if (isOneNodeDown) {
+      ErrorHelper.handleError('One node became unavailable while preparing the request', new Error());
+      this.queryService.isUpdating = false;
+      return;
+    }
 
 
     if (this.config.getConfig('isBiorefMode')) {
