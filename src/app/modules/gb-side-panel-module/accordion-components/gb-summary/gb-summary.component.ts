@@ -53,10 +53,6 @@ export class GbSummaryComponent {
   getTooltipMessage(nodeName: string) {
     const node = this.getNodes.find((e) => e.name === nodeName);
 
-    if (!node.isUp) {
-      return `This node (${node.name} | ${node.url} | ${node.organization.country}) seems to be down`
-    }
-
     let titleStr = `${nodeName} (${node.url} | ${node.organization.country})`;
 
     const networkStatus = this.medcoNetworkService.networkStatus?.find((e) => e.from === nodeName);
