@@ -284,8 +284,8 @@ export class TreeNodeService {
 
   private processMetadata(target: Concept, metadata: ApiValueMetadata) {
     if (metadata) {
-      if (metadata.unitValues) {
-        target.unit = metadata.unitValues['normalUnits'];
+      if (metadata.unitValues?.[0]) {
+        target.unit = metadata.unitValues[0]['normalUnits'];
       }
       if (metadata.dataType) {
         switch (metadata.dataType) {

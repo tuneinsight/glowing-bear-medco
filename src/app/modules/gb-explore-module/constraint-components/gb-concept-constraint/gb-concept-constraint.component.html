@@ -28,20 +28,20 @@
   <p-dropdown [(ngModel)]="numericalOperatorState" [options]="numericalOperation" dropdownIcon="pi pi-caret-down white-color" (onChange)="changeNumericalOperator($event)"></p-dropdown>
   <span>&nbsp;</span>
 
-  <div *ngIf="(numericalOperatorState !== null) && isBetween() " class="d-inline-block">
+  <div *ngIf="(numericalOperatorState !== null) && isBetween() " class="d-inline-flex">
     <input type="number" [step]="integerOrFloat" [min]="positive" class="col-sm-4" placeholder="min:{{minLimit}}"
            [(ngModel)]="minVal">
     <span>&nbsp;and&nbsp;</span>
     <input type="number" [step]="integerOrFloat" [min]="positive" class="col-sm-4" placeholder="max:{{maxLimit}}"
            [(ngModel)]="maxVal">
-    <span>&nbsp;{{unit}}</span>
+    <span style="white-space: nowrap;">&nbsp;{{unit}}</span>
     <gb-tooltip></gb-tooltip>
   </div>
 
-  <div *ngIf="(numericalOperatorState !== null) && !isBetween() " class="d-inline-block">
+  <div *ngIf="(numericalOperatorState !== null) && !isBetween() " class="d-inline-flex">
     <input type="number" [step]="integerOrFloat" [min]="positive" class="col-sm-8"
            [(ngModel)]="equalVal">
-    <span>&nbsp;{{unit}}</span>
+    <span style="white-space: nowrap;">&nbsp;{{unit}}</span>
     <gb-tooltip></gb-tooltip>
   </div>
 </div>
