@@ -22,13 +22,13 @@
 
           </button>
         </span>
+        <span *ngIf="queryType; else noAuthorization" style="margin-left: 8px;" class="gb-data-selection-text">
+          Allowed Result Type: <b>{{queryType.name}}</b>
+        </span>
       </span>
         <span style="display: flex; align-items: center; margin-left: 2em;">
 
           <!-- display of explore query type -->
-          <span *ngIf="queryType; else noAuthorization" class="float-right gb-data-selection-text">
-            Allowed Result Type: <b>{{queryType.name}}</b>
-          </span>
           <ng-template #noAuthorization>
             <span class="float-right">No authorization for explore query.</span>
           </ng-template>
