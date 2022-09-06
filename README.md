@@ -27,7 +27,10 @@ It is a fork of the version previously developed at EPFL for the [MedCo project]
 
 ## Getting started
 
-### Use the live development server
+### Requirements
+- The `geco-cryptolib` lib
+
+### Start the live development server
 ```bash
 cd deployment
 ./dev-server.sh
