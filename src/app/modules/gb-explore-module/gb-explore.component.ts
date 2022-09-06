@@ -13,9 +13,9 @@ import { KeycloakService } from 'keycloak-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppConfig } from 'src/app/config/app.config';
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { MedcoNetworkService } from 'src/app/services/api/medco-network.service';
 import { ExploreStatisticsService } from 'src/app/services/explore-statistics.service';
-import { TreeNodeService } from 'src/app/services/tree-node.service';
+import { ErrorHelper } from 'src/app/utilities/error-helper';
 import { OperationType } from '../../models/operation-models/operation-types';
 import { ExploreQueryType } from '../../models/query-models/explore-query-type';
 import { CohortService } from '../../services/cohort.service';
@@ -47,6 +47,7 @@ export class GbExploreComponent implements AfterViewChecked {
     public constraintService: ConstraintService,
     private changeDetectorRef: ChangeDetectorRef,
     private exploreStatisticsService: ExploreStatisticsService,
+    private medcoNetworkService: MedcoNetworkService,
     private keycloakService: KeycloakService) {
     this.queryService.lastSuccessfulSet.subscribe(resIDs => {
       this.lastSuccessfulSet = resIDs
@@ -64,9 +65,25 @@ export class GbExploreComponent implements AfterViewChecked {
 
     this.exploreStatisticsService.executeQueryFromExplore(this.bucketSize, this.minObservation)
   }
-
-  execQuery(event) {
+  async execQuery(event) {
     event.stopPropagation();
+
+    this.queryService.isUpdating = true;
+
+    await this.medcoNetworkService.getNetworkStatus();
+
+    const isOneNodeDown = this.medcoNetworkService.networkStatus.reduce((result, value) => {
+      if (result || (this.medcoNetworkService.projectNodes.find((p) => p === value.from) && !value.statuses)) {
+        return true;
+      }
+      return false;
+    }, false);
+
+    if (isOneNodeDown) {
+      ErrorHelper.handleError('One node became unavailable while preparing the request', new Error());
+      this.queryService.isUpdating = false;
+      return;
+    }
 
 
     if (this.config.getConfig('isBiorefMode')) {
@@ -125,6 +142,10 @@ export class GbExploreComponent implements AfterViewChecked {
 
   get hasConstraint(): boolean {
     return this.constraintService.hasConstraint().valueOf()
+  }
+
+  get allNodesIsUp(): boolean {
+    return this.medcoNetworkService.nodes.every((e) => e.isUp)
   }
 
   get isBiorefMode(): boolean {

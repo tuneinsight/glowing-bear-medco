@@ -1,1 +1,14 @@
+.participant-node {
+    color: lightgrey;
+    margin-top: 4px;
+    width: fit-content;
+}
 
+.node_is_up {
+    color: black;
+}
+
+.ui-button-secondary.no-background {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}

@@ -22,6 +22,8 @@ import { AppConfig } from 'src/app/config/app.config';
 })
 export class GbSummaryComponent {
 
+  private _isRefreshingNodes = false;
+
   constructor(private queryService: QueryService,
               private medcoNetworkService: MedcoNetworkService,
               private config: AppConfig) {
@@ -50,7 +52,48 @@ export class GbSummaryComponent {
     return this.medcoNetworkService.nodes;
   }
 
-  isNodeNotInProject(nodeName: string) {
-    return !this.medcoNetworkService.projectNodes.find((projectNodeName) => projectNodeName === nodeName);
+  get isRefreshingNodes() {
+    return this._isRefreshingNodes;
+  }
+
+  set isRefreshingNodes(value: boolean) {
+    this._isRefreshingNodes = value;
+  }
+
+  getTooltipMessage(nodeName: string) {
+    const node = this.getNodes.find((e) => e.name === nodeName);
+
+    let titleStr = `${nodeName} (${node.url} | ${node.organization.country})`;
+
+    const networkStatus = this.medcoNetworkService.networkStatus?.find((e) => e.from === nodeName);
+
+    if (networkStatus?.statuses) {
+      titleStr += ` is connected to:\n  \
+              ${networkStatus.statuses.reduce((result, status) => `${result}\n${status.node}: ${status.status}`, '')}
+      `;
+    } else {
+      titleStr += ' seems to be down.'
+    }
+    return titleStr;
+  }
+
+  refreshNodes() {
+    this.isRefreshingNodes = true;
+    this.medcoNetworkService.getNetworkStatus().then(() => {
+      this.isRefreshingNodes = false;
+    });
+  }
+
+
+  onChangeNode(e) {
+    this.medcoNetworkService.setNodeChecked(e.srcElement.name, e.srcElement.checked);
+  }
+
+  isNodeUp(nodeName: string) {
+    return !!this.medcoNetworkService.networkStatus?.find((e) => e.from === nodeName).statuses;
+  }
+
+  isNodeInProject(nodeName: string) {
+    return !!this.medcoNetworkService.projectNodes.find((projectNodeName) => projectNodeName === nodeName);
   }
 }
