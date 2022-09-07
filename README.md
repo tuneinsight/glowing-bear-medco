@@ -28,7 +28,7 @@ It is a fork of the version previously developed at EPFL for the [MedCo project]
 ## Getting started
 
 ### Requirements
-- The `geco-cryptolib` lib
+- The `geco-cryptolib` lib (not released yet)
 
 ### Start the live development server
 ```bash
