@@ -12,14 +12,11 @@
           <span class="gb-data-selection-emphasis-text">{{globalCount | async}} subjects</span>
         </span>
         <span id="save-box" *ngIf="!isBiorefMode && isGlobalCountOrPatientList">
-          <input [(ngModel)]="cohortName" pInputText (keydown)="saveIfEnter($event)" placeholder="Cohort name" (drop)="preventDefault($event)"/>
-          <span>&nbsp;</span>
+          <input class="gb-cohort-input" [(ngModel)]="cohortName" pInputText (keydown)="saveIfEnter($event)" placeholder="Cohort name" (drop)="preventDefault($event)"/>
           <button
             class="btn btn-outline-primary btn-sm gb-data-selection-overview-panel-btn {{lastSuccessfulSet ?  '' : 'gb-explore-waiting-cohort'}}"
             type="button" [disabled]="!lastSuccessfulSet" (click)="save()">
-
             <span>Save</span>
-
           </button>
         </span>
         <span *ngIf="queryType; else noAuthorization" style="margin-left: 8px;" class="gb-data-selection-text">
