@@ -5,7 +5,12 @@ This version of Glowing Bear is adapted for Tune Insight's platform TI4health's 
 
 It is a fork of the version previously developed at EPFL for the [MedCo project](https://medco.epfl.ch/).
 
+![TI4Health-screenshot](https://user-images.githubusercontent.com/725345/189142895-4efa3648-927c-4e43-9780-ceb118e95b65.png)
+
 ## Source code organization
+
+Glowing Bear is an Angular application structured as follows:
+
 - *deployment*: docker deployment files
 - *src*: root of the source code
   - *app*: angular application
@@ -18,7 +23,7 @@ It is a fork of the version previously developed at EPFL for the [MedCo project]
       - *gb-navbar-module*: navigation bar module, containing the menu with tabs
       - *gb-side-panel-module*: side panel module, containing the summary, ontology tree and saved cohorts
       - *gb-analysis-module*: analysis module, containing the analysis option (only survival at the current time) and settings for the analysis to run
-      - *gb-survival-results-module*: survival results module, containing the results of the various operations run on survival data points in the context of survival analysis. An overview of this compenent's logic can be found in this [file](https://github.com/tuneinsight/glowing-bear-medco/src/survival-analysis.md).
+      - *gb-survival-results-module*: survival results module, containing the results of the various operations run on survival data points in the context of survival analysis. An overview of this component's logic can be found in this [file](https://github.com/tuneinsight/glowing-bear-medco/src/survival-analysis.md).
     - *services*: services handling data flow
     - *utilities*: utility tools: crypto, log, error, etc.
   - *assets*: static assets 
@@ -36,7 +41,7 @@ cd deployment
 ./dev-server.sh
 ```
 
-The backend for this version is developed and provided by Tune Insight. If you're interested in contributing please [contact us](contact@tuneinsight.com).
+The backend for this version is developed and provided by Tune Insight. If you're interested in contributing please [contact us](mailto:contact@tuneinsight.com).
 
 
 ### Build the Docker image
@@ -46,4 +51,4 @@ docker-compose build glowing-bear-medco
 ```
 
 ## License
-*glowing-bear-medco* is licensed under the MPL 2.0. If you need more information, please [contact us](contact@tuneinsight.com).
+*glowing-bear-medco* is licensed under the MPL 2.0. If you need more information, please [contact us](mailto:contact@tuneinsight.com).
