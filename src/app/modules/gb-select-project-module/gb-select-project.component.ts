@@ -74,8 +74,7 @@ export class GbSelectProjectComponent {
     if (this.navbarService.items[1].disabled) {
       this.onChangeProject(0);
     } else if (this.config.projectId) {
-      const currentProjectIndex = this.projectList.findIndex((p) => p.uniqueId === this.config.projectId);
-      this._selectedProjectIndex = currentProjectIndex;
+      this._selectedProjectIndex = this.projectList.findIndex((p) => p.uniqueId === this.config.projectId);
     }
   }
 

@@ -31,6 +31,7 @@ import { AuthenticationService } from './authentication.service';
 import { MedcoNetworkService } from './api/medco-network.service';
 import { NavbarService } from './navbar.service';
 
+
 @Injectable()
 export class TreeNodeService {
   // the variable that holds the entire tree structure, used by the tree on the left side bar
@@ -104,7 +105,12 @@ export class TreeNodeService {
 
         this.processTreeNodes(treeNodes, this.constraintService);
         treeNodes.forEach((node) => this.rootTreeNodes.push(node));
-        this.config.setConfig('isBiorefMode', !this.keycloakService.isUserInRole(AuthenticationService.GECO_SURVIVAL_ANALYSIS_ROLE));
+
+        if (!this.config.getConfig('isModeChanged')) {
+          // Only retrieve the mode from keycloak service when it wasn't manually selected
+          this.config.setConfig('isBiorefMode', !this.keycloakService.isUserInRole(AuthenticationService.GECO_SURVIVAL_ANALYSIS_ROLE));
+        }
+
         this._isLoading = false;
       },
       (err) => {
