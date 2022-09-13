@@ -85,7 +85,7 @@ export class GbExploreStatisticsResultsComponent implements AfterViewInit, OnDes
 
 
   private exportPDF() {
-    
+
     if (this.refIntervalsComponents === undefined || this.refIntervalsComponents.length <= 0) {
       throw ErrorHelper.handleNewError('Cannot export pdf yet. Execute a query firsthand.');
     }
