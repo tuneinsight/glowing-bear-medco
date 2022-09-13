@@ -79,8 +79,8 @@ function prepare(survivalPointsClass0: SurvivalPoint[], survivalPointsClass1: Su
 export function coxToString(coefficient: number, variance: number): string {
   const bilat95 = 1.96
   let sd = Math.sqrt(variance)
-  let res = Math.exp(coefficient).toPrecision(3) + ' ['
-  res += Math.exp(coefficient - bilat95 * sd).toPrecision(3) + ','
-  res += Math.exp(coefficient + bilat95 * sd).toPrecision(2) + ']'
+  let res = Math.exp(coefficient).toPrecision(5) + ' ['
+  res += Math.exp(coefficient - bilat95 * sd).toPrecision(5) + ','
+  res += Math.exp(coefficient + bilat95 * sd).toPrecision(5) + ']'
   return res
 }

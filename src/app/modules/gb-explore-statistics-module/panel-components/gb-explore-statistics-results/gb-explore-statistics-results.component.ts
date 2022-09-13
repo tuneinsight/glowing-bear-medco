@@ -291,12 +291,12 @@ export abstract class ReferenceIntervalComponent implements OnDestroy {
     const CI1 = chartInfo.CI1
     const CI2 = chartInfo.CI2
 
-    this.middleCI1 = parseFloat(CI1.middle.toFixed(2));
+    this.middleCI1 = parseFloat(CI1.middle.toPrecision(5));
     this.middleCI1_full = CI1.middle;
     this.lowBoundCI1 = CI1.lowerBound
     this.highBoundCI1 = CI1.higherBound
 
-    this.middleCI2 = parseFloat(CI2.middle.toFixed(2));
+    this.middleCI2 = parseFloat(CI2.middle.toPrecision(5));
     this.middleCI2_full = CI2.middle;
     this.lowBoundCI2 = CI2.lowerBound
     this.highBoundCI2 = CI2.higherBound

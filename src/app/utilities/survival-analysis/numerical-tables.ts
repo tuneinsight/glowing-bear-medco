@@ -15,7 +15,7 @@ export function numericalTables(
   curves: SurvivalPoint[][],
   maxIter: number = 1000,
   tolerance: number = 1e-14,
-  stringPrecision: number = 3
+  stringPrecision: number = 5
 ): NumericalTablesType {
   const len = curves.length
 
@@ -79,13 +79,13 @@ export function numericalTables(
 
       let waldTest = cox.addChild(({ finalBeta, finalCovarianceMatrixEstimate }) => {
         let waldStat = Math.pow(finalBeta[0], 2) / (finalCovarianceMatrixEstimate[0][0] + 1e-14)
-        let waldTest_ = (1.0 - ChiSquaredCdf(waldStat, 1)).toPrecision(3)
+        let waldTest_ = (1.0 - ChiSquaredCdf(waldStat, 1)).toPrecision(5)
         return { res: waldTest_, errMessage: null }
       })
 
       let coxLogtest = cox.addChild(({ initialLogLikelihood, finalLogLikelihood }) => {
         let likelihoodRatio = 2.0 * (finalLogLikelihood - initialLogLikelihood)
-        let logTest_ = (1.0 - ChiSquaredCdf(likelihoodRatio, 1)).toPrecision(3)
+        let logTest_ = (1.0 - ChiSquaredCdf(likelihoodRatio, 1)).toPrecision(5)
         return { res: logTest_, errMessage: null }
       })
 
