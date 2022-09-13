@@ -49,6 +49,7 @@ export class GbMainComponent implements OnInit {
 
   onSelectActualMode() {
     this.config.setConfig('isBiorefMode', this.actualMode.value === 'bioref');
+    this.config.setConfig('isModeChanged', true);
     this.navbarService.init();
     this.isModeSelected = true;
   }
