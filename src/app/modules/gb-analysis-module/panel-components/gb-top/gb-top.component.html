@@ -1,4 +1,4 @@
-<p-accordionTab header="Analyses" id="gb-top-component" [(selected)]="expanded">
+<p-accordionTab header="Type of analysis" id="gb-top-component" [(selected)]="expanded">
 
   <div>
     <button pButton *ngFor="let analysisType of available" [label]="analysisType.name" (click)="selected = analysisType"

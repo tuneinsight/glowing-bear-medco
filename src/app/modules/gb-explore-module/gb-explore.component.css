@@ -12,7 +12,7 @@
 .gb-data-selection-accordion-sub-header-1 {
   font-size: large;
   color: gray;
-  margin: 0em;
+  margin: 0em 0em 0.5em 0em;
 }
 
 .gb-data-selection-accordion-sub-header-2 {
@@ -67,8 +67,9 @@
 }
 
 .gb-cohort-input {
-  border: 1px #595959 solid;
+  border: 1px #666666 solid;
   border-radius: 3px;
+  padding: 2px;
 }
 
 .fa-circle-o-notch {

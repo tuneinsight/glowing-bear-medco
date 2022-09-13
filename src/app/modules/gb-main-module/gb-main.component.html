@@ -35,7 +35,7 @@
     <div class="gb-bottom-panel">
       <span>{{footerText}}</span>
 
-      <p-button *ngIf="isBiorefMode" (click)="showBasicDialog()" icon="pi pi-external-link" label="copyright notice"></p-button>
+      <p-button *ngIf="isBiorefMode" (click)="showBasicDialog()" icon="pi pi-external-link" label="Copyright notice"></p-button>
       <p-dialog *ngIf="isBiorefMode" header="Copyright notice" [(visible)]="displayBasic" [style]="{width: '50vw'}">
         <p>
           LOINC: This material contains content from LOINC (<a href="http://loinc.org/">http://loinc.org/</a>). LOINC is copyright © 1995-2022,
@@ -61,6 +61,7 @@
           in Health Care (KKG)"
         </p>
       </p-dialog>
+        <a href="https://docs.tuneinsight.com" _target="blank" ><p-button icon="pi pi-external-link" label="Documentation"></p-button></a>
     </div>
   </div>
 </div>

@@ -72,7 +72,7 @@ export abstract class CoxRegression {
     inMatrix(hessian, this.hessian(this.data, beta))
     if (det(hessian) === 0) {
       status = 'The determinant of the hessian matrix is zero. The inverse of this hessian is used for Newton-Raphson method inside numerical methods. ' +
-        'It happens when no event of interest has occured within the time limit defined by the user. In the survival graphs, this is related to a constant line.'
+        'It happens when no event of interest has occurred within the time limit defined by the user. In the survival graphs, this is related to a constant line.'
       return {
         initialLogLikelihood: initialLogLikelihood,
         finalLogLikelihood: lLikelihood,
