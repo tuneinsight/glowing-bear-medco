@@ -38,27 +38,54 @@
       <p-button *ngIf="isBiorefMode" (click)="showBasicDialog()" icon="pi pi-external-link" label="Copyright notice"></p-button>
       <p-dialog *ngIf="isBiorefMode" header="Copyright notice" [(visible)]="displayBasic" [style]="{width: '50vw'}">
         <p>
-          LOINC: This material contains content from LOINC (<a href="http://loinc.org/">http://loinc.org/</a>). LOINC is copyright © 1995-2022,
-          Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes (LOINC) Committee and is
-          available at no cost under the license at <a href="http://loinc.org/license">http://loinc.org/license</a>. LOINC® is a registered United States
-          trademark of Regenstrief Institute, Inc.
-        </p>
-
-        <p>
-          GMDN: GMDN ® is a registered trademark of The GMDN Agency. All rights reserved. The copyright and database
+          <b>GMDN</b>: GMDN ® is a registered trademark of The <a target="_blank" rel="noopener noreferrer"
+            href="https://www.gmdnagency.org/">GMDN Agency</a>. All rights reserved. The copyright and database
           rights in the original GMDN materials are owned by The GMDN Agency Ltd 2005-2022. Used under licence from The
           GMDN Agency Ltd.
         </p>
+        <br>
         <p>
-          GUDI: Global Unique Device Identification codes from the Global Unique Device Identification Database (GUDID)
-          have been retrieved at the AccessGUDID-portal and are a courtesy of the the U.S. National Library of Medicine
-          in collaboration with the U.S. Food and Drug Administration.
+          <b>GUDI</b>: Global Unique Device Identification codes from the Global Unique Device Identification Database (GUDID)
+          have been retrieved at the <a target="_blank" rel="noopener noreferrer"
+            href="https://accessgudid.nlm.nih.gov/">AccessGUDID-portal</a> and are a courtesy of the the <a target="_blank"
+            rel="noopener noreferrer" href="https://www.nlm.nih.gov/">National Library of Medicine</a>
+          in collaboration with the <a target="_blank" rel="noopener noreferrer" href="https://www.fda.gov/">U.S. Food and Drug
+            Administration</a>.
         </p>
+        <br>
         <p>
-          ICD-10-GM: © 2022 German Federal Institute for Drugs and Medical Devices (Bundesinstitut für Arzneimittel und
-          Medizinprodukte BfArM) on behalf of the German Federal Ministry of Health (Bundesministerium für Gesundheit
-          BMG) with the participation of the ICD Working Group of the Board of Trustees for Questions of Classification
-          in Health Care (KKG)"
+          <b>ICD-10-GM</b>: © 2022 German Federal Institute for Drugs and Medical Devices (Bundesinstitut für Arzneimittel und
+          Medizinprodukte <a target="_blank" rel="noopener noreferrer" href="https://www.bfarm.de/EN/Home/_node.html">BfArM</a>)
+          on behalf of the German Federal Ministry of Health (Bundesministerium für Gesundheit
+          <a target="_blank" rel="noopener noreferrer" href="https://www.bundesgesundheitsministerium.de/">BMG</a>) with the
+          participation of the ICD Working Group of the Board of Trustees for Questions of Classification
+          in Health Care (<a target="_blank" rel="noopener noreferrer"
+            href="https://www.bfarm.de/DE/Kodiersysteme/Kooperationen-und-Projekte/KKG/_node.html">KKG</a>)"
+        </p>
+        <br>
+        <p>
+          <b>LOINC</b>: LOINC is copyright © 1995-2022,
+          <a target="_blank" rel="noopener noreferrer" href="https://www.regenstrief.org/">Regenstrief Institute, Inc.</a> and
+          the Logical Observation Identifiers Names and Codes (<a target="_blank" rel="noopener noreferrer"
+            href="https://loinc.org/">LOINC</a>) Committee and is
+          available at no cost under the license at <a target="_blank" rel="noopener noreferrer"
+            href="https://loinc.org/license">https://loinc.org/license</a>. LOINC® is a registered United States
+          trademark of <a target="_blank" rel="noopener noreferrer" href="https://www.regenstrief.org/">Regenstrief Institute,
+            Inc</a>.
+        </p>
+        <br>
+        <p>
+          <b>SNOMED CT</b>: SNOMED CT is copyright © SNOMED International 2021 v3.15.1., <a target="_blank"
+            rel="noopener noreferrer" href="https://www.snomed.org/">SNOMED CT international</a>. See <a target="_blank"
+            rel="noopener noreferrer" href="https://mlds.ihtsdotools.org/#/landing/CH">license details</a>.
+        </p>
+        <br>
+        <p>
+          <b>UCUM</b>: The Unified Code for Units of Measure (<a target="_blank" rel="noopener noreferrer"
+            href="https://ucum.nlm.nih.gov/">UCUM</a>), also known as the “UCUM Specification,” is copyright ©1999-2021, <a
+            target="_blank" rel="noopener noreferrer" href="https://www.regenstrief.org/">Regenstrief Institute, Inc.</a>, Inc.
+          and The UCUM Organization, Indianapolis, IN. All rights reserved. See <a target="_blank" rel="noopener noreferrer"
+            href="https://ucum.org/trac/wiki/license">license details</a>.
         </p>
       </p-dialog>
         <a href="https://docs.tuneinsight.com" _target="blank" ><p-button icon="pi pi-external-link" label="Documentation"></p-button></a>
