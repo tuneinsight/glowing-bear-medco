@@ -83,7 +83,7 @@ export class TreeNodeService {
           .reverse()
           .find((project) => project.name === 'i2b2');
         if (i2b2Project && i2b2Project.dataSourceId) {
-          console.log('Found project id', i2b2Project.uniqueId);
+          console.log('Found project:', i2b2Project.name);
           resolve();
         } else {
           this._isNoi2b2Datasource = true;
@@ -105,11 +105,6 @@ export class TreeNodeService {
 
         this.processTreeNodes(treeNodes, this.constraintService);
         treeNodes.forEach((node) => this.rootTreeNodes.push(node));
-
-        if (!this.config.getConfig('isModeChanged')) {
-          // Only retrieve the mode from keycloak service when it wasn't manually selected
-          this.config.setConfig('isBiorefMode', !this.keycloakService.isUserInRole(AuthenticationService.GECO_SURVIVAL_ANALYSIS_ROLE));
-        }
 
         this._isLoading = false;
       },
@@ -264,9 +259,7 @@ export class TreeNodeService {
         break;
     }
     console.log(
-      `Processed tree node ${node.name} of type ${node.nodeType}`,
-      node
-    );
+      `Loaded ontology ${node.name} of type ${node.nodeType}`);
   }
 
   /**

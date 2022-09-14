@@ -79,8 +79,8 @@ export class ExploreQueryService {
   // }
 
   public exploreQuerySingleNode(queryId: string, panels: ApiI2b2Panel[], publicKey: string): Observable<ExploreQueryResult> {
+    const start = performance.now(); // to measure performance
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
-
     return this.apiEndpointService.postCall(
       `projects/${this.config.projectId}/datasource/query`,
       {
@@ -134,11 +134,13 @@ export class ExploreQueryService {
                     const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
                     if (isCipherFormat(decryptedValue)) {
                       const roundedValues = decryptedValue.data[0].map((value) => Math.round(value));
+                      console.log("Query completed in", Math.round(performance.now() - start) + "ms")
                       return [[ ...result[0], ...roundedValues ]];
                     } else {
                       MessageHelper.alert('error', 'Error decrypting the result.');
                     }
                   } else {
+                    console.log("Query completed in", Math.round(performance.now() - start) + "ms")
                     return [[ ...result[0], ...orgResult.patientList.data[0] ]];
                   }
                 },
@@ -152,11 +154,13 @@ export class ExploreQueryService {
                         const valueInUint8 = this.cryptoService.decodeBase64Url(orgResult.patientList.value) as Uint8Array;
                         const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
                         if (isCipherFormat(decryptedValue)) {
+                          console.log("Query completed in", Math.round(performance.now() - start) + "ms")
                           return [ ...result, decryptedValue.data[0].length ];
                         } else {
                           MessageHelper.alert('error', 'Error decrypting the result.');
                         }
                       } else {
+                        console.log("Query completed in", Math.round(performance.now() - start) + "ms")
                         return [ ...result, orgResult.patientList.data[0].length ];
                       }
                     },
@@ -168,6 +172,7 @@ export class ExploreQueryService {
               MessageHelper.alert('info', '0 subjects found for this query.');
               this.navbarService.navigateToExploreTab();
             }
+            console.log("Query completed in", Math.round(performance.now() - start) + "ms")
             return exploreResult;
           } else {
             MessageHelper.alert('error', 'Error while querying datasource.', expQueryResp.error);
