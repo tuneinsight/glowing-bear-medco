@@ -30,7 +30,8 @@ const refIntervalCss = './gb-reference-interval.component.css'
 
 
 
-const shortCopyright = `GMDN: GMDN ® is a registered trademark of The GMDN Agency. All rights reserved. The copyright and database rights in the original GMDN materials are owned by The GMDN Agency Ltd 2005-2022. Used under licence from The GMDN Agency Ltd.
+const shortCopyright = `Copyright notice:
+GMDN: GMDN ® is a registered trademark of The GMDN Agency. All rights reserved. The copyright and database rights in the original GMDN materials are owned by The GMDN Agency Ltd 2005-2022. Used under licence from The GMDN Agency Ltd.
 GUDI: Global Unique Device Identification codes from the Global Unique Device Identification Database (GUDID) have been retrieved at the AccessGUDID-portal and are a courtesy of the the National Library of Medicine in collaboration with the U.S. Food and Drug Administration.
 ICD-10-GM: © 2022 German Federal Institute for Drugs and Medical Devices (Bundesinstitut für Arzneimittel und Medizinprodukte BfArM) on behalf of the German Federal Ministry of Health (Bundesministerium für Gesundheit BMG) with the participation of the ICD Working Group of the Board of Trustees for Questions of Classification in Health Care (KKG)"
 LOINC: LOINC is copyright © 1995-2022, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes (LOINC) Committee and is available at no cost under the license at https://loinc.org/license. LOINC® is a registered United States trademark of Regenstrief Institute, Inc.
@@ -109,11 +110,10 @@ export class GbExploreStatisticsResultsComponent implements AfterViewInit, OnDes
 
     this.refIntervalsComponents.forEach((c, i) => c.toPDF(pdf, i));
 
-
-    const subtitleFontSize = pdf.headersSize + 3
-    pdf.addOneLineText('General information: ', 0, subtitleFontSize)
-    pdf.addOneLineText('', 1, subtitleFontSize)
-
+    const timingValue = this.queryService.queryTimingSameInstance;
+    const chosenTiming = GbSelectionComponent.timings.filter(t => t.value === timingValue);
+    assert(chosenTiming.length > 0);
+    pdf.addOneLineText('Counting method: ' + chosenTiming[0].label, 0);
     pdf.addOneLineText('Constraints on cohort: ')
 
     const visitor = new PdfExportVisitor();
@@ -123,23 +123,13 @@ export class GbExploreStatisticsResultsComponent implements AfterViewInit, OnDes
       pdf.addTableFromObjects(null, [[constraint]], null, 0)
     })
 
-    addEmptyLine()
-
-    const timingValue = this.queryService.queryTimingSameInstance;
-    const chosenTiming = GbSelectionComponent.timings.filter(t => t.value === timingValue);
-    assert(chosenTiming.length > 0);
-    pdf.addOneLineText('Counting method: ' + chosenTiming[0].label, 0);
-
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 3; i++) {
       addEmptyLine()
     }
 
-    pdf.addOneLineText('Copyright notice', 0, subtitleFontSize)
-    shortCopyright.split('\n').forEach(line => {
-      pdf.addOneLineText(line)
-    })
+    pdf.addContentText([shortCopyright])
 
-    pdf.export('export.pdf');
+    pdf.export('TI4Health_Report_Export_'+new Date().toJSON().replace("T", "_").replace(/:/g, "-").slice(0,19)+'.pdf');
   }
 
   private displayCharts(chartsInfo: ChartInformation[]) {
@@ -323,9 +313,8 @@ export abstract class ReferenceIntervalComponent implements OnDestroy {
 
     const columnIndex = index % pdf.nbOfColumns
 
-    pdf.addOneLineText(`Reference interval`, columnIndex, pdf.headersSize + 5)
+    pdf.addOneLineText(`Reference Interval Report for ${this.numberOfObservations()} entries`, columnIndex, pdf.headersSize + 5)
     pdf.addVerticalMargin(2, columnIndex)
-    pdf.addOneLineText(`Based on the given parameters, the query has returned ${this.numberOfObservations()} entries`, columnIndex)
     this.chartComponentRef.instance.printToPDF(pdf, columnIndex)
     pdf.addOneLineText('The 95% reference interval (90% confidence) is: ', columnIndex)
     const referenceInterval = `${this.middleCI1} (${this.lowBoundCI1}-${this.highBoundCI1}) - ${this.middleCI2} (${this.lowBoundCI2}-${this.highBoundCI2})`
