@@ -87,6 +87,7 @@ export class GbSelectProjectComponent {
     this.cohortService.clearAll();
     this.queryService.clearAll();
     this.treeNodeService.exploreTreeNode();
+    this.navbarService.init();
     this.navbarService.navigateToExploreTab();
 
     if (this._setIntervalTimeout) {

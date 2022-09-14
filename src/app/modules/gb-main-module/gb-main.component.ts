@@ -10,6 +10,7 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { AuthenticationService } from '../../services/authentication.service';
 import { AppConfig } from '../../config/app.config';
 import { NavbarService } from 'src/app/services/navbar.service';
+import { KeycloakService } from 'keycloak-angular';
 
 @Component({
   selector: 'gb-main',
@@ -36,6 +37,7 @@ export class GbMainComponent implements OnInit {
 
   constructor(public authenticationService: AuthenticationService,
     private config: AppConfig,
+    private keycloakService: KeycloakService,
     private navbarService: NavbarService) {
   }
 
@@ -64,6 +66,12 @@ export class GbMainComponent implements OnInit {
     parentContainerElm.addEventListener('mousemove', this.onMouseMove.bind(this));
     parentContainerElm.addEventListener('mouseup', this.onMouseUp.bind(this));
     window.addEventListener('resize', this.onResize.bind(this));
+
+    if (!this.config.getConfig('isModeChanged')) {
+      // Only retrieve the mode from keycloak service when it wasn't manually selected
+      this.config.setConfig('isBiorefMode', !this.keycloakService.isUserInRole(AuthenticationService.GECO_SURVIVAL_ANALYSIS_ROLE));
+    }
+
   }
 
   ngOnInit() {

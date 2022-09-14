@@ -87,8 +87,6 @@ export class NavbarService {
       }
     }
 
-    console.log('Updated router link: ', routerLink)
-
     if (this.isSelectProject) {
       this.activeItem = this.items.find((item) => item.label.indexOf(OperationType.SELECT_PROJECT) !== -1);
     } else if (this.isExplore) {
