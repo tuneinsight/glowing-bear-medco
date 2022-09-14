@@ -85,10 +85,15 @@ export class GbExploreStatisticsResultsComponent implements AfterViewInit, OnDes
 
 
   private exportPDF() {
-    const pdf = new PDF(2, 8, -3);
+
     if (this.refIntervalsComponents === undefined || this.refIntervalsComponents.length <= 0) {
       throw ErrorHelper.handleNewError('Cannot export pdf yet. Execute a query firsthand.');
     }
+    let nbColumn = 1.1
+    if (this.refIntervalsComponents.length > 1) {
+      nbColumn = 2
+    }
+    const pdf = new PDF(nbColumn, 8, -3);
 
     const date = new Date();
     pdf.addOneLineText('Date of export (d/m/y): ' + date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getUTCFullYear(), 0);
