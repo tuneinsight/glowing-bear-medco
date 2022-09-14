@@ -129,7 +129,7 @@ export class GbExploreStatisticsResultsComponent implements AfterViewInit, OnDes
 
     pdf.addContentText([shortCopyright])
 
-    pdf.export('TI4Health_Report_Export_'+new Date().toJSON().replace("T", "_").replace(/:/g, "-").slice(0,19)+'.pdf');
+    pdf.export('TI4Health_Report_Export_' + new Date().toJSON().replace('T', '_').replace(/:/g, '-').slice(0, 19) + '.pdf');
   }
 
   private displayCharts(chartsInfo: ChartInformation[]) {
