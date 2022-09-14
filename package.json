@@ -27,7 +27,7 @@
     "@angular/router": "^9.1.13",
     "@dedis/kyber": "^3.4.4",
     "@fullcalendar/core": "^5.10.1",
-    "@tuneinsight/geco-cryptolib": "0.2.5-ti4health-428-ti4health-fix-count-val-2c8f06f",
+    "@tuneinsight/geco-cryptolib": "0.2.6-ti4health-main-9a3c481ea",
     "@types/chart.js": "^2.9.34",
     "@types/elliptic": "^6.4.12",
     "@types/file-saver": "^2.0.1",
