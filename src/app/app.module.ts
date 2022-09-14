@@ -53,6 +53,8 @@ export function loadServices(config: AppConfig,
                              treeNodeService: TreeNodeService,
                              cryptoService: CryptoService) {
 
+  const start = performance.now(); // to measure performance
+
   return () => config.load().then(
     () => authService.load().then(
       () => Promise.all([
@@ -61,7 +63,8 @@ export function loadServices(config: AppConfig,
       ])
         .then(() => cryptoService.load())
         .then( () => {
-        console.log('Application loaded.');
+        const elapsed = Math.round(performance.now() - start) + 'ms';
+        console.log('Application loaded in', elapsed);
       })
     )
   );
