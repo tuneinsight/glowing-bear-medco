@@ -30,10 +30,12 @@ const refIntervalCss = './gb-reference-interval.component.css'
 
 
 
-const shortCopyright = `LOINC ® codes and long common names: © 1995-2022, Regenstrief Institute, Inc. and the LOINC Committee
-GMDN ® codes, terms, and descriptions: © GMDN Agency 2005-2022.
-GUDI codes: courtesy of the the U.S. National Library of Medicine in collaboration with the U.S. Food and Drug Administration
-ICD-10-GM codes and descriptions: © 2022 Bundesinstitut für Arzneimittel und Medizinprodukte`
+const shortCopyright = `GMDN: GMDN ® is a registered trademark of The GMDN Agency. All rights reserved. The copyright and database rights in the original GMDN materials are owned by The GMDN Agency Ltd 2005-2022. Used under licence from The GMDN Agency Ltd.
+GUDI: Global Unique Device Identification codes from the Global Unique Device Identification Database (GUDID) have been retrieved at the AccessGUDID-portal and are a courtesy of the the National Library of Medicine in collaboration with the U.S. Food and Drug Administration.
+ICD-10-GM: © 2022 German Federal Institute for Drugs and Medical Devices (Bundesinstitut für Arzneimittel und Medizinprodukte BfArM) on behalf of the German Federal Ministry of Health (Bundesministerium für Gesundheit BMG) with the participation of the ICD Working Group of the Board of Trustees for Questions of Classification in Health Care (KKG)"
+LOINC: LOINC is copyright © 1995-2022, Regenstrief Institute, Inc. and the Logical Observation Identifiers Names and Codes (LOINC) Committee and is available at no cost under the license at https://loinc.org/license. LOINC® is a registered United States trademark of Regenstrief Institute, Inc.
+SNOMED CT: SNOMED CT is copyright © SNOMED International 2021 v3.15.1., SNOMED CT international. See license details.
+UCUM: The Unified Code for Units of Measure (UCUM), also known as the “UCUM Specification,” is copyright ©1999-2021, Regenstrief Institute, Inc., Inc. and The UCUM Organization, Indianapolis, IN. All rights reserved. See license details.`
 
 
 export interface SVGConvertible {

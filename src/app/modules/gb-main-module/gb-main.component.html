@@ -35,8 +35,8 @@
     <div class="gb-bottom-panel">
       <span>{{footerText}}</span>
 
-      <p-button *ngIf="isBiorefMode" (click)="showBasicDialog()" icon="pi pi-external-link" label="Copyright notice"></p-button>
-      <p-dialog *ngIf="isBiorefMode" header="Copyright notice" [(visible)]="displayBasic" [style]="{width: '50vw'}">
+      <p-button *ngIf="isBiorefMode" (click)="showCopyrightDialog()" icon="pi pi-external-link" label="Copyright notice"></p-button>
+      <p-dialog *ngIf="isBiorefMode" header="Copyright notice" [(visible)]="displayCopyright" [style]="{width: '50vw'}">
         <p>
           <b>GMDN</b>: GMDN ® is a registered trademark of The <a target="_blank" rel="noopener noreferrer"
             href="https://www.gmdnagency.org/">GMDN Agency</a>. All rights reserved. The copyright and database
@@ -88,7 +88,15 @@
             href="https://ucum.org/trac/wiki/license">license details</a>.
         </p>
       </p-dialog>
-        <a href="https://docs.tuneinsight.com" _target="blank" ><p-button icon="pi pi-external-link" label="Documentation"></p-button></a>
+      <p-button *ngIf="isBiorefMode" (click)="showCreditsDialog()" icon="pi pi-external-link" label="Credits"></p-button>
+      <p-dialog *ngIf="isBiorefMode" header="Credits" [(visible)]="displayCredits" [style]="{width: '50vw', 'text-align': 'center'}">
+        <img title="Swiss BioRef" style="margin-right: 5px" width="200px" src="assets/icons/swiss-bioref-logo.png" />
+        <br><br>
+        <a href="https://sphn.ch" target="_blank"><img title="SPHN" style="margin-right: 5px" width="200px" src="assets/icons/sphn-logo.png" /></a>
+        <br><br>
+        <a href="https://tuneinsight.com" target="_blank"><img title="Tune Insight" style="margin-right: 5px" width="200px" src="assets/icons/tuneinsight-logo.png" /></a>
+      </p-dialog>
+        <a href="https://docs.tuneinsight.com" target="_blank" ><p-button icon="pi pi-external-link" label="Documentation"></p-button></a>
     </div>
   </div>
 </div>
