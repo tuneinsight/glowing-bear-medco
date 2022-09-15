@@ -91,7 +91,7 @@ export class GbSummaryComponent {
 
   isNodeUp(nodeName: string) {
     const thisNodeStatus = this.medcoNetworkService.networkStatus?.find((e) => e.from === nodeName)
-    if (!thisNodeStatus){
+    if (!thisNodeStatus) {
       return false
     }
     const statuses = thisNodeStatus.statuses
