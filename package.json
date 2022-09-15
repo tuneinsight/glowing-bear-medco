@@ -25,7 +25,6 @@
     "@angular/platform-browser-dynamic": "^9.1.13",
     "@angular/platform-server": "^9.1.13",
     "@angular/router": "^9.1.13",
-    "@dedis/kyber": "^3.4.4",
     "@fullcalendar/core": "^5.10.1",
     "@tuneinsight/geco-cryptolib": "0.2.6-ti4health-main-9a3c481ea",
     "@types/chart.js": "^2.9.34",

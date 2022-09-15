@@ -18,6 +18,8 @@ import {Cohort} from '../../../../models/cohort-models/cohort';
 import {savePatientListToCSVFile} from '../../../../utilities/files/csv';
 import {OperationStatus} from '../../../../models/operation-status';
 import {ErrorHelper} from '../../../../utilities/error-helper';
+import { Message } from '@angular/compiler/src/i18n/i18n_ast';
+import { MessageHelper } from 'src/app/utilities/message-helper';
 
 @Component({
   selector: 'gb-cohorts',
@@ -103,15 +105,7 @@ export class GbCohortsComponent implements AfterViewInit, OnInit {
 
   downloadCohort(e: Event, cohort: Cohort) {
     e.stopPropagation()
-    this.savedCohortsPatientListService.getListStatusNotifier(cohort.name).subscribe(
-      (x) => { console.log(`New status of request for patient list of saved cohort ${cohort.name}, status: ${x}`) }
-    )
-    this.savedCohortsPatientListService.getList(cohort.name).subscribe(
-      value => { if (value) { savePatientListToCSVFile(cohort.name, value[0].map(node => node.name), value[1]) } },
-      err => {
-        throw ErrorHelper.handleError(`While retrieving list for cohort ${cohort.name}`, err)
-      }
-    )
+    MessageHelper.alert('warn', 'Not implemented')
   }
 
   restoreCohort(e: Event, cohort: Cohort) {
