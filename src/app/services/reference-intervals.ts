@@ -26,28 +26,21 @@ export class ReferenceIntervalComputer {
     // https://stackoverflow.com/questions/11935175/sampling-a-random-subset-from-an-array
     private static getRandomSubarray<T>(arr: T[], size: number) {
 
-        let shuffled = arr.slice(0);
-        let i = arr.length;
-        let temp: T;
-        let index: number;
-
-        while (i--) {
-            index = Math.floor((i + 1) * Math.random());
-            temp = shuffled[index];
-            shuffled[index] = shuffled[i];
-            shuffled[i] = temp;
+        const sampled = [];
+        for (let i = 0; i < size; i++) {
+          sampled[i] = arr[Math.floor(Math.random() * arr.length)];
         }
 
-        return shuffled.slice(0, size);
+        return sampled;
     }
 
 
     static bootstrapReferenceInterval(fullData: number[], sampleSize = 240,
-        bootR = 5000, percentileLow = 0.025, percentileHigh = 0.975): Bootstrapping {
+        bootR = 1000, percentileLow = 0.025, percentileHigh = 0.975): Bootstrapping {
         const riLow = []
         const riHigh = []
 
-        if (sampleSize > fullData.length) {
+        if (fullData.length > sampleSize) {
             sampleSize = fullData.length
         }
 
