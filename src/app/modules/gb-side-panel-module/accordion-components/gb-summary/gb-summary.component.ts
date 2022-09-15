@@ -90,7 +90,12 @@ export class GbSummaryComponent {
   }
 
   isNodeUp(nodeName: string) {
-    return !!this.medcoNetworkService.networkStatus?.find((e) => e.from === nodeName).statuses;
+    const thisNodeStatus = this.medcoNetworkService.networkStatus?.find((e) => e.from === nodeName)
+    if (!thisNodeStatus){
+      return false
+    }
+    const statuses = thisNodeStatus.statuses
+    return !!statuses;
   }
 
   isNodeInProject(nodeName: string) {
