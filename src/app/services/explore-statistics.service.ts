@@ -232,7 +232,7 @@ export class ExploreStatisticsService {
         const apiRequest: ApiExploreStatistics = {
             id: ExploreStatisticsService.getNewQueryID(),
             analytes: [...modifiers],
-            userPublicKey: null,
+            userPublicKey: this.cryptoService.ephemeralPublicKey,
             bucketSize,
             minObservations,
             panels: this._lastCohortDefinition,

@@ -15,10 +15,7 @@ import {CohortService} from '../../../../services/cohort.service';
 import {SavedCohortsPatientListService} from '../../../../services/saved-cohorts-patient-list.service';
 import {ConstraintService} from '../../../../services/constraint.service';
 import {Cohort} from '../../../../models/cohort-models/cohort';
-import {savePatientListToCSVFile} from '../../../../utilities/files/csv';
 import {OperationStatus} from '../../../../models/operation-status';
-import {ErrorHelper} from '../../../../utilities/error-helper';
-import { Message } from '@angular/compiler/src/i18n/i18n_ast';
 import { MessageHelper } from 'src/app/utilities/message-helper';
 
 @Component({
