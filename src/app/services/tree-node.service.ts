@@ -87,7 +87,7 @@ export class TreeNodeService {
           resolve();
         } else {
           this._isNoi2b2Datasource = true;
-          alert('Cannot find i2b2 project, please create one with the name "i2b2", with a valid i2b2 datasource and login again.');
+          alert('Cannot find i2b2 project, please make sure the configuration have a projected named "i2b2", with a valid i2b2 datasource and login again.');
           this.keycloakService.logout();
         }
       });
@@ -113,7 +113,7 @@ export class TreeNodeService {
           this.navbarService.navigateToSelectProjectTab();
         } else {
           console.error(err);
-          let errMessage = 'Undefined error when checking network.';
+          let errMessage = 'Error when accessing the network.';
           alert(`${errMessage} Please contact an administrator. You will now be logged out.`);
           this.keycloakService.logout();
         }

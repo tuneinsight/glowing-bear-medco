@@ -35,7 +35,6 @@ import { GbExploreStatisticsResultsComponent, ReferenceIntervalHistogramComponen
   ],
   exports: [
     RouterModule,
-
   ],
   declarations: [
     GbExploreStatisticsComponent,

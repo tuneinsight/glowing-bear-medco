@@ -6,9 +6,6 @@
   font-weight: bolder;
 }
 
-.gb-data-selection-accordion-header {
-}
-
 .gb-data-selection-accordion-sub-header-1 {
   font-size: large;
   color: gray;
@@ -31,10 +28,10 @@
 
 .gb-data-selection-accordion-sub-header-2 #save-box{
   padding-left: 1em;
+  display: flex;
 }
 
 .gb-data-selection-accordion-sub-header-3 {
-  color: GrayText;
   margin: 0em;
 }
 

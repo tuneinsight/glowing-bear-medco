@@ -9,13 +9,13 @@
   custom variables
 */
 :root {
-  --gb-ti-main-color: #222831;
-  --gb-ti-main-color-light: rgba(34, 40, 49, 0.1);
+  --gb-ti-main-color: rgb(48, 71, 94);
+  --gb-ti-main-color-light: rgb(48, 71, 94, 0.2);
   --gb-navbar-bg-color: #fdfdfd;
   --gb-orange-light: #FFDD56;
   --gb-orange-light-light: #ffd9cb;
   --gb-ti-main-color-light-light: rgba(34, 40, 49, 0.2);
-  --gb-top-panel-height: 26px;
+  --gb-top-panel-height: 32px;
 }
 
 /*
@@ -47,20 +47,22 @@ button {
   background-color: var(--gb-ti-main-color);
   color: white;
   font-family: 'Roboto', sans-serif;
-  font-size: 300%;
+  font-size: 150%;
   text-align: center;
-  padding: 200px;
   opacity: .8;
   border-color: transparent;
   height: 100vh;
-  width: 100%;
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
-.loading-message img {
-  margin-top: -100px;
-  width: 60%;
-  height: auto;
+.loading-message .logo-intro {
+  width: 300px;
+}
+.loading-message .spinner-intro {
+  margin-bottom: 30px;
 }
 
 body .gb-spinner {
@@ -202,37 +204,37 @@ body .hline {
 
 /* Change input placeholder text color */
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-  color: lightgray;
+  color: #bebebe;
 }
 
 :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-  color: lightgray;
+  color: #bebebe;
   opacity: 1;
 }
 
 ::-moz-placeholder { /* Mozilla Firefox 19+ */
-  color: lightgray;
+  color: #bebebe;
   opacity: 1;
 }
 
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
-  color: lightgray;
+  color: #bebebe;
 }
 
 .form-control::-webkit-input-placeholder {
-  color: lightgray;
+  color: #bebebe;
 }
 
 .form-control:-moz-placeholder {
-  color: lightgray;
+  color: #bebebe;
 }
 
 .form-control::-moz-placeholder {
-  color: lightgray;
+  color: #bebebe;
 }
 
 .form-control:-ms-input-placeholder {
-  color: lightgray;
+  color: #bebebe;
 }
 
 /*

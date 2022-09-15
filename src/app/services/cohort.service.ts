@@ -208,17 +208,17 @@ export class CohortService {
         try {
           this.updateCohorts(CohortService.apiCohortsToCohort(apiCohorts.results.cohorts))
         } catch (err) {
-          MessageHelper.alert('error', 'An error occured with received saved cohorts', (err as Error).message)
+          MessageHelper.alert('error', 'An error occurred with received saved cohorts', (err as Error).message)
         }
         this._isRefreshing = false
       }).bind(this),
       error: (err => {
-        MessageHelper.alert('error', 'An error occured while retrieving saved cohorts', (err as HttpErrorResponse).error.message)
+        MessageHelper.alert('error', 'An error occurred while retrieving saved cohorts', (err as HttpErrorResponse).error.message)
         this._isRefreshing = false
 
       }).bind(this),
       complete: (() => {
-        MessageHelper.alert('success', 'Saved cohorts successfully retrieved')
+        // MessageHelper.alert('success', 'Saved cohorts successfully retrieved')
         this._isRefreshing = false
       }).bind(this)
     })
@@ -243,7 +243,7 @@ export class CohortService {
       this._isRefreshing = false
     },
       error => {
-        MessageHelper.alert('error', 'An error occured while saving cohort', (error as HttpErrorResponse).error.message)
+        MessageHelper.alert('error', 'An error occurred while saving cohort', (error as HttpErrorResponse).error.message)
         this._isRefreshing = false
       })
 
@@ -279,7 +279,7 @@ export class CohortService {
         console.log('on remove cohort, message: ', message)
       },
       err => {
-        MessageHelper.alert('error', 'An error occured while removing saved cohorts', (err as HttpErrorResponse).error.message)
+        MessageHelper.alert('error', 'An error occurred while removing saved cohorts', (err as HttpErrorResponse).error.message)
       }
     )
   }

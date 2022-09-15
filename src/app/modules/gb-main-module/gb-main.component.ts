@@ -27,7 +27,8 @@ export class GbMainComponent implements OnInit {
   isGutterDragged: boolean;
   x_pos: number; // Stores x coordinate of the mouse pointer
   x_gap: number; // Stores x gap (edge) between mouse and gutter
-  displayBasic = false;
+  displayCopyright = false;
+  displayCredits = false;
   isModeSelected = false;
   _modes = [
     { label: 'SPO', value: 'spo' },
@@ -41,8 +42,11 @@ export class GbMainComponent implements OnInit {
     private navbarService: NavbarService) {
   }
 
-  showBasicDialog() {
-    this.displayBasic = true;
+  showCopyrightDialog() {
+    this.displayCopyright = true;
+  }
+  showCreditsDialog() {
+    this.displayCredits = true;
   }
 
   onHandleModeDropdownChange(event) {

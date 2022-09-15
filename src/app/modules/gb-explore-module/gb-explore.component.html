@@ -3,8 +3,10 @@
 
 
   <div class="gb-data-selection-accordion-header">
-    <div class="gb-data-selection-accordion-sub-header-1">
-      Define your TI4Health Explore query
+    <div>
+      <span *ngIf="queryType; else noAuthorization" style="margin-left: 8px;" class="gb-data-selection-text">
+        Allowed result type: <b>{{queryType.name}}</b>
+      </span>
     </div>
     <div class="gb-data-selection-accordion-sub-header-2">
       <span style="display: flex; align-items: center;">
@@ -12,18 +14,12 @@
           <span class="gb-data-selection-emphasis-text">{{globalCount | async}} subjects</span>
         </span>
         <span id="save-box" *ngIf="!isBiorefMode && isGlobalCountOrPatientList">
-          <input [(ngModel)]="cohortName" pInputText (keydown)="saveIfEnter($event)" placeholder="Cohort name" (drop)="preventDefault($event)"/>
-          <span>&nbsp;</span>
+          <input class="gb-cohort-input" [(ngModel)]="cohortName" pInputText (keydown)="saveIfEnter($event)" placeholder="Cohort name" (drop)="preventDefault($event)"/>
           <button
             class="btn btn-outline-primary btn-sm gb-data-selection-overview-panel-btn {{lastSuccessfulSet ?  '' : 'gb-explore-waiting-cohort'}}"
             type="button" [disabled]="!lastSuccessfulSet" (click)="save()">
-
             <span>Save</span>
-
           </button>
-        </span>
-        <span *ngIf="queryType; else noAuthorization" style="margin-left: 8px;" class="gb-data-selection-text">
-          Allowed Result Type: <b>{{queryType.name}}</b>
         </span>
       </span>
         <span style="display: flex; align-items: center; margin-left: 2em;">
@@ -59,25 +55,18 @@
         </span>
       </div>
   </div>
-
-  
-
-  <div *ngIf="isBiorefMode" #analytesDropzones class="input-label-wrapper small-font analytes-explore-container">
-    <div>
-      <label class="title-label">
-        Analytes:
-      </label>
-    </div>
-    <gb-analytes-dropzones></gb-analytes-dropzones>
-  </div>
-
   <div style="margin-top: 1em;">
     <div *ngIf="isBiorefMode" class="title-label">
       Cohort definition:
     </div>
     <gb-selection [operationType]="OperationType.EXPLORE"></gb-selection>
   </div>
-
+  <div *ngIf="isBiorefMode" #analytesDropzones class="input-label-wrapper small-font analytes-explore-container">
+    <div title="Variable to analyze" class="title-label">
+        Analytes:
+    </div>
+    <gb-analytes-dropzones></gb-analytes-dropzones>
+  </div>
 
 
 
