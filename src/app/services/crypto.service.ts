@@ -17,8 +17,6 @@ import { catchError, exhaust, map } from 'rxjs/operators';
 @Injectable()
 export class CryptoService implements OnDestroy {
 
-  private static nbParallelWorkers = 0;
-
   private csID: string;
 
   private publicKey: string;

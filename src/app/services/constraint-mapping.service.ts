@@ -122,7 +122,6 @@ export class ConstraintMappingService {
     if (constraint.concept.encryptionDescriptor && constraint.concept.encryptionDescriptor.encrypted) {
       // todo: children IDs implementation
       item.encrypted = true;
-      item.queryTerm = this.cryptoService.encryptIntegerWithCothorityKey(constraint.concept.encryptionDescriptor.id);
 
     } else {
       item.encrypted = false;

@@ -136,6 +136,7 @@ export class ReferenceIntervalComputer {
         * given intervals = { lowerBound = [2, 3, 4, 5], count = [4, 2, 0, 1]},
         * binWidth = 1 it will return [2, 2, 2, 2, 3, 3, 5] + .5 =  [2.5, 2.5, 2.5, 2.5, 3.5, 3.5, 5.5]
         */
+        // @ts-ignore
         return this.intervals.flatMap(i => {
             return Array(i.count).fill(i.lowerBound + this._binWidth / 2)
         })
