@@ -233,7 +233,7 @@ export class ExploreQueryService {
    * @param query
    */
   exploreLocalQuery(query: ExploreQuery) {
-    let currentDefinition = this.constraintMappingService.mapConstraint(query.constraint);
+    let currentDefinition = this.constraintMappingService.mapConstraint(query.constraint, query.queryTimingSameInstanceNum);
     let currentTiming = query.queryTimingSameInstanceNum ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any;
 
     return this.exploreQueryLocalNode(
@@ -252,7 +252,7 @@ export class ExploreQueryService {
    * @param query
    */
   exploreQuery(query: ExploreQuery) {
-    let currentDefinition = this.constraintMappingService.mapConstraint(query.constraint);
+    let currentDefinition = this.constraintMappingService.mapConstraint(query.constraint, query.queryTimingSameInstanceNum);
     let currentTiming = query.queryTimingSameInstanceNum ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any;
 
     return this.exploreQueryAllNodes(

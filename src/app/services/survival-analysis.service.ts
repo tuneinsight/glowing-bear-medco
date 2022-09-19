@@ -142,7 +142,8 @@ export class SurvivalService {
 
     let constraint = subGroup.rootConstraint
 
-    return this.constraintMappingService.mapConstraint(constraint)
+    return this.constraintMappingService.mapConstraint(constraint,
+      subGroup.timing === ApiI2b2Timing.sameInstanceNum ? true : false)
   }
 
   runSurvivalAnalysis() {

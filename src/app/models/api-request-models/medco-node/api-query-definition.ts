@@ -11,5 +11,7 @@ import { ApiI2b2Timing } from './api-i2b2-timing';
 
 export class ApiQueryDefinition {
   panels: ApiI2b2Panel[];
+  // queryTiming is not sent to the backend, always "any" is sent.
+  // this variable is only used to decide whether to send the panel timing or not.
   queryTiming: ApiI2b2Timing;
 }

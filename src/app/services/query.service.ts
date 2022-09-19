@@ -160,10 +160,7 @@ export class QueryService {
   public execQuery(): void {
     const isLocal = true;
 
-    if (!this.constraintService.hasConstraint()) {
-      MessageHelper.alert('warn', 'No constraints specified, please correct.');
-      return;
-    } else if (!this.queryType && !isLocal) {
+    if (!this.queryType && !isLocal) {
       MessageHelper.alert('warn', 'No authorized query type.');
       return;
     }
