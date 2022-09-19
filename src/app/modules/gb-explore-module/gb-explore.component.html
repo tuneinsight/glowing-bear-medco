@@ -31,7 +31,7 @@
 
           <span>
             <!-- disabled button during query -->
-            <button *ngIf="!isUpdating && hasConstraint; else disabledButton" type="button" (click)="execQuery($event)"
+            <button *ngIf="!isUpdating && (!isBiorefMode || hasAnalytes); else disabledButton" type="button" (click)="execQuery($event)"
               class="btn btn-outline-primary btn-sm gb-data-selection-update-btn
               {{isDirty? 'gb-explore-query-btn-dirty' : ''}}">
               Run
@@ -49,9 +49,9 @@
 
           1) Drag & drop the laboratory analyte(s) of interest from the ontology sidebar into the box in the Analytes field
 
-          2) Select the cohort definitions (like AdministrativeSex, Age or Predetermined conditions) in the preloaded fields or construct them from the ontology as needed
+          2) Optionally, select the cohort definitions (like AdministrativeSex, Age or Predetermined conditions) in the preloaded fields or construct them from the ontology as needed
 
-          3) Start the analysis by pressing the “Run”-button.'"></gb-generic-tooltip>
+          3) Start the analysis by pressing the “Run” button.'"></gb-generic-tooltip>
         </span>
       </div>
   </div>
