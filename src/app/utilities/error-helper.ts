@@ -24,7 +24,7 @@ export class ErrorHelper {
     if (err && err.stack) {
       console.error(`${err.stack}`);
     }
-    MessageHelper.alert('error', `Error: ${errMsg}`);
+    MessageHelper.alert('error', `${errMsg}`);
   }
 
   /**
@@ -34,7 +34,7 @@ export class ErrorHelper {
   static handleNewError(errMsg: string): Error  {
     let err = new Error(errMsg);
     console.error(`${errMsg}\n${err.stack}`);
-    MessageHelper.alert('error', `Error: ${errMsg}`);
+    MessageHelper.alert('error', `${errMsg}`);
     return err;
   }
 

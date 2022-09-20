@@ -34,7 +34,7 @@ type LoadingState = 'loading' | 'complete';
         style({
           background: 'rgba(51, 156, 144, 0.5)'
         }),
-        animate('1000ms ease-out', style({
+        animate('500ms ease-out', style({
           background: 'rgba(255, 255, 255, 0.0)'
         }))
       ])
@@ -49,14 +49,11 @@ export class GbSelectionComponent {
 
   @ViewChild('rootConstraintComponent', { static: true }) rootConstraintComponent: GbConstraintComponent;
 
-  private isUploadListenerNotAdded: boolean;
-
   constructor(private config: AppConfig,
     private constraintService: ConstraintService,
     private queryService: QueryService,
     private cohortService: CohortService) {
-    this.isUploadListenerNotAdded = true;
-    // changes coming from cohrot restoration
+    // changes coming from cohort restoration
     this.cohortService.queryTiming.subscribe(timing => {
       this.queryService.queryTimingSameInstance = timing === ApiI2b2Timing.sameInstanceNum
     })
