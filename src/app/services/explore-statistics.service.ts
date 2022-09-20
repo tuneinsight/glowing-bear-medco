@@ -1,21 +1,16 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Injectable, Output } from '@angular/core';
-import { KeycloakService } from 'keycloak-angular';
 import { Observable, of, ReplaySubject, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiI2b2Panel } from '../models/api-request-models/medco-node/api-i2b2-panel';
 import { ApiI2b2Timing } from '../models/api-request-models/medco-node/api-i2b2-timing';
 import { ApiExploreStatistics, ModifierApiObjet} from '../models/api-request-models/survival-analyis/api-explore-statistics';
 import { ApiExploreStatisticResult, ApiExploreStatisticsResponse } from '../models/api-response-models/explore-statistics/explore-statistics-response';
-import { ApiNodeMetadata } from '../models/api-response-models/medco-network/api-node-metadata';
-import { ApiExploreQueryResult } from '../models/api-response-models/medco-node/api-explore-query-result';
 import { CombinationConstraint } from '../models/constraint-models/combination-constraint';
 import { Constraint } from '../models/constraint-models/constraint';
-import { ExploreQueryType } from '../models/query-models/explore-query-type';
 import { TreeNode } from '../models/tree-models/tree-node';
 import { ErrorHelper } from '../utilities/error-helper';
 import { ApiEndpointService } from './api-endpoint.service';
-import { MedcoNetworkService } from './api/medco-network.service';
 import { CohortService } from './cohort.service';
 import { ConstraintMappingService } from './constraint-mapping.service';
 import { ConstraintReverseMappingService } from './constraint-reverse-mapping.service';
@@ -24,7 +19,6 @@ import { CryptoService } from './crypto.service';
 import { NavbarService } from './navbar.service';
 import { QueryService } from './query.service';
 import { AppConfig } from '../config/app.config';
-import { ExploreQueryService } from './api/medco-node/explore-query.service';
 import { ReferenceIntervalComputer } from './reference-intervals';
 import { isCipherFormat } from 'src/app/utilities/is-cipher-format';
 import { MessageHelper } from '../utilities/message-helper';
@@ -132,15 +126,12 @@ export class ExploreStatisticsService {
         private config: AppConfig,
         private apiEndpointService: ApiEndpointService,
         private cryptoService: CryptoService,
-        private medcoNetworkService: MedcoNetworkService,
         private constraintService: ConstraintService,
         private cohortService: CohortService,
         private queryService: QueryService,
-        private exploreQueryService: ExploreQueryService,
         private constraintMappingService: ConstraintMappingService,
         private reverseConstraintMappingService: ConstraintReverseMappingService,
         private navbarService: NavbarService,
-        private keycloakService: KeycloakService
     ) {
 
     }
@@ -215,7 +206,9 @@ export class ExploreStatisticsService {
         const analytes = Array.from(uniqueAnalytes);
 
         if (analytes.length === 0) {
-            throw ErrorHelper.handleNewError('No analytes have been specified (numerical medical concepts). The value returned by the request will be the reference interval for the specified analytes.');
+            this.queryService.isUpdating = false
+            this.displayLoadingIcon.next(false)
+            throw ErrorHelper.handleNewUserInputError('No analytes have been specified (numerical medical concepts).');
         }
 
         // the analytes split into two groups: modifiers and concepts
@@ -250,7 +243,7 @@ export class ExploreStatisticsService {
 
         }, err => {
             if (err.error === undefined) {
-                ErrorHelper.handleNewError('An unknown error occurred during the request execution.')
+                ErrorHelper.handleNewError('An error occurred during the request execution.')
             } else {
                 ErrorHelper.handleNewError(err.error.message)
             }
@@ -260,7 +253,7 @@ export class ExploreStatisticsService {
 
     private handleAnswer(answers: ApiExploreStatisticsResponse[], cohortConstraint: Constraint) {
         if (answers === undefined || answers.length === 0) {
-            throw ErrorHelper.handleNewError('Error with the servers. Empty result in explore-statistics.');
+            throw ErrorHelper.handleNewError('Empty server response. Empty result in explore-statistics.');
         }
 
         // query IDs of the cohort built from the constraints and saved in the backend nodes' DB
