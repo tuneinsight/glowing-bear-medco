@@ -12,7 +12,7 @@
       <span *ngIf="isNodeInProject(node.name) && hasPerSiteCounts && queryResults|async">: {{(queryResults|async).perSiteCounts[nodeIdx]}} subjects</span>
     </li>
   </ul>
-  <div *ngIf="!config.getConfig('isBiorefMode')">
+  <div *ngIf="!isBiorefMode">
     <h6>Latest explore query</h6>
     <p>Total: {{globalCount | async}} subjects</p>
   </div>
