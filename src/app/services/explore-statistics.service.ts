@@ -102,7 +102,7 @@ export class ExploreStatisticsService {
 
     private _lastQueryTiming: ApiI2b2Timing;
     private _lastCohortDefinition: ApiI2b2Panel[] = []
-    // Sends the result of the latest query when is is available
+    // Sends the result of the latest query when is available
     @Output() chartsDataSubject: Subject<ChartInformation[]> = new ReplaySubject(1)
 
     // Emits whenever the explore statistics query has been launched.
@@ -186,7 +186,6 @@ export class ExploreStatisticsService {
 
     private processQuery(bucketSize: number, minObservations: number) {
 
-
         const uniqueAnalytes = new Set(this._analytes);
         this.analytesSubject.next(uniqueAnalytes)
 
@@ -238,6 +237,7 @@ export class ExploreStatisticsService {
 
         const observableRequest = this.sendRequest(apiRequest);
 
+        this.chartsDataSubject = new ReplaySubject(1);
         this.navbarService.navigateToExploreStatisticsTab();
 
         observableRequest.subscribe((answers: ApiExploreStatisticsResponse[]) => {
