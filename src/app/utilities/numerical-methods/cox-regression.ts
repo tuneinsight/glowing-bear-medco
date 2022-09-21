@@ -19,7 +19,7 @@ export abstract class CoxRegression {
   protected data: TimePoint[];
   public constructor(data: TimePoint[], maxIter: number, tolerance: number) {
     if (data.length === 0) {
-      throw ErrorHelper.handleNewError('Number of observation is 0, this exception should be treated before.')
+      throw ErrorHelper.handleNewError('No observations found.')
     }
     this.data = data
     this.maxIter = maxIter
