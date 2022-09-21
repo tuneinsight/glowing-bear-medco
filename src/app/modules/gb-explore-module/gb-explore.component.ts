@@ -88,10 +88,9 @@ export class GbExploreComponent implements AfterViewChecked {
 
     if (this.config.getConfig('isBiorefMode')) {
       this.execExploreStatisticsQuery(event);
+    } else {
+      this.queryService.execQuery();
     }
-
-
-    this.queryService.execQuery();
   }
 
 
@@ -142,6 +141,10 @@ export class GbExploreComponent implements AfterViewChecked {
 
   get hasConstraint(): boolean {
     return this.constraintService.hasConstraint().valueOf()
+  }
+
+  get hasAnalytes(): boolean {
+    return this.exploreStatisticsService.hasAnalytes
   }
 
   get allNodesIsUp(): boolean {

@@ -101,4 +101,8 @@ export class GbSummaryComponent {
   isNodeInProject(nodeName: string) {
     return !!this.medcoNetworkService.projectNodes.find((projectNodeName) => projectNodeName === nodeName);
   }
+
+  get isBiorefMode(): boolean {
+    return this.config.getConfig('isBiorefMode');
+  }
 }

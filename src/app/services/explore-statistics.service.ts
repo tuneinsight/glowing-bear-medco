@@ -131,7 +131,7 @@ export class ExploreStatisticsService {
         private queryService: QueryService,
         private constraintMappingService: ConstraintMappingService,
         private reverseConstraintMappingService: ConstraintReverseMappingService,
-        private navbarService: NavbarService,
+        private navbarService: NavbarService
     ) {
 
     }
@@ -141,7 +141,8 @@ export class ExploreStatisticsService {
 
     // The panels returned by the constraint service have a tendency to be out of date. Use this method to refresh them.
     private refreshConstraint(constraint: CombinationConstraint): Observable<CombinationConstraint> {
-        const i2b2Panels: ApiI2b2Panel[] = this.constraintMappingService.mapConstraint(constraint)
+        const i2b2Panels: ApiI2b2Panel[] = this.constraintMappingService.mapConstraint(constraint,
+          this.queryService.queryTimingSameInstance)
 
         if (i2b2Panels.length === 0) {
             /* Return an empty constraint if the passed parameter is empty.
@@ -193,14 +194,14 @@ export class ExploreStatisticsService {
         const cohortConstraint = this.constraintService.generateConstraint();
 
         this.refreshConstraint(this.constraintService.generateConstraint()).subscribe(refreshed => {
-            /* There are problems with the current version of the code. Hence it is necessary to use
-            * the hackish method refreshConstraint so that the summary of the used constraints is up to date.
-            * If a user replaces a concept with another by dropping the selected concept on the
-            * previously selected concept in the explore statistics form, the newer concept wont be displayed
-            * in the summary of the query. The newer concept will still be sent to the backend because
-            * mapConstraint will returned the latest up to date i2b2 tree.
-            */
-            this.rootConstraint.next(refreshed)
+          /* There are problems with the current version of the code. Hence it is necessary to use
+          * the hackish method refreshConstraint so that the summary of the used constraints is up to date.
+          * If a user replaces a concept with another by dropping the selected concept on the
+          * previously selected concept in the explore statistics form, the newer concept wont be displayed
+          * in the summary of the query. The newer concept will still be sent to the backend because
+          * mapConstraint will returned the latest up to date i2b2 tree.
+          */
+          this.rootConstraint.next(refreshed)
         })
 
         const analytes = Array.from(uniqueAnalytes);
@@ -214,7 +215,8 @@ export class ExploreStatisticsService {
         // the analytes split into two groups: modifiers and concepts
         const { modifiers } = this.extractConceptsAndModifiers(analytes);
 
-        this._lastCohortDefinition = this.constraintMappingService.mapConstraint(cohortConstraint)
+        this._lastCohortDefinition = this.constraintMappingService.mapConstraint(cohortConstraint,
+          this.queryService.queryTimingSameInstance)
         this._lastQueryTiming = this.queryService.lastTiming
 
 
@@ -240,7 +242,7 @@ export class ExploreStatisticsService {
 
         observableRequest.subscribe((answers: ApiExploreStatisticsResponse[]) => {
             this.handleAnswer(answers, cohortConstraint);
-
+            this.queryService.isUpdating = false;
         }, err => {
             if (err.error === undefined) {
                 ErrorHelper.handleNewError('An error occurred during the request execution.')
@@ -383,6 +385,10 @@ export class ExploreStatisticsService {
 
     public get analytes(): TreeNode[] {
         return this._analytes.map(t => t.clone(undefined, false, true))
+    }
+
+    public get hasAnalytes(): boolean {
+      return this._analytes.length > 0
     }
 
     saveCohortStatistics() {

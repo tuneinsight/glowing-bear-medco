@@ -21,28 +21,28 @@ export class ConstraintMappingService {
 
   constructor(private cryptoService: CryptoService) { }
 
-  public mapConstraint(constraint: Constraint): ApiI2b2Panel[] {
+  public mapConstraint(constraint: Constraint, queryTimingSameInstance: boolean): ApiI2b2Panel[] {
     let panels = [];
-    this.mapCombinationConstraint(panels, constraint as CombinationConstraint);
+    this.mapCombinationConstraint(panels, constraint as CombinationConstraint, queryTimingSameInstance);
     return panels;
   }
 
-  private mapCombinationConstraint(panels: ApiI2b2Panel[], constraint: Constraint) {
+  private mapCombinationConstraint(panels: ApiI2b2Panel[], constraint: Constraint, queryTimingSameInstance: boolean) {
 
     switch (constraint.className) {
       case 'CombinationConstraint':
         if ((constraint as CombinationConstraint).children.length === 0) {
           return;
         } else if ((constraint as CombinationConstraint).combinationState === CombinationState.Or) {
-          panels.push(this.generateI2b2Panel(constraint));
+          panels.push(this.generateI2b2Panel(constraint, queryTimingSameInstance));
         } else if ((constraint as CombinationConstraint).combinationState === CombinationState.And) {
           (constraint as CombinationConstraint).children.forEach((childConstraint) =>
-            this.mapCombinationConstraint(panels, childConstraint as CombinationConstraint))
+            this.mapCombinationConstraint(panels, childConstraint as CombinationConstraint, queryTimingSameInstance))
         }
         break;
 
       default: // should be ConceptConstraint or GenomicAnnotationConstraint
-        panels.push(this.generateI2b2Panel(constraint));
+        panels.push(this.generateI2b2Panel(constraint, queryTimingSameInstance));
         break;
     }
   }
@@ -54,10 +54,10 @@ export class ConstraintMappingService {
    * @param constraint
    * @param negated
    */
-  private generateI2b2Panel(constraint: Constraint): ApiI2b2Panel {
+  private generateI2b2Panel(constraint: Constraint, queryTimingSameInstance: boolean): ApiI2b2Panel {
     let panel = new ApiI2b2Panel();
 
-    panel.timing = constraint.panelTimingSameInstance ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any
+    panel.timing = constraint.panelTimingSameInstance && queryTimingSameInstance ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any
     panel.not = constraint.excluded;
 
     switch (constraint.className) {
