@@ -119,78 +119,71 @@ export class ConstraintMappingService {
 
     let item = new ApiI2b2Item();
 
-    if (constraint.concept.encryptionDescriptor && constraint.concept.encryptionDescriptor.encrypted) {
-      // todo: children IDs implementation
-      item.encrypted = true;
+    item.queryTerm = constraint.concept.path;
+    if (constraint.concept.modifier) {
+      item.modifier = new ApiI2B2Modifier();
+      item.queryTerm = constraint.concept.modifier.appliedConceptPath;
+      item.modifier.key = constraint.concept.modifier.path;
+      item.modifier.appliedPath = constraint.concept.modifier.appliedPath;
+    }
 
-    } else {
-      item.encrypted = false;
-      item.queryTerm = constraint.concept.path;
-      if (constraint.concept.modifier) {
-        item.modifier = new ApiI2B2Modifier();
-        item.queryTerm = constraint.concept.modifier.appliedConceptPath;
-        item.modifier.key = constraint.concept.modifier.path;
-        item.modifier.appliedPath = constraint.concept.modifier.appliedPath;
-      }
+    switch (constraint.concept.type) {
+      case ValueType.SIMPLE:
+        break;
 
-      switch (constraint.concept.type) {
-        case ValueType.SIMPLE:
-          break;
+      case ValueType.NUMERICAL:
+        item.type = 'NUMBER'
+        if (constraint.applyNumericalOperator && (constraint.numericalOperator)) {
+          item.operator = constraint.numericalOperator
+          item.value = ''
 
-        case ValueType.NUMERICAL:
-          item.type = 'NUMBER'
-          if (constraint.applyNumericalOperator && (constraint.numericalOperator)) {
-            item.operator = constraint.numericalOperator
-            item.value = ''
+          switch (constraint.numericalOperator) {
+            case NumericalOperator.BETWEEN:
 
-            switch (constraint.numericalOperator) {
-              case NumericalOperator.BETWEEN:
+              item.value = constraint.minValue.toString() + ' and ' + constraint.maxValue.toString()
+              break;
 
-                item.value = constraint.minValue.toString() + ' and ' + constraint.maxValue.toString()
-                break;
+            case NumericalOperator.EQUAL:
+            case NumericalOperator.GREATER:
+            case NumericalOperator.GREATER_OR_EQUAL:
+            case NumericalOperator.LOWER:
+            case NumericalOperator.LOWER_OR_EQUAL:
+            case NumericalOperator.NOT_EQUAL:
 
-              case NumericalOperator.EQUAL:
-              case NumericalOperator.GREATER:
-              case NumericalOperator.GREATER_OR_EQUAL:
-              case NumericalOperator.LOWER:
-              case NumericalOperator.LOWER_OR_EQUAL:
-              case NumericalOperator.NOT_EQUAL:
+              item.value = constraint.numValue.toString();
+              break;
 
-                item.value = constraint.numValue.toString();
-                break;
-
-              default:
-                throw ErrorHelper.handleNewUserInputError(`Numerical operator: ${constraint.numericalOperator} not handled.`);
-            }
+            default:
+              throw ErrorHelper.handleNewUserInputError(`Numerical operator: ${constraint.numericalOperator} not handled.`);
           }
-          break;
+        }
+        break;
 
-        case ValueType.TEXT:
-          item.type = 'TEXT'
-          if (constraint.applyTextOperator && (constraint.textOperator)) {
-            switch (constraint.textOperator) {
-              case TextOperator.LIKE_EXACT:
-              case TextOperator.LIKE_BEGIN:
-              case TextOperator.LIKE_CONTAINS:
-              case TextOperator.LIKE_END:
-                item.operator = constraint.textOperator;
-                item.value = constraint.textOperatorValue;
-                break;
+      case ValueType.TEXT:
+        item.type = 'TEXT'
+        if (constraint.applyTextOperator && (constraint.textOperator)) {
+          switch (constraint.textOperator) {
+            case TextOperator.LIKE_EXACT:
+            case TextOperator.LIKE_BEGIN:
+            case TextOperator.LIKE_CONTAINS:
+            case TextOperator.LIKE_END:
+              item.operator = constraint.textOperator;
+              item.value = constraint.textOperatorValue;
+              break;
 
-              case TextOperator.IN:
-                item.operator = constraint.textOperator;
-                item.value = constraint.textOperatorValue.split(',').map(substring => '\'' + substring + '\'').join(',');
-                break;
+            case TextOperator.IN:
+              item.operator = constraint.textOperator;
+              item.value = constraint.textOperatorValue.split(',').map(substring => '\'' + substring + '\'').join(',');
+              break;
 
-              default:
-                throw ErrorHelper.handleNewUserInputError(`Text operator: ${constraint.textOperator} not handled.`);
-            }
+            default:
+              throw ErrorHelper.handleNewUserInputError(`Text operator: ${constraint.textOperator} not handled.`);
           }
-          break;
+        }
+        break;
 
-        default:
-          throw ErrorHelper.handleNewUserInputError(`Concept type not supported: ${constraint.concept.type.toString()}.`);
-      }
+      default:
+        throw ErrorHelper.handleNewUserInputError(`Concept type not supported: ${constraint.concept.type.toString()}.`);
     }
 
     console.log(`Generated i2b2 item ${item.queryTerm}.`, item)
@@ -200,7 +193,6 @@ export class ConstraintMappingService {
   private generateI2b2ItemsFromGenomicAnnotation(constraint: GenomicAnnotationConstraint): ApiI2b2Item[] {
     return constraint.variantIds.map((variantId) => {
       let item = new ApiI2b2Item();
-      item.encrypted = true;
       item.queryTerm = variantId; // todo: variant IDs are pre-encrypted
       return item;
     });

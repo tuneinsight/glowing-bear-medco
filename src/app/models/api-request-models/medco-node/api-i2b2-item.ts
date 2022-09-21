@@ -6,5 +6,4 @@ export class ApiI2b2Item {
   value?: string;
   type?: string;
   modifier?: ApiI2B2Modifier;
-  encrypted: boolean;
 }

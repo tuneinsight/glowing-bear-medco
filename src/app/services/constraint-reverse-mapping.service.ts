@@ -76,12 +76,7 @@ export class ConstraintReverseMappingService {
    * @param target
    */
   private mapPanel(panel: ApiI2b2Panel): Observable<Constraint> {
-    for (const item of panel.conceptItems) {
-      if (item.encrypted) {
-        // restoration of encrypted concept is not supported
-        return null
-      }
-    }
+
     let sameInstance = panel.timing === ApiI2b2Timing.sameInstanceNum
     if (panel.conceptItems.length === 1) {
       return this.mapItem(panel.conceptItems[0]).pipe(map(constraint => {
@@ -105,10 +100,7 @@ export class ConstraintReverseMappingService {
   private mapItem(item: ApiI2b2Item): Observable<ConceptConstraint> {
     let modificated: Observable<TreeNode>
     let resTreeNode: Observable<TreeNode>
-    if (item.encrypted === true) {
-      // this should have been checked out before
-      return null
-    }
+
     let conceptURI = item.modifier ? modifiedConceptPath(item.queryTerm, item.modifier.key) : item.queryTerm
     // check if the concept is already loaded
     let existingConstraint = this.constraintService.allConstraints.find(
@@ -137,7 +129,6 @@ export class ConstraintReverseMappingService {
     }))
     if (item.modifier) {
       let modificandum = new ApiI2b2Item()
-      modificandum.encrypted = item.encrypted
       modificandum.modifier = null
       modificandum.operator = item.operator
       modificandum.value = item.value
@@ -189,7 +180,7 @@ export class ConstraintReverseMappingService {
               constraint.maxValue = constraint.concept.isInteger ? parseInt(boundaries[1], 10) : parseFloat(boundaries[1])
               break;
             default:
-              MessageHelper.alert('error', `While parsing concept constraint ${constraint.textRepresentation}, numerical operator ${operator} unkown`)
+              MessageHelper.alert('error', `While parsing concept constraint ${constraint.textRepresentation}, numerical operator ${operator} unknown`)
               break;
           }
           break;
@@ -219,7 +210,7 @@ export class ConstraintReverseMappingService {
               }).join(',')
               break;
             default:
-              MessageHelper.alert('error', `While parsing concept constraint ${constraint.textRepresentation}, text operator ${operator} unkown`)
+              MessageHelper.alert('error', `While parsing concept constraint ${constraint.textRepresentation}, text operator ${operator} unknown`)
               break;
 
           }
@@ -227,7 +218,7 @@ export class ConstraintReverseMappingService {
         case ValueType.SIMPLE:
           break;
         default:
-          MessageHelper.alert('error', `While parsing concept constraint ${constraint.textRepresentation}, type ${constraint.concept.type} unkown`)
+          MessageHelper.alert('error', `While parsing concept constraint ${constraint.textRepresentation}, type ${constraint.concept.type} unknown`)
           break;
       }
     }
