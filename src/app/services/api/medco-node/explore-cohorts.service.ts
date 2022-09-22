@@ -90,17 +90,6 @@ export class ExploreCohortsService {
     );
   }
 
-  postCohortsPatientListSingleNode(node: ApiNodeMetadata, cohortPatientListRequest: ApiCohortsPatientLists):
-    Observable<[ApiNodeMetadata, ApiCohortsPatientListsResponse]> {
-
-    return this.apiEndpointService.postCall(
-      'node/explore/cohorts/patient-list',
-      cohortPatientListRequest,
-      node.url
-    ).pipe(map((resp) => [node, resp]));
-  }
-
-
   getCohortAllNodes(): Observable<ApiCohortResponse> {
     return this.getCohortSingleNode()
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
@@ -114,12 +103,5 @@ export class ExploreCohortsService {
   removeCohortAllNodes(name: string, exploreQueryId: string) {
     return this.removeCohortSingleNode(name, exploreQueryId)
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
-  }
-
-  postCohortsPatientListAllNodes(cohortPatientListRequest: ApiCohortsPatientLists):
-    Observable<[ApiNodeMetadata, ApiCohortsPatientListsResponse][]> {
-
-    return forkJoin(this.medcoNetworkService.nodes.map(node => this.postCohortsPatientListSingleNode(node, cohortPatientListRequest)))
-      .pipe(timeout((ExploreCohortsService.TIMEOUT_MS)))
   }
 }

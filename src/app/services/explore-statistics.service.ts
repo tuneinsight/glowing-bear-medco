@@ -167,15 +167,15 @@ export class ExploreStatisticsService {
      * This function is called when the user wants to execute an explore statistics from the explore tab.
      * This function sends an explore statistics query to all running back-end nodes.
      * When the answer is received it is processed and transformed
-     * into a list of chart informations. Each chart information is used to build a new chart in the front end.
+     * into a list of chart information. Each chart information is used to build a new chart in the front end.
      */
     executeQueryFromExplore(bucketSize: number, minObservation: number) {
         if (bucketSize === undefined || bucketSize <= 0) {
-            bucketSize = 1 // TODO remove this when we'll have created the processus sharing the bucket size between servers
+            bucketSize = 1 // TODO remove this when we'll have created the process for sharing the bucket size between servers
         }
 
         if (minObservation === undefined) {
-            minObservation = 0 // TODO remove  when we'll have created the processus sharing the min observation between servers
+            minObservation = 0 // TODO remove  when we'll have created the process for sharing the min observation between servers
         }
 
 

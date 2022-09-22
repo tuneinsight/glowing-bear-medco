@@ -192,63 +192,6 @@ export class SurvivalService {
     return this.apiSurvivalAnalysisService.survivalAnalysisAllNodes(apiSurvivalAnalysis)
   }
 
-  survivalAnalysisDecrypt(survivalAnalysisResponse: ApiSurvivalAnalysisResponse): Observable<SurvivalAnalysisClear> {
-    return forkJoin(
-      // generate the ClearGroup[]
-      // @ts-ignore
-      survivalAnalysisResponse.results.map(group =>
-        this.cryptoService.decryptIntegersWithEphemeralKey(
-          [group.initialCount]
-            .concat(group.groupResults.map(groupResult => groupResult.events.eventofinterest))
-            .concat(group.groupResults.map(groupResult => groupResult.events.censoringevent))
-        ).pipe(map(decrypted => {
-
-          // assemble back the decrypted values
-          const nbEvents = group.groupResults.length;
-          let eventsOfInterest = decrypted.slice(1, nbEvents + 1);
-          let censoringEvents = decrypted.slice(nbEvents + 1);
-          console.log(`Decrypted 1+${eventsOfInterest.length}+${censoringEvents.length}=${decrypted.length} survival analysis elements`);
-
-          // filter out points that are null
-          let timepoints = group.groupResults.map(groupResult => groupResult.timepoint);
-          for (let i = 0; i < nbEvents; i++) {
-            if (eventsOfInterest[i] === 0 && censoringEvents[i] === 0) {
-              timepoints.splice(i, 1);
-              eventsOfInterest.splice(i, 1);
-              censoringEvents.splice(i, 1);
-              i--;
-            }
-          }
-          console.log(`Decryption of survival analysis results: ${nbEvents - timepoints.length} points ignored`);
-
-          // create cleartext group
-          let cleartextGroup = new ClearGroup();
-          cleartextGroup.groupId = group.groupID;
-          cleartextGroup.groupResults = [];
-          cleartextGroup.initialCount = decrypted[0];
-          for (let i = 0; i < timepoints.length; i++) {
-            cleartextGroup.groupResults.push({
-              timepoint: timepoints[i],
-              events: {
-                eventOfInterest: eventsOfInterest[i],
-                censoringEvent: censoringEvents[i]
-              }
-            });
-          }
-          return cleartextGroup;
-        }))
-      )
-    ).pipe(
-      // package it into SurvivalAnalysisClear
-      map(clearGroups => {
-        let res = new SurvivalAnalysisClear();
-        // @ts-ignore
-        res.results = clearGroups;
-        return res;
-      })
-    );
-  }
-
   settings(): SurvivalSettings {
 
     let subGroupsTextualRepresentations = this._subGroups.map(sg => {

@@ -8,11 +8,9 @@
 import { Component } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { AnalysisType } from '../../../../models/analysis-models/analysis-type';
-import { ApiI2b2Panel } from '../../../../models/api-request-models/medco-node/api-i2b2-panel';
 import { SurvivalAnalysisClear } from '../../../../models/survival-analysis/survival-analysis-clear';
 import { CohortService } from '../../../../services/cohort.service';
 import { NavbarService } from '../../../../services/navbar.service';
-import { ApiI2b2Item } from '../../../../models/api-request-models/medco-node/api-i2b2-item';
 import { OperationStatus } from '../../../../models/operation-status';
 import { SurvivalService } from '../../../../services/survival-analysis.service';
 import { SurvivalResultsService } from '../../../../services/survival-results.service';
@@ -213,34 +211,3 @@ export class GbTopComponent {
     return this.cohortService.selectedCohort
   }
 }
-
-let testPanels = [{
-  cohortName: 'group1',
-  panels: new Array<ApiI2b2Panel>()
-}, {
-  cohortName: 'group2',
-  panels: new Array<ApiI2b2Panel>()
-}]
-
-function fillTestPanels() {
-  let firstPanel = new ApiI2b2Panel()
-  firstPanel.not = false
-  let firstItem = new ApiI2b2Item()
-  firstItem.encrypted = false
-  firstItem.queryTerm = '/I2B2/I2B2/Demographics/Gender/Female/'
-  firstItem.operator = 'equals'
-  firstPanel.conceptItems.push(firstItem)
-
-  testPanels[0].panels.push(firstPanel)
-
-  let secondPanel = new ApiI2b2Panel()
-  secondPanel.not = false
-  let secondItem = new ApiI2b2Item()
-  secondItem.encrypted = false
-  secondItem.queryTerm = '/I2B2/I2B2/Demographics/Gender/Male/'
-  secondItem.operator = 'equals'
-  secondPanel.conceptItems.push(secondItem)
-
-  testPanels[1].panels.push(secondPanel)
-}
-

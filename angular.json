@@ -49,8 +49,7 @@
               "src/styles/styles.css",
               "node_modules/ngx-toastr/toastr.css"
             ],
-            "scripts": [],
-            "webWorkerTsConfig": "tsconfig.worker.json"
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -140,7 +139,6 @@
             "tsConfig": [
               "tsconfig.app.json",
               "tsconfig.spec.json",
-              "tsconfig.worker.json",
               "tsconfig.json"
             ],
             "exclude": [

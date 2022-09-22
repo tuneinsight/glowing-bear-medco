@@ -235,7 +235,7 @@ export class ExploreSearchService {
             case DataType.STRING:
               return ValueType.TEXT
             default:
-              MessageHelper.alert('warn', `In ontology tree, data type ${metadata.dataType} unkown`)
+              MessageHelper.alert('warn', `In ontology tree, data type ${metadata.dataType} unknown`)
               return ValueType.SIMPLE
           }
         }
