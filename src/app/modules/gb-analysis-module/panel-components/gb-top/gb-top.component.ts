@@ -178,6 +178,7 @@ export class GbTopComponent {
       console.log('[ANALYSIS] Decrypted & formatted survival analysis result', formattedResults);
 
       if (!(formattedResults.results) || formattedResults.results.length === 0) {
+        this._ready = true
         return
       }
       this._clearRes.next(formattedResults)
