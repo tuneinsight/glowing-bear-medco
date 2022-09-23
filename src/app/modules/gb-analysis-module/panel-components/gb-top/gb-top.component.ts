@@ -177,7 +177,11 @@ export class GbTopComponent {
 
       console.log('[ANALYSIS] Decrypted & formatted survival analysis result', formattedResults);
 
-      if (!(formattedResults.results) || formattedResults.results.length === 0) {
+      if (!(formattedResults.results) ||
+         formattedResults.results.length === 0 ||
+         formattedResults.results[0].groupResults.length === 0
+      ) {
+        ErrorHelper.handleNewError('No observations found.')
         this._ready = true
         return
       }

@@ -181,6 +181,7 @@ export class GbSurvivalSettingsComponent implements OnInit {
 
   set selectedStartsWhen(when: When) {
     this.survivalService.startsWhen = when
+    this.changedEventConcepts.emit(this.isFormValid())
   }
 
   get selectedEndsWhen(): When {
@@ -189,6 +190,7 @@ export class GbSurvivalSettingsComponent implements OnInit {
 
   set selectedEndsWhen(when: When) {
     this.survivalService.endsWhen = when
+    this.changedEventConcepts.emit(this.isFormValid())
   }
 
   get selectedGranularity(): Granularity {
@@ -197,6 +199,7 @@ export class GbSurvivalSettingsComponent implements OnInit {
 
   set selectedGranularity(gran: Granularity) {
     this.survivalService.granularity = gran
+    this.changedEventConcepts.emit(this.isFormValid())
   }
 
   get limit(): number {
@@ -205,6 +208,7 @@ export class GbSurvivalSettingsComponent implements OnInit {
 
   set limit(num: number) {
     this.survivalService.limit = num
+    this.changedEventConcepts.emit(this.isFormValid())
   }
   set startConcept(concept: Concept) {
     this.survivalService.startConcept = concept
