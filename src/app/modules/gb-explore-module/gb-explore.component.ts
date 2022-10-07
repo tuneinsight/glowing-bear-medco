@@ -22,6 +22,7 @@ import { CohortService } from '../../services/cohort.service';
 import { ConstraintService } from '../../services/constraint.service';
 import { QueryService } from '../../services/query.service';
 import { FormatHelper } from '../../utilities/format-helper';
+import { QueryTemporalSetting } from 'src/app/models/query-models/query-temporal-setting';
 
 @Component({
   selector: 'gb-explore',
@@ -139,8 +140,10 @@ export class GbExploreComponent implements AfterViewChecked {
     return this.queryService.isDirty
   }
 
-  get hasConstraint(): boolean {
-    return this.constraintService.hasConstraint().valueOf()
+  get hasDefinitions(): boolean {
+    let hasSelectionConstraint = this.constraintService.hasSelectionConstraint().valueOf()
+    let hasSequentialConstraint = this.constraintService.hasSequentialConstraint().valueOf()
+    return hasSelectionConstraint && (this.queryService.queryTiming === QueryTemporalSetting.sequential ? hasSequentialConstraint : true)
   }
 
   get hasAnalytes(): boolean {

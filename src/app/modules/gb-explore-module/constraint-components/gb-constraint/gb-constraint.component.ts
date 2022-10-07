@@ -6,15 +6,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import {Component, OnInit, Input, EventEmitter, Output, ElementRef} from '@angular/core';
-import {Constraint} from '../../../../models/constraint-models/constraint';
-import {TreeNodeService} from '../../../../services/tree-node.service';
-import {CohortService} from '../../../../services/cohort.service';
-import {ConstraintService} from '../../../../services/constraint.service';
-import {CombinationConstraint} from '../../../../models/constraint-models/combination-constraint';
-import {QueryService} from '../../../../services/query.service';
-import {AppConfig} from '../../../../config/app.config';
-import {GenomicAnnotationsService} from '../../../../services/api/genomic-annotations.service';
+import { Component, OnInit, Input, EventEmitter, Output, ElementRef } from '@angular/core';
+import { Constraint } from '../../../../models/constraint-models/constraint';
+import { TreeNodeService } from '../../../../services/tree-node.service';
+import { CohortService } from '../../../../services/cohort.service';
+import { ConstraintService } from '../../../../services/constraint.service';
+import { CombinationConstraint } from '../../../../models/constraint-models/combination-constraint';
+import { QueryService } from '../../../../services/query.service';
+import { AppConfig } from '../../../../config/app.config';
+import { GenomicAnnotationsService } from '../../../../services/api/genomic-annotations.service';
+import { QueryTemporalSetting } from 'src/app/models/query-models/query-temporal-setting';
+import { CompositeConstraint } from 'src/app/models/constraint-models/composite-constraint';
 
 @Component({
   selector: 'gb-constraint',
@@ -95,8 +97,8 @@ export class GbConstraintComponent implements OnInit {
 
   get containerClass(): string {
     if (this.element.nativeElement.children[0].classList.length === 0) {
-      const containerClassName = (this.constraint.className === 'CombinationConstraint'
-        && (<CombinationConstraint>this.constraint).isRoot) ?
+      const containerClassName = (this.constraint.className === 'CompositeConstraint'
+        && (<CompositeConstraint>this.constraint).isRoot) ?
         'gb-constraint-container-root ' : 'gb-constraint-container';
 
       let borderClassName = '';
@@ -132,8 +134,12 @@ export class GbConstraintComponent implements OnInit {
     return (this.constraint) ? this.constraint.panelTimingSameInstance : false
   }
 
+  get queryTiming(): QueryTemporalSetting {
+    return this.queryService.queryTiming
+  }
+
   get queryTimingSameInstance(): boolean {
-    return this.queryService.queryTimingSameInstance
+    return this.queryTiming === QueryTemporalSetting.sameinstance
   }
 
 }

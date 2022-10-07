@@ -11,21 +11,15 @@
 import { CombinationState } from './combination-state';
 import { Constraint } from './constraint';
 import { ConstraintVisitor } from './constraintVisitor';
+import { CompositeConstraint } from './composite-constraint';
 
-export class CombinationConstraint extends Constraint {
-  public static readonly groupTextRepresentation = 'Group';
+export class CombinationConstraint extends CompositeConstraint {
 
-  private _children: Constraint[];
   private _combinationState: CombinationState;
-  private _isRoot: boolean;
-
-
 
   constructor() {
     super();
-    this._children = [];
     this.combinationState = CombinationState.And;
-    this.isRoot = false;
   }
 
   // visitor pattern https://refactoring.guru/design-patterns/visitor
@@ -33,18 +27,8 @@ export class CombinationConstraint extends Constraint {
     return v.visitCombinationConstraint(this)
   }
 
-  get className(): string {
+  get compositeClassName(): string {
     return 'CombinationConstraint';
-  }
-
-  addChild(constraint: Constraint) {
-
-    if (!(<CombinationConstraint>constraint).isRoot) {
-      // to enforce polymorphism, otherwise child set method is not called
-      constraint.parentConstraint = this;
-    }
-    this.children.push(constraint);
-    return;
   }
 
   updateChild(index: number, constraint: Constraint) {
@@ -56,33 +40,19 @@ export class CombinationConstraint extends Constraint {
   }
 
   clone(): CombinationConstraint {
-    let res = new CombinationConstraint;
+    let res = new CombinationConstraint();
+    res._textRepresentation = this.textRepresentation;
     res.parentConstraint = (this.parentConstraint) ? this.parentConstraint : null;
     res.isRoot = this.isRoot;
     res.excluded = this.excluded
     res.combinationState = this.combinationState;
     res.panelTimingSameInstance = this.panelTimingSameInstance;
-    res.children = this._children.map(constr => constr.clone());
+    res.children = this.children.map(constr => constr.clone());
     return res;
   }
 
   isAnd() {
     return this.combinationState === CombinationState.And;
-  }
-
-  /**
-   *  the input value validity of a combination constraint is true if all children constraints have valid values.
-   *  If one or multiple children are not valid, only the first non-empty message string is returned
-   */
-  inputValueValidity(): string {
-
-    for (const child of this.children) {
-      let validity = child.inputValueValidity()
-      if (validity !== '') {
-        return validity
-      }
-    }
-    return ''
   }
 
 
@@ -107,13 +77,6 @@ export class CombinationConstraint extends Constraint {
       CombinationState.Or : CombinationState.And;
   }
 
-  removeChildConstraint(child: Constraint) {
-    let index = this.children.indexOf(child);
-    if (index > -1) {
-      this.children.splice(index, 1);
-    }
-  }
-
   get isRoot(): boolean {
     return this._isRoot;
   }
@@ -128,13 +91,22 @@ export class CombinationConstraint extends Constraint {
 
 
   get textRepresentation(): string {
-    if (this.children.length === 0) {
-      return CombinationConstraint.groupTextRepresentation;
+    if (this.children.length > 0) {
+      let newRepresentation = ''
+      for (let index = 0; index < this.children.length; index++) {
+
+        let representation = this.children[index].textRepresentation
+        if (index > 0) {
+          let combinationRepresentation = this.combinationState === CombinationState.And ? 'and' : 'or'
+          representation = ` ${combinationRepresentation} ${representation}`
+        }
+        newRepresentation = `${newRepresentation}${representation}`
+      }
+
+      return this.excluded ? 'not ' : '' + `(${newRepresentation})`
+    } else {
+      return 'Group';
     }
-
-    return (this.excluded ? 'not (' : '(') + this.children.map(({ textRepresentation }) => textRepresentation)
-      .join(this.combinationState === CombinationState.And ? ' and ' : ' or ') + ')'
-
   }
 
 }

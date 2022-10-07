@@ -6,8 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { v4 as uuidv4 } from 'uuid';
 import { Constraint } from '../constraint-models/constraint';
+import { SequentialConstraint } from '../constraint-models/sequential-constraint';
 
 export class ExploreQuery {
 
@@ -16,6 +16,8 @@ export class ExploreQuery {
   private _description: string;
   // the constraint of the query
   private _constraint: Constraint;
+
+  private _sequentialConstraint: SequentialConstraint;
 
   // the query-level i2b2 timing policy
   private _queryTimingSameInstanceNum: boolean;
@@ -29,7 +31,16 @@ export class ExploreQuery {
    * Generates a new unique ID for this query.
    */
   generateUniqueId(): void {
-    this.uniqueId = uuidv4();
+    let d = new Date();
+    let id = `MedCo_Explore_Query_${d.getUTCFullYear()}${d.getUTCMonth()}${d.getUTCDate()}${d.getUTCHours()}` +
+      `${d.getUTCMinutes()}${d.getUTCSeconds()}${d.getUTCMilliseconds()}`;
+
+    if (this.name) {
+      // embed name without whitespaces if defined
+      id = `${id}_${this.name.replace(/\s/g, '_')}`;
+    }
+
+    this.uniqueId = id;
   }
 
   // --- getters / setters
@@ -59,6 +70,14 @@ export class ExploreQuery {
 
   get constraint(): Constraint {
     return this._constraint;
+  }
+
+  get sequentialConstraint(): SequentialConstraint {
+    return this._sequentialConstraint;
+  }
+
+  set sequentialConstraint(sequentialConstraint: SequentialConstraint) {
+    this._sequentialConstraint = sequentialConstraint;
   }
 
   set constraint(value: Constraint) {

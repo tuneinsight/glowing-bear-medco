@@ -15,14 +15,21 @@ import { FormatHelper } from '../../utilities/format-helper';
 export class CohortConstraint extends Constraint {
   private _cohort: Cohort;
 
+  static NewCohortConstraintFromCohort(cohort: Cohort): CohortConstraint {
+    const cohortConstraint = new CohortConstraint();
+    cohortConstraint.cohort = cohort;
+    cohortConstraint._textRepresentation = cohortConstraint.cohort.name;
+    return cohortConstraint
+  }
+
   constructor() {
     super();
-    this.textRepresentation = 'Cohort';
+    this._textRepresentation = 'Cohort';
   }
 
   clone(): CohortConstraint {
     let res = new CohortConstraint();
-    res.textRepresentation = this.textRepresentation;
+    res._textRepresentation = this.textRepresentation;
     res.parentConstraint = this.parentConstraint;
 
     return res;
@@ -38,6 +45,6 @@ export class CohortConstraint extends Constraint {
 
   set cohort(cohort: Cohort) {
     this._cohort = cohort;
-    this.textRepresentation = cohort ? `Cohort: ${cohort.name}` : FormatHelper.nullValuePlaceholder;
+    this._textRepresentation = cohort ? `Cohort: ${cohort.name}` : FormatHelper.nullValuePlaceholder;
   }
 }

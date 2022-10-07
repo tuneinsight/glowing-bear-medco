@@ -1,0 +1,9 @@
+<div class="gb-composite-constraint-container" >
+
+
+  <gb-combination-constraint *ngIf="compositeClassName === 'CombinationConstraint' "
+                             [constraint]="constraint"></gb-combination-constraint>
+
+  <gb-sequential-constraint *ngIf="compositeClassName === 'SequentialConstraint' "
+                            [constraint]="constraint"></gb-sequential-constraint>
+</div>

@@ -7,11 +7,12 @@
  */
 import { ApiI2b2Panel } from '../medco-node/api-i2b2-panel'
 import { ApiI2b2Timing } from '../medco-node/api-i2b2-timing'
+import {ApiQueryDefinition} from "../medco-node/api-query-definition";
 
 export class ApiSurvivalAnalysis {
   id: string
   cohortQueryID: string
-  subGroupsDefinitions: { name: string, timing: ApiI2b2Timing, panels: Array<ApiI2b2Panel> }[]
+  subGroupsDefinitions: { name: string, constraint: ApiQueryDefinition }[]
   timeLimit: number
   timeGranularity: string
   startConcept: string

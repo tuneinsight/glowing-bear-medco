@@ -31,7 +31,7 @@
 
           <span>
             <!-- disabled button during query -->
-            <button *ngIf="!isUpdating && ((isBiorefMode && hasAnalytes) || hasConstraint); else disabledButton" type="button" (click)="execQuery($event)"
+            <button *ngIf="!isUpdating && ((isBiorefMode && hasAnalytes) || hasDefinitions); else disabledButton" type="button" (click)="execQuery($event)"
               class="btn btn-outline-primary btn-sm gb-data-selection-update-btn
               {{isDirty? 'gb-explore-query-btn-dirty' : ''}}">
               Run

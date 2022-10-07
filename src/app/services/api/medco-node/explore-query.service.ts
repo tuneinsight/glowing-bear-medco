@@ -1,26 +1,31 @@
 /**
  * Copyright 2020-2021 EPFL LDS
+ * Copyright 2021 CHUV
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import {Injectable} from '@angular/core';
-import {AppConfig} from '../../../config/app.config';
-import {Observable, throwError} from 'rxjs';
+import { Injectable } from '@angular/core';
+import { AppConfig } from '../../../config/app.config';
+import {Observable, forkJoin, throwError} from 'rxjs';
 import {timeout, map, tap, catchError} from 'rxjs/operators';
-import {ApiI2b2Panel} from '../../../models/api-request-models/medco-node/api-i2b2-panel';
-import {ConstraintMappingService} from '../../constraint-mapping.service';
-import {ApiEndpointService} from '../../api-endpoint.service';
-import {MedcoNetworkService} from '../medco-network.service';
-import {ExploreQuery} from '../../../models/query-models/explore-query';
-import {CryptoService} from '../../crypto.service';
-import {ApiI2b2Timing} from '../../../models/api-request-models/medco-node/api-i2b2-timing';
+import { ApiI2b2Panel } from '../../../models/api-request-models/medco-node/api-i2b2-panel';
+import { ConstraintMappingService } from '../../constraint-mapping.service';
+import { ApiEndpointService } from '../../api-endpoint.service';
+import { GenomicAnnotationsService } from '../genomic-annotations.service';
+import { ApiExploreQueryResult } from '../../../models/api-response-models/medco-node/api-explore-query-result';
+import { MedcoNetworkService } from '../medco-network.service';
+import { ExploreQuery } from '../../../models/query-models/explore-query';
+import { CryptoService } from '../../crypto.service';
+import { ApiNodeMetadata } from '../../../models/api-response-models/medco-network/api-node-metadata';
+import { ApiI2b2Timing } from '../../../models/api-request-models/medco-node/api-i2b2-timing';
+import { ApiI2b2SequentialOperator } from 'src/app/models/api-request-models/medco-node/api-sequence-of-events/api-i2b2-sequential-operator';
 import { KeycloakService } from 'keycloak-angular';
 import { ExploreQueryResult } from 'src/app/models/query-models/explore-query-result';
-import { MessageHelper } from 'src/app/utilities/message-helper';
 import { isCipherFormat } from 'src/app/utilities/is-cipher-format';
 import { NavbarService } from '../../navbar.service';
+import { MessageHelper } from "../../../utilities/message-helper";
 
 @Injectable()
 export class ExploreQueryService {
@@ -30,14 +35,24 @@ export class ExploreQueryService {
   private static QUERY_TIMEOUT_MS = 1000 * 60 * 10;
 
   /**
-   * Last query definition used in query that successed to return anything
+   * Last query selection definition used in query that succeeded to return anything
    */
-  private _lastDefinition: ApiI2b2Panel[]
+  private _lastSelectionDefinition: ApiI2b2Panel[]
 
   /**
-   * Last query timing used in query that successed to return anything
+   * Last query sequential definition used in query that succeeded to return anything
+   */
+  private _lastSequentialDefinition: ApiI2b2Panel[]
+
+  /**
+   * Last query timing used in query that succeeded to return anything
    */
   private _lastQueryTiming: ApiI2b2Timing
+
+  /**
+   * Last timing sequence used in query that succeeded to return anything
+   */
+  private _lastTimingSequence: ApiI2b2SequentialOperator[]
 
   /**
    * Last query ID used in query that successed to return anything
@@ -78,7 +93,8 @@ export class ExploreQueryService {
   //   ).pipe(map((expQueryResp) => [node, expQueryResp['result']]));
   // }
 
-  public exploreQuerySingleNode(queryId: string, panels: ApiI2b2Panel[], publicKey: string): Observable<ExploreQueryResult> {
+  public exploreQuerySingleNode(queryId: string, selectionPanels: ApiI2b2Panel[], sequentialPanels: ApiI2b2Panel[],
+                                queryTiming: ApiI2b2Timing, queryTimingSequence: ApiI2b2SequentialOperator[], publicKey: string): Observable<ExploreQueryResult> {
     const start = performance.now(); // to measure performance
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
     return this.apiEndpointService.postCall(
@@ -92,7 +108,9 @@ export class ExploreQueryService {
         parameters: {
           id: queryId,
           definition: {
-            panels: panels
+            selectionPanels: selectionPanels,
+            sequentialPanels: sequentialPanels,
+            sequentialOperators: queryTimingSequence
           }
         }
       }
@@ -202,11 +220,9 @@ export class ExploreQueryService {
    * @param panels
    */
   private exploreQueryLocalNode(queryId: string, userPublicKey: string,
-    panels: ApiI2b2Panel[], queryTiming: ApiI2b2Timing) {
+    selectionPanels: ApiI2b2Panel[], sequentialPanels: ApiI2b2Panel[], queryTiming: ApiI2b2Timing, queryTimingSequence: ApiI2b2SequentialOperator[]) {
 
-    this.preparePanelTimings(panels, queryTiming)
-
-    return this.exploreQuerySingleNode(queryId, panels, userPublicKey)
+    return this.exploreQuerySingleNode(queryId, selectionPanels, sequentialPanels, queryTiming, queryTimingSequence,  userPublicKey)
       .pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
   }
 
@@ -220,11 +236,12 @@ export class ExploreQueryService {
    * @param panels
    */
      private exploreQueryAllNodes(queryId: string, userPublicKey: string,
-      panels: ApiI2b2Panel[], queryTiming: ApiI2b2Timing) {
+                                  selectionPanels: ApiI2b2Panel[],
+                                  sequentialPanels: ApiI2b2Panel[],
+                                  queryTiming: ApiI2b2Timing,
+                                  queryTimingSequence: ApiI2b2SequentialOperator[]) {
 
-      this.preparePanelTimings(panels, queryTiming)
-
-      return this.exploreQuerySingleNode(queryId, panels, userPublicKey)
+      return this.exploreQuerySingleNode(queryId, selectionPanels, sequentialPanels, queryTiming, queryTimingSequence, userPublicKey)
         .pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
     }
 
@@ -233,17 +250,23 @@ export class ExploreQueryService {
    * @param query
    */
   exploreLocalQuery(query: ExploreQuery) {
-    let currentDefinition = this.constraintMappingService.mapConstraint(query.constraint, query.queryTimingSameInstanceNum);
+    let currentSelectionDefinition = this.constraintMappingService.mapConstraint(query.constraint, query.queryTimingSameInstanceNum);
+    let currentSequentialDefinition = this.constraintMappingService.mapConstraint(query.sequentialConstraint, query.queryTimingSameInstanceNum)
     let currentTiming = query.queryTimingSameInstanceNum ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any;
+    let currentTimingSequence = query.sequentialConstraint.temporalSequence
 
     return this.exploreQueryLocalNode(
       query.uniqueId,
       this.cryptoService.ephemeralPublicKey,
-      currentDefinition,
+      currentSelectionDefinition,
+      currentSequentialDefinition,
       currentTiming,
+      currentTimingSequence
     ).pipe(tap(() => {
-      this._lastDefinition = currentDefinition
+      this._lastSelectionDefinition = currentSelectionDefinition
+      this._lastSequentialDefinition = currentSequentialDefinition
       this._lastQueryTiming = currentTiming
+      this._lastTimingSequence = currentTimingSequence
     }));
   }
 
@@ -252,36 +275,40 @@ export class ExploreQueryService {
    * @param query
    */
   exploreQuery(query: ExploreQuery) {
-    let currentDefinition = this.constraintMappingService.mapConstraint(query.constraint, query.queryTimingSameInstanceNum);
+    let currentSelectionDefinition = this.constraintMappingService.mapConstraint(query.constraint, query.queryTimingSameInstanceNum);
+    let currentSequentialDefinition = this.constraintMappingService.mapConstraint(query.sequentialConstraint, query.queryTimingSameInstanceNum)
     let currentTiming = query.queryTimingSameInstanceNum ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any;
+    let currentTimingSequence = query.sequentialConstraint.temporalSequence;
 
     return this.exploreQueryAllNodes(
       query.uniqueId,
       this.cryptoService.ephemeralPublicKey,
-      currentDefinition,
+      currentSelectionDefinition,
+      currentSequentialDefinition,
       currentTiming,
+      currentTimingSequence,
     ).pipe(tap(() => {
-      this._lastDefinition = currentDefinition
+      this._lastSelectionDefinition = currentSelectionDefinition
+      this._lastSequentialDefinition = currentSelectionDefinition
       this._lastQueryTiming = currentTiming
+      this._lastTimingSequence = currentTimingSequence
     }));
   }
 
-  // preparePanelTimings reset all panel timing to false if the query-level is false,
-  // does nothing otherwise
-  private preparePanelTimings(panels: ApiI2b2Panel[], queryTiming: ApiI2b2Timing): void {
-    if (queryTiming === ApiI2b2Timing.any) {
-      panels.forEach(panel => {
-        panel.timing = ApiI2b2Timing.any
-      })
-    }
+  get lastSelectionDefinition(): ApiI2b2Panel[] {
+    return this._lastSelectionDefinition
   }
 
-  get lastDefinition(): ApiI2b2Panel[] {
-    return this._lastDefinition
+  get lastSequentialDefinition(): ApiI2b2Panel[] {
+    return this._lastSequentialDefinition
   }
 
   get lastQueryTiming(): ApiI2b2Timing {
     return this._lastQueryTiming
+  }
+
+  get lastTimingSequence(): ApiI2b2SequentialOperator[] {
+    return this._lastTimingSequence
   }
 
   get lastQueryId(): string {

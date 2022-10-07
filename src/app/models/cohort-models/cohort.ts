@@ -8,7 +8,7 @@
 import { CombinationConstraint } from '../constraint-models/combination-constraint'
 
 import { ApiQueryDefinition } from '../api-request-models/medco-node/api-query-definition'
-import {ErrorHelper} from '../../utilities/error-helper';
+import { SequentialConstraint } from '../constraint-models/sequential-constraint'
 
 export class Cohort {
   private _name: string
@@ -24,17 +24,24 @@ export class Cohort {
   public visible: boolean
 
 
-  private _rootConstraint: CombinationConstraint
+  private _rootSelectionConstraint: CombinationConstraint
+  private _rootSequentialConstraint: SequentialConstraint
 
   constructor(
-    name: string, rootConstraint: CombinationConstraint, createDate: Date[],
+    name: string,
+    rootSelectionConstraint: CombinationConstraint,
+    rootSequentialConstraint: SequentialConstraint,
+    createDate: Date[],
     updateDate: Date[]
   ) {
     this._name = name
 
-    if (rootConstraint !== null) {
+    if (rootSelectionConstraint !== null) {
+      this._rootSelectionConstraint = rootSelectionConstraint.clone()
+    }
 
-      this._rootConstraint = rootConstraint.clone()
+    if (rootSequentialConstraint !== null) {
+      this._rootSequentialConstraint = rootSequentialConstraint.clone()
     }
 
     if (createDate) {
@@ -57,15 +64,14 @@ export class Cohort {
     return new Array(...this._patient_set_id)
   }
 
-  get rootConstraint(): CombinationConstraint {
-    if (this._rootConstraint) {
+  get rootSelectionConstraint(): CombinationConstraint {
+    if (this._rootSelectionConstraint) {
       let cpy = new CombinationConstraint
-      cpy.parentConstraint = this._rootConstraint.parentConstraint
-      cpy.textRepresentation = this._rootConstraint.textRepresentation
+      cpy.parentConstraint = this._rootSelectionConstraint.parentConstraint
 
-      cpy.children = this._rootConstraint.children
-      cpy.combinationState = this._rootConstraint.combinationState
-      cpy.isRoot = this._rootConstraint.isRoot
+      cpy.children = this._rootSelectionConstraint.children
+      cpy.combinationState = this._rootSelectionConstraint.combinationState
+      cpy.isRoot = this._rootSelectionConstraint.isRoot
 
       return cpy
     } else {
@@ -73,20 +79,50 @@ export class Cohort {
     }
   }
 
-  set rootConstraint(constr: CombinationConstraint) {
+  set rootSelectionConstraint(constr: CombinationConstraint) {
     if (constr) {
       let cpy = new CombinationConstraint
       cpy.parentConstraint = constr.parentConstraint
-      cpy.textRepresentation = constr.textRepresentation
 
       cpy.children = constr.children
       cpy.combinationState = constr.combinationState
       cpy.isRoot = constr.isRoot
 
-      this._rootConstraint = cpy
+      this._rootSelectionConstraint = cpy
 
     } else {
-      this._rootConstraint = null
+      this._rootSelectionConstraint = null
+    }
+  }
+
+  get rootSequentialConstraint(): SequentialConstraint {
+    if (this._rootSequentialConstraint) {
+      let cpy = new SequentialConstraint
+      cpy.parentConstraint = this._rootSequentialConstraint.parentConstraint
+
+      cpy.children = this._rootSequentialConstraint.children
+
+      cpy.isRoot = this._rootSequentialConstraint.isRoot
+
+      return cpy
+    } else {
+      return null
+    }
+  }
+
+  set rootSequentialConstraint(constr: SequentialConstraint) {
+    if (constr) {
+      let cpy = new SequentialConstraint
+      cpy.parentConstraint = constr.parentConstraint
+
+      cpy.children = constr.children
+
+      cpy.isRoot = constr.isRoot
+
+      this._rootSequentialConstraint = cpy
+
+    } else {
+      this._rootSequentialConstraint = null
     }
   }
 
