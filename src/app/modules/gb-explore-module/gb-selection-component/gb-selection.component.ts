@@ -46,13 +46,13 @@ type LoadingState = 'loading' | 'complete';
 })
 export class GbSelectionComponent {
 
-  // to be accessed from the HTML template
-  QueryTemporalSetting = QueryTemporalSetting
-
   public static readonly timings: SelectItem[] = [
     { label: 'Treat groups independently', value: QueryTemporalSetting.independent },
     { label: 'Selected groups occur in the same instance', value: QueryTemporalSetting.sameinstance },
     { label: 'Selected groups occur in a temporal sequence', value: QueryTemporalSetting.sequential }]
+
+  // to be accessed from the HTML template
+  QueryTemporalSetting = QueryTemporalSetting
 
   @ViewChild('rootConstraintComponent', { static: true }) rootConstraintComponent: GbConstraintComponent;
 

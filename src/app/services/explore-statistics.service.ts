@@ -28,7 +28,7 @@ import {AppConfig} from '../config/app.config';
 import {ReferenceIntervalComputer} from './reference-intervals';
 import {isCipherFormat} from 'src/app/utilities/is-cipher-format';
 import {MessageHelper} from '../utilities/message-helper';
-import {QueryTemporalSetting} from "../models/query-models/query-temporal-setting";
+import {QueryTemporalSetting} from '../models/query-models/query-temporal-setting';
 
 export class ConfidenceInterval {
     constructor(public readonly lowerBound: number, public readonly middle: number, public readonly higherBound: number) {
@@ -149,7 +149,7 @@ export class ExploreStatisticsService {
     // The panels returned by the constraint service have a tendency to be out of date. Use this method to refresh them.
     private refreshConstraint(constraint: CombinationConstraint): Observable<CombinationConstraint> {
         const i2b2Panels: ApiI2b2Panel[] = this.constraintMappingService.mapConstraint(constraint,
-          this.queryService.queryTiming == QueryTemporalSetting.independent)
+          this.queryService.queryTiming === QueryTemporalSetting.independent)
 
         if (i2b2Panels.length === 0) {
             /* Return an empty constraint if the passed parameter is empty.
@@ -222,7 +222,7 @@ export class ExploreStatisticsService {
         const { modifiers } = this.extractConceptsAndModifiers(analytes);
 
         this._lastCohortDefinition = this.constraintMappingService.mapConstraint(cohortConstraint,
-          this.queryService.queryTiming == QueryTemporalSetting.independent)
+          this.queryService.queryTiming === QueryTemporalSetting.independent)
         this._lastQueryTiming = this.queryService.lastTiming
 
 

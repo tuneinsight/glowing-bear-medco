@@ -24,7 +24,7 @@ import {CombinationConstraint} from '../models/constraint-models/combination-con
 import {ApiI2b2Timing} from '../models/api-request-models/medco-node/api-i2b2-timing';
 import {QueryTemporalSetting} from '../models/query-models/query-temporal-setting';
 import {SequentialConstraint} from '../models/constraint-models/sequential-constraint';
-import {QueryService} from "./query.service";
+import {QueryService} from './query.service';
 
 export class SubGroup {
   name: string
@@ -178,8 +178,10 @@ export class SurvivalService {
           name: sg.name,
           constraint: {
             queryTiming: sg.timing,
-            selectionPanels: this.constraintMappingService.mapConstraint(sg.rootSelectionConstraint, this.queryService.queryTiming == QueryTemporalSetting.independent),
-            sequentialPanels: this.constraintMappingService.mapConstraint(sg.rootSequentialConstraint, this.queryService.queryTiming == QueryTemporalSetting.independent),
+            selectionPanels: this.constraintMappingService.mapConstraint(sg.rootSelectionConstraint,
+              this.queryService.queryTiming === QueryTemporalSetting.independent),
+            sequentialPanels: this.constraintMappingService.mapConstraint(sg.rootSequentialConstraint,
+              this.queryService.queryTiming === QueryTemporalSetting.independent),
             sequentialOperators: sg.rootSequentialConstraint.temporalSequence,
           }
         }

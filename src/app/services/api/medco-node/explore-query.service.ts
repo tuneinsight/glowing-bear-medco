@@ -25,7 +25,7 @@ import { KeycloakService } from 'keycloak-angular';
 import { ExploreQueryResult } from 'src/app/models/query-models/explore-query-result';
 import { isCipherFormat } from 'src/app/utilities/is-cipher-format';
 import { NavbarService } from '../../navbar.service';
-import { MessageHelper } from "../../../utilities/message-helper";
+import { MessageHelper } from '../../../utilities/message-helper';
 
 @Injectable()
 export class ExploreQueryService {
@@ -94,7 +94,8 @@ export class ExploreQueryService {
   // }
 
   public exploreQuerySingleNode(queryId: string, selectionPanels: ApiI2b2Panel[], sequentialPanels: ApiI2b2Panel[],
-                                queryTiming: ApiI2b2Timing, queryTimingSequence: ApiI2b2SequentialOperator[], publicKey: string): Observable<ExploreQueryResult> {
+                                queryTiming: ApiI2b2Timing, queryTimingSequence: ApiI2b2SequentialOperator[],
+                                publicKey: string): Observable<ExploreQueryResult> {
     const start = performance.now(); // to measure performance
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
     return this.apiEndpointService.postCall(
@@ -220,7 +221,8 @@ export class ExploreQueryService {
    * @param panels
    */
   private exploreQueryLocalNode(queryId: string, userPublicKey: string,
-    selectionPanels: ApiI2b2Panel[], sequentialPanels: ApiI2b2Panel[], queryTiming: ApiI2b2Timing, queryTimingSequence: ApiI2b2SequentialOperator[]) {
+                                selectionPanels: ApiI2b2Panel[], sequentialPanels: ApiI2b2Panel[],
+                                queryTiming: ApiI2b2Timing, queryTimingSequence: ApiI2b2SequentialOperator[]) {
 
     return this.exploreQuerySingleNode(queryId, selectionPanels, sequentialPanels, queryTiming, queryTimingSequence,  userPublicKey)
       .pipe(timeout(ExploreQueryService.QUERY_TIMEOUT_MS));
@@ -251,7 +253,8 @@ export class ExploreQueryService {
    */
   exploreLocalQuery(query: ExploreQuery) {
     let currentSelectionDefinition = this.constraintMappingService.mapConstraint(query.constraint, query.queryTimingSameInstanceNum);
-    let currentSequentialDefinition = this.constraintMappingService.mapConstraint(query.sequentialConstraint, query.queryTimingSameInstanceNum)
+    let currentSequentialDefinition = this.constraintMappingService.mapConstraint(query.sequentialConstraint,
+      query.queryTimingSameInstanceNum)
     let currentTiming = query.queryTimingSameInstanceNum ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any;
     let currentTimingSequence = query.sequentialConstraint.temporalSequence
 
@@ -276,7 +279,8 @@ export class ExploreQueryService {
    */
   exploreQuery(query: ExploreQuery) {
     let currentSelectionDefinition = this.constraintMappingService.mapConstraint(query.constraint, query.queryTimingSameInstanceNum);
-    let currentSequentialDefinition = this.constraintMappingService.mapConstraint(query.sequentialConstraint, query.queryTimingSameInstanceNum)
+    let currentSequentialDefinition = this.constraintMappingService.mapConstraint(query.sequentialConstraint,
+      query.queryTimingSameInstanceNum)
     let currentTiming = query.queryTimingSameInstanceNum ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any;
     let currentTimingSequence = query.sequentialConstraint.temporalSequence;
 

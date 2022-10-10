@@ -8,7 +8,7 @@
 
 import { ApiI2b2Panel } from './api-i2b2-panel';
 import { ApiI2b2Timing } from './api-i2b2-timing';
-import {ApiI2b2SequentialOperator} from "./api-sequence-of-events/api-i2b2-sequential-operator";
+import {ApiI2b2SequentialOperator} from './api-sequence-of-events/api-i2b2-sequential-operator';
 
 export class ApiQueryDefinition {
   selectionPanels: ApiI2b2Panel[];

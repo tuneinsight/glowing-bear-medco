@@ -42,7 +42,7 @@ export class GbSequentialConstraintComponent extends GbCompositeConstraintCompon
   }
 
 
-  temporalStringRepresentation(operator: ApiI2b2SequentialOperator): string {
+  temporalStringRepresentation(operator: ApiI2b2When): string {
     switch (operator) {
       case ApiI2b2When.lessequal:
         return 'before or same time as'

@@ -5,9 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import { ApiI2b2Panel } from '../medco-node/api-i2b2-panel'
-import { ApiI2b2Timing } from '../medco-node/api-i2b2-timing'
-import {ApiQueryDefinition} from "../medco-node/api-query-definition";
+import {ApiQueryDefinition} from '../medco-node/api-query-definition';
 
 export class ApiSurvivalAnalysis {
   id: string
