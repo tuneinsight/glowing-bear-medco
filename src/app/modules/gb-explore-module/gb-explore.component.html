@@ -55,17 +55,17 @@
         </span>
       </div>
   </div>
+  <div *ngIf="isBiorefMode" #analytesDropzones class="input-label-wrapper analytes-explore-container">
+    <div title="Variable to analyze" class="title-label">
+      Analytes:
+    </div>
+    <gb-analytes-dropzones></gb-analytes-dropzones>
+  </div>
   <div style="margin-top: 1em;">
     <div *ngIf="isBiorefMode" class="title-label">
       Cohort definition:
     </div>
     <gb-selection [operationType]="OperationType.EXPLORE"></gb-selection>
-  </div>
-  <div *ngIf="isBiorefMode" #analytesDropzones class="input-label-wrapper small-font analytes-explore-container">
-    <div title="Variable to analyze" class="title-label">
-        Analytes:
-    </div>
-    <gb-analytes-dropzones></gb-analytes-dropzones>
   </div>
 
 

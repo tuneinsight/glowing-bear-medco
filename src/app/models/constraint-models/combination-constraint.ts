@@ -41,7 +41,7 @@ export class CombinationConstraint extends CompositeConstraint {
 
   clone(): CombinationConstraint {
     let res = new CombinationConstraint();
-    res._textRepresentation = this.textRepresentation;
+    res.textRepresentation = this.textRepresentation;
     res.parentConstraint = (this.parentConstraint) ? this.parentConstraint : null;
     res.isRoot = this.isRoot;
     res.excluded = this.excluded

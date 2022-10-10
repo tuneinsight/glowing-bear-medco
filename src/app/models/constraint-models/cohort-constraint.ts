@@ -18,18 +18,18 @@ export class CohortConstraint extends Constraint {
   static NewCohortConstraintFromCohort(cohort: Cohort): CohortConstraint {
     const cohortConstraint = new CohortConstraint();
     cohortConstraint.cohort = cohort;
-    cohortConstraint._textRepresentation = cohortConstraint.cohort.name;
+    cohortConstraint.textRepresentation = cohortConstraint.cohort.name;
     return cohortConstraint
   }
 
   constructor() {
     super();
-    this._textRepresentation = 'Cohort';
+    this.textRepresentation = 'Cohort';
   }
 
   clone(): CohortConstraint {
     let res = new CohortConstraint();
-    res._textRepresentation = this.textRepresentation;
+    res.textRepresentation = this.textRepresentation;
     res.parentConstraint = this.parentConstraint;
 
     return res;
@@ -45,6 +45,6 @@ export class CohortConstraint extends Constraint {
 
   set cohort(cohort: Cohort) {
     this._cohort = cohort;
-    this._textRepresentation = cohort ? `Cohort: ${cohort.name}` : FormatHelper.nullValuePlaceholder;
+    this.textRepresentation = cohort ? `Cohort: ${cohort.name}` : FormatHelper.nullValuePlaceholder;
   }
 }
