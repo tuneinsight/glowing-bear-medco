@@ -17,6 +17,7 @@ import { AppConfig } from '../../../../config/app.config';
 import { GenomicAnnotationsService } from '../../../../services/api/genomic-annotations.service';
 import { QueryTemporalSetting } from 'src/app/models/query-models/query-temporal-setting';
 import { CompositeConstraint } from 'src/app/models/constraint-models/composite-constraint';
+import {ErrorHelper} from "../../../../utilities/error-helper";
 
 @Component({
   selector: 'gb-constraint',
@@ -26,10 +27,9 @@ import { CompositeConstraint } from 'src/app/models/constraint-models/composite-
 export class GbConstraintComponent implements OnInit {
   @Input() constraint: Constraint;
   @Input() isRoot: boolean;
+  @Input() areCohortConstraintsAllowed: boolean;
   @Output() constraintRemoved: EventEmitter<any> = new EventEmitter();
   droppedConstraint: Constraint = null;
-  // i2b2 panel timing policy
-  _panelTimingSameInstance: boolean
 
   constructor(protected treeNodeService: TreeNodeService,
     protected cohortService: CohortService,
@@ -38,6 +38,7 @@ export class GbConstraintComponent implements OnInit {
     protected genomicAnnotationsService: GenomicAnnotationsService,
     protected element: ElementRef,
     protected config: AppConfig) {
+    this.areCohortConstraintsAllowed = true;
   }
 
   ngOnInit() {
@@ -84,15 +85,18 @@ export class GbConstraintComponent implements OnInit {
 
   onDrop(event: DragEvent) {
     event.preventDefault();
+
+    if (event.dataTransfer.getData("text") === "cohort" && !this.areCohortConstraintsAllowed) {
+      ErrorHelper.handleNewError('You cannot use a cohort as a constraint here')
+      event.stopPropagation()
+      return null
+    }
+
     this.element.nativeElement.firstChild.classList.remove('dropzone');
   }
 
   update() {
     this.queryService.isDirty = true;
-  }
-
-  changeInclusion() {
-    this.constraint.excluded = !this.constraint.excluded
   }
 
   get containerClass(): string {

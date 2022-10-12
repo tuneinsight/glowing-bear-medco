@@ -95,16 +95,6 @@ export class GbSelectionComponent {
     return this.queryService.queryTiming
   }
 
-  get globalCount(): Observable<string> {
-    return this.queryService.queryResults.pipe(map((queryResults) =>
-      queryResults ? FormatHelper.formatCountNumber(queryResults.globalCount) : '0'
-    ));
-  }
-
-  get loadingState(): LoadingState {
-    return this.queryService.isUpdating ? 'loading' : 'complete';
-  }
-
   get rootSelectionConstraint(): CombinationConstraint {
     return this.constraintService.rootSelectionConstraint
   }

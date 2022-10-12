@@ -204,10 +204,6 @@ export class CohortService {
     return this._queryTemporalSequence.asObservable()
   }
 
-  get panelTimings(): Observable<ApiI2b2Timing[]> {
-    return this._panelTimings.asObservable()
-  }
-
   get patternValidation(): RegExp {
     return this._patternValidation
   }
