@@ -81,7 +81,7 @@ export class GbExploreComponent implements AfterViewChecked {
     }, false);
 
     if (isOneNodeDown) {
-      ErrorHelper.handleError('One node became unavailable while preparing the request', new Error());
+      ErrorHelper.handleError('Not all nodes are up or reachable', new Error());
       this.queryService.isUpdating = false;
       return;
     }
@@ -143,7 +143,7 @@ export class GbExploreComponent implements AfterViewChecked {
   get hasDefinitions(): boolean {
     let hasSelectionConstraint = this.constraintService.hasSelectionConstraint().valueOf()
     let hasSequentialConstraint = this.constraintService.hasSequentialConstraint().valueOf()
-    return hasSelectionConstraint && (this.queryService.queryTiming === QueryTemporalSetting.sequential ? hasSequentialConstraint : true)
+    return (this.queryService.queryTiming !== QueryTemporalSetting.sequential && hasSelectionConstraint) || (this.queryService.queryTiming === QueryTemporalSetting.sequential && hasSequentialConstraint)
   }
 
   get hasAnalytes(): boolean {

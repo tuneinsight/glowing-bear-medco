@@ -114,6 +114,9 @@ export class ConstraintService {
   }
 
   public hasSequentialConstraint(): Boolean {
+    if (this.rootSequentialConstraint.children.length < 2) {
+      return false;
+    }
     return ConstraintHelper.hasNonEmptyChildren(this.rootSequentialConstraint);
   }
 
