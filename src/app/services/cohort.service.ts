@@ -57,25 +57,24 @@ export class CohortService {
   _patternValidation: RegExp
 
 
-  private static apiCohortsToCohort(apiCohorts: ApiCohortResponse[]): Cohort[] {
+  private static apiCohortsToCohort(apiCohorts: ApiCohortResponse): Cohort[] {
 
-    const cohortNumber = apiCohorts.length;
+    const cohortNumber = apiCohorts.results.cohorts.length;
 
     let cohortName: string;
 
     let res = new Array<Cohort>()
     for (let i = 0; i < cohortNumber; i++) {
       let cohort = new Cohort(
-        cohortName = apiCohorts[i].name,
+        cohortName = apiCohorts.results.cohorts[i].name,
         null,
         null,
-        [new Date(apiCohorts[i].CreationDate)],
-        [new Date(apiCohorts[i].CreationDate)]
+        new Date(apiCohorts.results.cohorts[i].CreationDate),
+        new Date(apiCohorts.results.cohorts[i].CreationDate)
       );
 
-      cohort.patient_set_id = [1]; // apiCohorts.map(apiCohort => apiCohort.exploreQuery.id)
-      cohort.queryDefinition = apiCohorts.map(apiCohort => apiCohort.exploreQuery.definition);
-      cohort.exploreQueryId = apiCohorts[i].exploreQuery.id;
+      cohort.queryDefinition = apiCohorts.results.cohorts[i].exploreQuery.definition;
+      cohort.exploreQueryId = apiCohorts.results.cohorts[i].exploreQuery.id;
       res.push(cohort);
 
     }
@@ -213,35 +212,37 @@ export class CohortService {
     this.exploreCohortsService.getCohortAllNodes().pipe(
       // else the clone() is undefined
       map(apiCohortResponse => {
-      if (apiCohortResponse.exploreQuery.definition !== null) {
-        let seq = apiCohortResponse.exploreQuery.definition.sequentialOperators
-        if (seq !== null) {
-          let seqWithObject = seq.map((seqElm) => {
-            // the received seqElm is not a complete object, because it does not have methods
-            let ret = new ApiI2b2SequentialOperator()
-            ret.when = seqElm.when
-            ret.whichDateFirst = seqElm.whichDateFirst
-            ret.whichDateSecond = seqElm.whichDateSecond
-            ret.whichObservationFirst = seqElm.whichObservationFirst
-            ret.whichObservationSecond = seqElm.whichObservationSecond
-            ret.spans = ((seqElm.spans) && (seqElm.spans.length > 0)) ?
-              seqElm.spans.map(span => {
-                let retSpan = new ApiI2b2TimingSequenceSpan()
-                retSpan.operator = span.operator
-                retSpan.units = span.units
-                retSpan.value = span.value
-                return retSpan
-              }) : null
-            return ret
-          })
-          apiCohortResponse.exploreQuery.definition.sequentialOperators = seqWithObject
+      if (apiCohortResponse.results.cohorts !== null) {
+        for( let i = 0; i < apiCohortResponse.results.cohorts.length; i++){
+          let seq = apiCohortResponse.results.cohorts[i].exploreQuery.definition.sequentialOperators
+          if (seq !== null) {
+            let seqWithObject = seq.map((seqElm) => {
+              // the received seqElm is not a complete object, because it does not have methods
+              let ret = new ApiI2b2SequentialOperator()
+              ret.when = seqElm.when
+              ret.whichDateFirst = seqElm.whichDateFirst
+              ret.whichDateSecond = seqElm.whichDateSecond
+              ret.whichObservationFirst = seqElm.whichObservationFirst
+              ret.whichObservationSecond = seqElm.whichObservationSecond
+              ret.spans = ((seqElm.spans) && (seqElm.spans.length > 0)) ?
+                seqElm.spans.map(span => {
+                  let retSpan = new ApiI2b2TimingSequenceSpan()
+                  retSpan.operator = span.operator
+                  retSpan.units = span.units
+                  retSpan.value = span.value
+                  return retSpan
+                }) : null
+              return ret
+            })
+            apiCohortResponse.results.cohorts[i].exploreQuery.definition.sequentialOperators = seqWithObject
+          }
         }
       }
       return apiCohortResponse
     })).subscribe({
       next: (apiCohorts => {
         try {
-          this.updateCohorts(CohortService.apiCohortsToCohort(apiCohorts.results.cohorts))
+          this.updateCohorts(CohortService.apiCohortsToCohort(apiCohorts))
         } catch (err) {
           MessageHelper.alert('error', 'An error occurred with received saved cohorts', (err as Error).message)
         }
@@ -260,19 +261,10 @@ export class CohortService {
   }
 
   postCohort(cohort: Cohort) {
-    let apiCohorts = new Array<ApiCohort>()
     this._isRefreshing = true
     let cohortName = cohort.name
-    this.medcoNetworkService.nodes.forEach((_, index) => {
-      let apiCohort = new ApiCohort()
-      apiCohort.queryID = cohort.patient_set_id[index]
 
-      apiCohort.creationDate = cohort.updateDate[index].toISOString()
-      apiCohort.updateDate = cohort.updateDate[index].toISOString()
-      apiCohorts.push(apiCohort)
-    })
-
-    this.exploreCohortsService.postCohortAllNodes(cohortName, apiCohorts, this.exploreQueryService.lastQueryId).subscribe(message => {
+    this.exploreCohortsService.postCohortAllNodes(cohortName, this.exploreQueryService.lastQueryId).subscribe(message => {
       cohort.exploreQueryId = this.exploreQueryService.lastQueryId;
       this.updateCohorts([cohort]);
       this._isRefreshing = false
@@ -287,12 +279,12 @@ export class CohortService {
   updateCohorts(cohorts: Cohort[]) {
     let tmp = new Map<string, Date>()
     this._cohorts.forEach(cohort => {
-      tmp.set(cohort.name, cohort.lastUpdateDate())
+      tmp.set(cohort.name, cohort.updateDate)
     })
     cohorts.forEach(newCohort => {
       if (tmp.has(newCohort.name)) {
         const localDate = tmp.get(newCohort.name)
-        const remoteDate = newCohort.lastUpdateDate()
+        const remoteDate = newCohort.updateDate
         if (remoteDate >= localDate) {
           let i = this._cohorts.findIndex(c => c.name === newCohort.name)
           this._cohorts[i] = newCohort
@@ -302,7 +294,7 @@ export class CohortService {
         }
       } else {
         this._cohorts.push(newCohort)
-        tmp.set(newCohort.name, newCohort.lastUpdateDate())
+        tmp.set(newCohort.name, newCohort.updateDate)
       }
     })
 
@@ -329,27 +321,33 @@ export class CohortService {
   }
 
   // from cached to view
-  restoreTerms(cohors: Cohort): void {
+  restoreTerms(cohort: Cohort): void {
 
-    let cohortDefinition = cohors.mostRecentQueryDefinition()
+    let cohortDefinition = cohort.queryDefinition
     if (!cohortDefinition) {
-      MessageHelper.alert('warn', `Definition not found for cohort ${cohors.name}`)
+      MessageHelper.alert('warn', `Definition not found for cohort ${cohort.name}`)
       return
     }
 
     this._queryTiming.next(cohortDefinition.queryTiming)
-    this.constraintReverseMappingService.mapPanels(cohortDefinition.selectionPanels)
-      .subscribe(constraint => {
-        constraint = CohortService.unflattenConstraints(constraint)
-        if (constraint) {
-          if (constraint instanceof ConceptConstraint) {
-            this.constraintService.rootSelectionConstraint.addChild(constraint)
-          } else {
-            this.constraintService.rootSelectionConstraint = (constraint as CombinationConstraint);
-            this.constraintService.rootSelectionConstraint.isRoot = true
+    if ((cohortDefinition.selectionPanels !== undefined) &&
+      (cohortDefinition.selectionPanels !== null) &&
+      (cohortDefinition.selectionPanels.length !== 0)) {
+      this.constraintReverseMappingService.mapPanels(cohortDefinition.selectionPanels)
+        .subscribe(constraint => {
+          constraint = CohortService.unflattenConstraints(constraint)
+          if (constraint) {
+            if (constraint instanceof ConceptConstraint) {
+              this.constraintService.rootSelectionConstraint.addChild(constraint)
+            } else {
+              this.constraintService.rootSelectionConstraint = (constraint as CombinationConstraint);
+              this.constraintService.rootSelectionConstraint.isRoot = true
+            }
           }
-        }
-      })
+        })
+    }else{
+      this.constraintService.rootSelectionConstraint = new CombinationConstraint()
+    }
     if ((cohortDefinition.sequentialPanels !== undefined) &&
       (cohortDefinition.sequentialPanels !== null) &&
       (cohortDefinition.sequentialPanels.length !== 0)) {
@@ -372,6 +370,7 @@ export class CohortService {
           `for ${cohortDefinition.sequentialOperators.length} sequential events, there should be ${cohortDefinition.sequentialOperators.length - 1}`)
       }
     } else {
+      this.constraintService.rootSequentialConstraint = new SequentialConstraint()
       this._queryTemporalSequence.next(null)
     }
     this.restoring.next(true)
@@ -394,33 +393,23 @@ export class CohortService {
       throw ErrorHelper.handleNewUserInputError(`Name ${this.cohortName} already used.`);
     }
 
-    let creationDates = new Array<Date>()
-    let updateDates = new Array<Date>()
-    let queryDefinitions = new Array<ApiQueryDefinition>()
     const nunc = Date.now()
-    for (let i = 0; i < this.medcoNetworkService.nodes.length; i++) {
-      creationDates.push(new Date(nunc))
-      updateDates.push(new Date(nunc))
-      let definition = new ApiQueryDefinition()
-      definition.selectionPanels = this.queryService.lastSelectionDefinition
-      definition.sequentialPanels = this.queryService.lastSequenceDefinition
-      definition.queryTiming = queryTiming
-      definition.queryTiming = this.queryService.lastTiming
-      definition.sequentialOperators = this.queryService.lastTimingSequence
-      queryDefinitions.push(definition)
-    }
+    let definition = new ApiQueryDefinition()
+    definition.selectionPanels = this.queryService.lastSelectionDefinition
+    definition.sequentialPanels = this.queryService.lastSequenceDefinition
+    definition.queryTiming = queryTiming
+    definition.queryTiming = this.queryService.lastTiming
+    definition.sequentialOperators = this.queryService.lastTimingSequence
 
     let cohort = new Cohort(
       this.cohortName,
       this.constraintService.rootSelectionConstraint,
       this.constraintService.rootSequentialConstraint,
-      creationDates,
-      updateDates,
+      new Date(nunc),
+      new Date(nunc),
     )
-    if (queryDefinitions.some(apiDef => (apiDef.selectionPanels) || (apiDef.queryTiming))) {
-      cohort.queryDefinition = queryDefinitions
-    }
-    cohort.patient_set_id = this.lastSuccessfulSet
+    cohort.queryDefinition = definition
+
     this.postCohort(cohort);
     MessageHelper.alert('success', 'Cohort successfully saved.');
 

@@ -98,7 +98,7 @@ export class ConstraintReverseMappingService {
   }
 
   private mapItem(item: ApiI2b2Item): Observable<ConceptConstraint> {
-    let modificated: Observable<TreeNode>
+    let modified: Observable<TreeNode>
     let resTreeNode: Observable<TreeNode>
 
     let conceptURI = item.modifier ? modifiedConceptPath(item.queryTerm, item.modifier.key) : item.queryTerm
@@ -111,7 +111,7 @@ export class ConstraintReverseMappingService {
       return of(existingConstraint as ConceptConstraint)
     }
     // else, get details
-    let obs = (item.modifier) ?
+    let obs = (item.modifier) && (item.modifier.key != '') ?
       this.exploreSearchService.exploreSearchModifierInfo(item.modifier.key, item.modifier.appliedPath, item.queryTerm) :
       this.exploreSearchService.exploreSearchConceptInfo(item.queryTerm)
 
@@ -134,9 +134,9 @@ export class ConstraintReverseMappingService {
       modificandum.value = item.value
       modificandum.type = item.type
       modificandum.queryTerm = item.queryTerm
-      modificated = this.mapItem(modificandum).pipe(map(({ treeNode }) => treeNode))
+      modified = this.mapItem(modificandum).pipe(map(({ treeNode }) => treeNode))
 
-      resTreeNode = forkJoin([treeNodeObs, modificated]).pipe(map(([modifierNode, modificatedNode]) => {
+      resTreeNode = forkJoin([treeNodeObs, modified]).pipe(map(([modifierNode, modificatedNode]) => {
         modifierNode.appliedConcept = modificatedNode.clone()
         return modifierNode
       }))

@@ -12,13 +12,12 @@ import { SequentialConstraint } from '../constraint-models/sequential-constraint
 
 export class Cohort {
   private _name: string
-  private _patient_set_id: Array<number>
-  private _queryDefinitions: Array<ApiQueryDefinition>
+  private _exploreQueryId: string;
+  private _queryDefinition: ApiQueryDefinition
 
   public selected: boolean
-  private _creationDate: Date[]
-  private _updateDate: Date[]
-  private _exploreQueryId: string;
+  private _creationDate: Date
+  private _updateDate: Date
 
   public bookmarked: boolean
   public visible: boolean
@@ -31,8 +30,8 @@ export class Cohort {
     name: string,
     rootSelectionConstraint: CombinationConstraint,
     rootSequentialConstraint: SequentialConstraint,
-    createDate: Date[],
-    updateDate: Date[]
+    createDate: Date,
+    updateDate: Date
   ) {
     this._name = name
 
@@ -58,10 +57,6 @@ export class Cohort {
 
   get name(): string {
     return this._name
-  }
-
-  get patient_set_id(): Array<number> {
-    return new Array(...this._patient_set_id)
   }
 
   get rootSelectionConstraint(): CombinationConstraint {
@@ -130,24 +125,19 @@ export class Cohort {
     this._name = n
   }
 
-  set patient_set_id(psid: Array<number>) {
-    this._patient_set_id = new Array(...psid)
-
+  set queryDefinition(qd: ApiQueryDefinition) {
+    this._queryDefinition = qd
   }
 
-  set queryDefinition(qd: Array<ApiQueryDefinition>) {
-    this._queryDefinitions = qd
+  get queryDefinition(): ApiQueryDefinition {
+    return this._queryDefinition
   }
 
-  get queryDefinition(): Array<ApiQueryDefinition> {
-    return this._queryDefinitions
-  }
-
-  get creationDate(): Date[] {
+  get creationDate(): Date {
     return this._creationDate
   }
 
-  get updateDate(): Date[] {
+  get updateDate(): Date {
     return this._updateDate
   }
 
@@ -159,48 +149,12 @@ export class Cohort {
     this._exploreQueryId = value;
   }
 
-  /**
-   * hasAllQueryDefinitions checks whether all nodes have returned a query definition
-   */
-  hasAllQueryDefinitions(): boolean {
-    if (this.queryDefinition.length === 0) {
-      return false
-    }
-    for (const definition of this.queryDefinition) {
-      if ((definition === null) || (definition === undefined)) {
-        return false
-      }
-    }
-    return true
-
-  }
-
-  /**
-   * sameQueryDefinitions check if query definitions, grouped by update dates, have the same date.
-   * If dates don't match within a group, false is returned.
-   */
-  sameQueryDefinitions(): boolean {
-    let map = new Map<Date, ApiQueryDefinition>()
-
-    for (let i = 0; i < this.updateDate.length; i++) {
-      let date = this.updateDate[i]
-      let queryDefinition = this.queryDefinition[i]
-      if (map.has(date)) {
-        let lastDefinition = map.get(date)
-        if (lastDefinition !== queryDefinition) {
-          return false
-        }
-      } else {
-        map.set(date, queryDefinition)
-      }
-    }
-    return true
-  }
 
 
   /**
    * mostRecentQueryDefinitions returns the definition with the most recent
    */
+  /*
   mostRecentQueryDefinition(): ApiQueryDefinition {
     let sortedDef = this.queryDefinition
       .filter(definition => ((definition !== null) || (definition !== undefined)))
@@ -212,20 +166,20 @@ export class Cohort {
     } else {
       return null
     }
-  }
+  }*/
 
   /**
    * lastUpdateDate returns the most recent update date
    */
-  lastUpdateDate(): Date {
+  /*lastUpdateDate(): Date {
     return this._updateDate.reduce((date1, date2) => (date1 > date2) ? date1 : date2)
-  }
+  }*/
 
   /**
    * lastCreationDate returns the most recent creation date
    */
-  lastCreationDate(): Date {
+  /*lastCreationDate(): Date {
     return this._creationDate.reduce((date1, date2) => (date1 > date2) ? date1 : date2)
-  }
+  }*/
 
 }
