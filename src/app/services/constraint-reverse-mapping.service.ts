@@ -111,7 +111,7 @@ export class ConstraintReverseMappingService {
       return of(existingConstraint as ConceptConstraint)
     }
     // else, get details
-    let obs = (item.modifier) && (item.modifier.key != '') ?
+    let obs = (item.modifier) && (item.modifier.key !== '') ?
       this.exploreSearchService.exploreSearchModifierInfo(item.modifier.key, item.modifier.appliedPath, item.queryTerm) :
       this.exploreSearchService.exploreSearchConceptInfo(item.queryTerm)
 

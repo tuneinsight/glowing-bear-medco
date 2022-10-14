@@ -11,13 +11,12 @@ import { Constraint } from '../../../../models/constraint-models/constraint';
 import { TreeNodeService } from '../../../../services/tree-node.service';
 import { CohortService } from '../../../../services/cohort.service';
 import { ConstraintService } from '../../../../services/constraint.service';
-import { CombinationConstraint } from '../../../../models/constraint-models/combination-constraint';
 import { QueryService } from '../../../../services/query.service';
 import { AppConfig } from '../../../../config/app.config';
 import { GenomicAnnotationsService } from '../../../../services/api/genomic-annotations.service';
 import { QueryTemporalSetting } from 'src/app/models/query-models/query-temporal-setting';
 import { CompositeConstraint } from 'src/app/models/constraint-models/composite-constraint';
-import {ErrorHelper} from "../../../../utilities/error-helper";
+import {ErrorHelper} from '../../../../utilities/error-helper';
 
 @Component({
   selector: 'gb-constraint',
@@ -86,7 +85,7 @@ export class GbConstraintComponent implements OnInit {
   onDrop(event: DragEvent) {
     event.preventDefault();
 
-    if (event.dataTransfer.getData("text") === "cohort" && !this.areCohortConstraintsAllowed) {
+    if (event.dataTransfer.getData('text') === 'cohort' && !this.areCohortConstraintsAllowed) {
       ErrorHelper.handleNewError('You cannot use a cohort as a constraint here')
       event.stopPropagation()
       return null

@@ -213,7 +213,7 @@ export class CohortService {
       // else the clone() is undefined
       map(apiCohortResponse => {
       if (apiCohortResponse.results.cohorts !== null) {
-        for( let i = 0; i < apiCohortResponse.results.cohorts.length; i++){
+        for ( let i = 0; i < apiCohortResponse.results.cohorts.length; i++) {
           let seq = apiCohortResponse.results.cohorts[i].exploreQuery.definition.sequentialOperators
           if (seq !== null) {
             let seqWithObject = seq.map((seqElm) => {
@@ -345,7 +345,7 @@ export class CohortService {
             }
           }
         })
-    }else{
+    } else {
       this.constraintService.rootSelectionConstraint = new CombinationConstraint()
     }
     if ((cohortDefinition.sequentialPanels !== undefined) &&
