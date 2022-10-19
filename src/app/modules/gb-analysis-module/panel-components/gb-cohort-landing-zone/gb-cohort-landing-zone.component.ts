@@ -17,7 +17,7 @@ import { QueryService } from '../../../../services/query.service';
 import { ErrorHelper } from '../../../../utilities/error-helper';
 import { QueryTemporalSetting } from 'src/app/models/query-models/query-temporal-setting';
 
-const nameMaxLength = 10
+const nameMaxLength = 20
 
 @Component({
   selector: 'gb-cohort-landing-zone',
