@@ -36,7 +36,7 @@ interface Project {
 export class GbSelectProjectComponent {
   private projectList: Project[] = [];
   private _selectedProjectIndex = -1;
-  //private _setIntervalTimeout = null;
+  // private _setIntervalTimeout = null;
 
   constructor(
     private config: AppConfig,
@@ -90,13 +90,13 @@ export class GbSelectProjectComponent {
     this.navbarService.init();
     this.navbarService.navigateToExploreTab();
 
-    //if (this._setIntervalTimeout) {
-    //  clearInterval(this._setIntervalTimeout);
-    //}
+    // if (this._setIntervalTimeout) {
+    //   clearInterval(this._setIntervalTimeout);
+    // }
     this.medcoNetworkService.getNetworkStatus();
-    //this._setIntervalTimeout = setInterval(() => {
-    //  this.medcoNetworkService.getNetworkStatus();
-    //}, 1000 * 60);
+    // this._setIntervalTimeout = setInterval(() => {
+    //   this.medcoNetworkService.getNetworkStatus();
+    // }, 1000 * 60);
   }
 
   public getProjectList() {

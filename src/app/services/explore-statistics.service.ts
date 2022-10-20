@@ -257,6 +257,7 @@ export class ExploreStatisticsService {
                 ErrorHelper.handleNewError(err.error.message)
             }
             this.displayLoadingIcon.next(false);
+            this.queryService.isUpdating = false;
         });
     }
 
