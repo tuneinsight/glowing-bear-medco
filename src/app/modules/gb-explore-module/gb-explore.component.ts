@@ -147,6 +147,18 @@ export class GbExploreComponent implements AfterViewChecked {
       (this.queryService.queryTiming === QueryTemporalSetting.sequential && hasSequentialConstraint)
   }
 
+  get runDisabledReason(): string {
+    let hasSelectionConstraint = this.constraintService.hasSelectionConstraint().valueOf()
+    if (!hasSelectionConstraint)  {
+      return 'No selection criteria defined'
+    }
+    let hasSequentialConstraint = this.constraintService.hasSequentialConstraint().valueOf()
+    if (!hasSequentialConstraint) {
+      return 'Missing sequential constraints'
+    }
+    return ''
+  }
+
   get hasAnalytes(): boolean {
     return this.exploreStatisticsService.hasAnalytes
   }

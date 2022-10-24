@@ -33,13 +33,15 @@
             <!-- disabled button during query -->
             <button *ngIf="!isUpdating && ((isBiorefMode && hasAnalytes) || hasDefinitions); else disabledButton" type="button" (click)="execQuery($event)"
               class="btn btn-outline-primary btn-sm gb-data-selection-update-btn
-              {{isDirty? 'gb-explore-query-btn-dirty' : ''}}">
+              {{isDirty? 'gb-explore-query-btn-dirty' : ''}}" >
               Run
             </button>
             <ng-template #disabledButton>
-              <button type="button" disabled class="btn btn-outline-primary btn-sm gb-data-selection-update-btn">
-                Run
-              </button>
+              <span pTooltip="{{ runDisabledReason }}" >
+                <button type="button" disabled class="btn btn-outline-primary btn-sm gb-data-selection-update-btn">
+                  Run
+                </button>
+              </span>
             </ng-template>
 
             <i *ngIf="isUpdating" class="fa fa-circle-o-notch fa-spin"
