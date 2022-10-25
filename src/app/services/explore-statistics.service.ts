@@ -271,17 +271,19 @@ export class ExploreStatisticsService {
         }
 
         const chartsInformations =
-            serverResponse.results.reduce((responseResult, result: ApiExploreStatisticResult) => {
+            serverResponse.results.reduce((responseResult, result: ApiExploreStatisticResult, index) => {
                 const intervals = result.intervals.reduce((intervalsResult, i) => {
                         return [ ...intervalsResult, new Interval(i.lowerBound, i.higherBound, i.count) ];
                     }, []
                 );
-
+                const start = performance.now()
+                console.log('computing chart and referece intervals for result ' + index)
                 const newChartInformation = new ChartInformation(
                     intervals,
                     result.unit,
                     result.analyteName,
                     cohortConstraint.textRepresentation);
+                console.log('chart for result ' + index + ' computed in ' + Math.round(performance.now() - start) + ' ms')
 
                 if (newChartInformation.numberOfObservations() > 0) {
                     return [
@@ -296,6 +298,7 @@ export class ExploreStatisticsService {
 
 
         if (chartsInformations.length) {
+           console.log('waiting for the intervals to be decrypted')
             // waiting for the intervals to be decrypted by the crypto service to emit the chart information to external listeners.
             this.chartsDataSubject.next(chartsInformations);
         }
@@ -303,6 +306,8 @@ export class ExploreStatisticsService {
     }
 
     private sendRequest(apiRequest: ApiExploreStatistics): Observable<ApiExploreStatisticsResponse[]> {
+        const start = performance.now();
+
         const publicKey = this.cryptoService.ephemeralPublicKey;
 
         return this.apiEndpointService.postCall(
@@ -318,10 +323,12 @@ export class ExploreStatisticsService {
           )
           .pipe(
               map((exploreStatsResponse) => {
+                console.log('received statistics query response after ' + Math.round(performance.now() - start) + ' ms')
                   const resultsArr = Object.values(exploreStatsResponse.results);
-
+                  const start_dec = performance.now();
                   const formattedResults = resultsArr.map((value: any, index) => {
                       if (value.type === 'ciphertable') {
+                        console.log('decrypting statistics query value ' + index)
                         const valueInUint8 = this.cryptoService.decodeBase64Url(value.value) as Uint8Array;
                         const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
                         if (isCipherFormat(decryptedValue)) {
@@ -343,6 +350,7 @@ export class ExploreStatisticsService {
                           timers: []
                         };
                   });
+                console.log('decryption took ' + Math.round(performance.now() - start_dec) + ' ms')
 
                   return [{
                       globalTimers: [],
