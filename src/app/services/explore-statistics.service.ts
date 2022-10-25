@@ -113,6 +113,9 @@ export class ExploreStatisticsService {
     // Emits whenever an export of the statistical results as a pdf document needs to be generated.
     exportPDF: Subject<any> = new Subject();
 
+    // ProcessingStep
+    @Output() ProcessingStep: Subject<string> = new ReplaySubject(1)
+
     // This observable emits the latest query's cohort inclusion criteria for the explore statistics query
     rootConstraint: Subject<CombinationConstraint> = new ReplaySubject(1)
     // This observable emits the latest explore statistics query set of analytes
@@ -234,6 +237,7 @@ export class ExploreStatisticsService {
         };
 
         this.displayLoadingIcon.next(true);
+        this.ProcessingStep.next("Querying the results...");
 
         const observableRequest = this.sendRequest(apiRequest);
 
@@ -241,6 +245,7 @@ export class ExploreStatisticsService {
         this.navbarService.navigateToExploreStatisticsTab();
 
         observableRequest.subscribe((answers: ApiExploreStatisticsResponse[]) => {
+            this.ProcessingStep.next("Results received. Processing results...");
             this.handleAnswer(answers, cohortConstraint);
             this.queryService.isUpdating = false;
         }, err => {
@@ -270,36 +275,41 @@ export class ExploreStatisticsService {
             throw ErrorHelper.handleNewError('Empty server response. Please verify you selected an analyte.');
         }
 
-        const chartsInformations =
-            serverResponse.results.reduce((responseResult, result: ApiExploreStatisticResult) => {
-                const intervals = result.intervals.reduce((intervalsResult, i) => {
+
+        this.ProcessingStep.next("Results received and decrypted. Bootstrapping for the reference interval...");
+        setTimeout(() => { // Allow the UI to update before starting the bootstrap
+
+            const chartsInformations =
+                serverResponse.results.reduce((responseResult, result: ApiExploreStatisticResult) => {
+                    const intervals = result.intervals.reduce((intervalsResult, i) => {
                         return [ ...intervalsResult, new Interval(i.lowerBound, i.higherBound, i.count) ];
-                    }, []
-                );
+                    }, []);
 
-                const newChartInformation = new ChartInformation(
-                    intervals,
-                    result.unit,
-                    result.analyteName,
-                    cohortConstraint.textRepresentation);
+                    const newChartInformation = new ChartInformation(
+                        intervals,
+                        result.unit,
+                        result.analyteName,
+                        cohortConstraint.textRepresentation);
 
-                if (newChartInformation.numberOfObservations() > 0) {
-                    return [
-                        ...responseResult,
-                        newChartInformation
-                    ];
-                } else {
-                    MessageHelper.alert('info', `0 observations for the ${result.analyteName} analyte.`);
-                    return responseResult;
-                }
-            }, []);
+                    if (newChartInformation.numberOfObservations() > 0) {
+                        return [
+                            ...responseResult,
+                            newChartInformation
+                        ];
+                    } else {
+                        MessageHelper.alert('info', `0 observations for the ${result.analyteName} analyte.`);
+                        return responseResult;
+                    }
+                }, []);
 
-
-        if (chartsInformations.length) {
-            // waiting for the intervals to be decrypted by the crypto service to emit the chart information to external listeners.
-            this.chartsDataSubject.next(chartsInformations);
-        }
-        this.displayLoadingIcon.next(false);
+            if (chartsInformations.length) {
+                // waiting for the intervals to be bootstrapped and emit the chart information to external listeners.
+                this.ProcessingStep.next("Done.");
+                this.chartsDataSubject.next(chartsInformations);
+            }
+            this.ProcessingStep.next("");
+            this.displayLoadingIcon.next(false);
+        }, 20);
     }
 
     private sendRequest(apiRequest: ApiExploreStatistics): Observable<ApiExploreStatisticsResponse[]> {
@@ -343,6 +353,8 @@ export class ExploreStatisticsService {
                           timers: []
                         };
                   });
+
+                  this.ProcessingStep.next("Results received and decrypted. Processing...");
 
                   return [{
                       globalTimers: [],
