@@ -32,9 +32,9 @@
 
 
    constructor() {
-     this.textRepresentation = '';
+     this._textRepresentation = '';
      this.parentConstraint = null;
-     this._panelTimingSameInstance = null;
+     this.panelTimingSameInstance = null;
      this.excluded = false;
    }
 
@@ -50,7 +50,6 @@
 
    set textRepresentation(value: string) {
      this._textRepresentation = value;
-
    }
 
 

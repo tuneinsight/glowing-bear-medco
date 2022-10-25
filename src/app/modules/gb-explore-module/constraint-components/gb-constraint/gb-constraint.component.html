@@ -1,8 +1,8 @@
 <div class="{{containerClass}}">
   <!-- Remove Button -->
-  
+
   <div class="pull-right">
-    
+
     <span class="switch-label" style="margin-right: 0.5rem;" *ngIf="depth==1">
       <ng-container *ngIf="constraint.excluded; else included">excluded</ng-container>
       <ng-template #included>included</ng-template>
@@ -22,10 +22,10 @@
     <br>
     <br>
   </ng-container>
-  
-  
-  <gb-combination-constraint *ngIf="constraint.className === 'CombinationConstraint' "
-                             [constraint]="constraint"></gb-combination-constraint>
+
+
+  <gb-composite-constraint *ngIf="constraint.className === 'CompositeConstraint' "
+                           [constraint]="constraint"></gb-composite-constraint>
   <gb-concept-constraint *ngIf="constraint.className === 'ConceptConstraint' "
                          [constraint]="constraint"></gb-concept-constraint>
   <gb-genomic-annotation-constraint *ngIf="constraint.className === 'GenomicAnnotationConstraint' "

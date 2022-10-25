@@ -28,8 +28,11 @@
             <p>
               <strong>{{subgroup.groupId}}</strong>
             </p>
-            <p *ngIf="subgroup.rootConstraint" class="indented">
-              <strong>Root constraint: </strong>{{subgroup.rootConstraint}}
+            <p *ngIf="subgroup.rootSelectionConstraint" class="indented">
+              <strong>Root selection constraint: </strong>{{subgroup.rootSelectionConstraint}}
+            </p>
+            <p *ngIf="subgroup.rootSequentialConstraint" class="indented">
+              <strong>Root sequential constraint: </strong>{{subgroup.rootSequentialConstraint}}
             </p>
             <br>
 

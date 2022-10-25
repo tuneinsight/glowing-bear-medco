@@ -9,15 +9,21 @@ import {ApiQueryDefinition} from '../../api-request-models/medco-node/api-query-
 
 
 export class ApiCohortResponse {
-  name: string;
-  CreationDate: string;
-  exploreQuery: {
-    creationDate: string;
-    definition: ApiQueryDefinition;
-    id: string;
-    outputDataObjectsSharedIDs: {
-      [k in string]: string;
-    }
-    status: string;
+  id: string
+  status: string
+  results: {
+    cohorts: {
+      name: string;
+      CreationDate: string;
+      exploreQuery: {
+        creationDate: string;
+        definition: ApiQueryDefinition;
+        id: string;
+        outputDataObjectsSharedIDs: {
+          [k in string]: string;
+        }
+        status: string;
+      };
+    }[]
   };
 }

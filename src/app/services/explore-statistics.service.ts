@@ -1,27 +1,34 @@
-import { v4 as uuidv4 } from 'uuid';
-import { Injectable, Output } from '@angular/core';
-import { Observable, of, ReplaySubject, Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { ApiI2b2Panel } from '../models/api-request-models/medco-node/api-i2b2-panel';
-import { ApiI2b2Timing } from '../models/api-request-models/medco-node/api-i2b2-timing';
-import { ApiExploreStatistics, ModifierApiObjet} from '../models/api-request-models/survival-analyis/api-explore-statistics';
-import { ApiExploreStatisticResult, ApiExploreStatisticsResponse } from '../models/api-response-models/explore-statistics/explore-statistics-response';
-import { CombinationConstraint } from '../models/constraint-models/combination-constraint';
-import { Constraint } from '../models/constraint-models/constraint';
-import { TreeNode } from '../models/tree-models/tree-node';
-import { ErrorHelper } from '../utilities/error-helper';
-import { ApiEndpointService } from './api-endpoint.service';
-import { CohortService } from './cohort.service';
-import { ConstraintMappingService } from './constraint-mapping.service';
-import { ConstraintReverseMappingService } from './constraint-reverse-mapping.service';
-import { ConstraintService } from './constraint.service';
-import { CryptoService } from './crypto.service';
-import { NavbarService } from './navbar.service';
-import { QueryService } from './query.service';
-import { AppConfig } from '../config/app.config';
-import { ReferenceIntervalComputer } from './reference-intervals';
-import { isCipherFormat } from 'src/app/utilities/is-cipher-format';
-import { MessageHelper } from '../utilities/message-helper';
+import {v4 as uuidv4} from 'uuid';
+import {Injectable, Output} from '@angular/core';
+import {Observable, of, ReplaySubject, Subject} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {ApiI2b2Panel} from '../models/api-request-models/medco-node/api-i2b2-panel';
+import {ApiI2b2Timing} from '../models/api-request-models/medco-node/api-i2b2-timing';
+import {
+  ApiExploreStatistics,
+  ModifierApiObjet
+} from '../models/api-request-models/survival-analyis/api-explore-statistics';
+import {
+  ApiExploreStatisticResult,
+  ApiExploreStatisticsResponse
+} from '../models/api-response-models/explore-statistics/explore-statistics-response';
+import {CombinationConstraint} from '../models/constraint-models/combination-constraint';
+import {Constraint} from '../models/constraint-models/constraint';
+import {TreeNode} from '../models/tree-models/tree-node';
+import {ErrorHelper} from '../utilities/error-helper';
+import {ApiEndpointService} from './api-endpoint.service';
+import {CohortService} from './cohort.service';
+import {ConstraintMappingService} from './constraint-mapping.service';
+import {ConstraintReverseMappingService} from './constraint-reverse-mapping.service';
+import {ConstraintService} from './constraint.service';
+import {CryptoService} from './crypto.service';
+import {NavbarService} from './navbar.service';
+import {QueryService} from './query.service';
+import {AppConfig} from '../config/app.config';
+import {ReferenceIntervalComputer} from './reference-intervals';
+import {isCipherFormat} from 'src/app/utilities/is-cipher-format';
+import {MessageHelper} from '../utilities/message-helper';
+import {QueryTemporalSetting} from '../models/query-models/query-temporal-setting';
 
 export class ConfidenceInterval {
     constructor(public readonly lowerBound: number, public readonly middle: number, public readonly higherBound: number) {
@@ -142,7 +149,7 @@ export class ExploreStatisticsService {
     // The panels returned by the constraint service have a tendency to be out of date. Use this method to refresh them.
     private refreshConstraint(constraint: CombinationConstraint): Observable<CombinationConstraint> {
         const i2b2Panels: ApiI2b2Panel[] = this.constraintMappingService.mapConstraint(constraint,
-          this.queryService.queryTimingSameInstance)
+          this.queryService.queryTiming === QueryTemporalSetting.independent)
 
         if (i2b2Panels.length === 0) {
             /* Return an empty constraint if the passed parameter is empty.
@@ -215,7 +222,7 @@ export class ExploreStatisticsService {
         const { modifiers } = this.extractConceptsAndModifiers(analytes);
 
         this._lastCohortDefinition = this.constraintMappingService.mapConstraint(cohortConstraint,
-          this.queryService.queryTimingSameInstance)
+          this.queryService.queryTiming === QueryTemporalSetting.independent)
         this._lastQueryTiming = this.queryService.lastTiming
 
 
@@ -250,6 +257,7 @@ export class ExploreStatisticsService {
                 ErrorHelper.handleNewError(err.error.message)
             }
             this.displayLoadingIcon.next(false);
+            this.queryService.isUpdating = false;
         });
     }
 
@@ -404,7 +412,7 @@ export class ExploreStatisticsService {
             rootConstraint => {
                 const cohort = this.lastCohortDefinition
                 const timing = this.lastQueryTiming
-                this.cohortService.saveCohort(rootConstraint, cohort, timing)
+                this.cohortService.saveCohort(timing)
             })
     }
 

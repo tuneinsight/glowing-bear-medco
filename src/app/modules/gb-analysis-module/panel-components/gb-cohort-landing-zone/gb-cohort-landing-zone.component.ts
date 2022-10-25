@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 CHUV
+ * Copyright 2020 - 2021 CHUV
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,14 +10,14 @@ import { SelectItem } from 'primeng';
 import { SubGroup, SurvivalService } from '../../../../services/survival-analysis.service';
 import { AnalysisService } from '../../../../services/analysis.service';
 import { ConstraintService } from '../../../../services/constraint.service';
-import { MessageHelper } from '../../../../utilities/message-helper';
 import { OperationType } from '../../../../models/operation-models/operation-types';
 import { CohortService } from '../../../../services/cohort.service';
 import { ApiI2b2Timing } from '../../../../models/api-request-models/medco-node/api-i2b2-timing';
 import { QueryService } from '../../../../services/query.service';
 import { ErrorHelper } from '../../../../utilities/error-helper';
+import { QueryTemporalSetting } from 'src/app/models/query-models/query-temporal-setting';
 
-const nameMaxLength = 10
+const nameMaxLength = 20
 
 @Component({
   selector: 'gb-cohort-landing-zone',
@@ -100,8 +100,8 @@ export class GbCohortLandingZoneComponent implements OnInit {
       throw ErrorHelper.handleNewUserInputError(`Subgroup name ${this.name} can only contain alphanumerical symbols (without ö é ç ...) and underscores "_".`);
     } else if (this.name.length > nameMaxLength) {
       throw ErrorHelper.handleNewUserInputError(`Subgroup name length cannot exceed ${nameMaxLength}.`);
-    } else if (!this.constraintService.hasConstraint()) {
-      throw ErrorHelper.handleNewUserInputError('Both inclusion and exclusion constraints are empty, nothing to add.');
+    } else if (!this.constraintService.hasSelectionConstraint()) {
+      throw ErrorHelper.handleNewUserInputError('Selection constraint is empty, nothing to add.');
     }
 
     let inputValueValidation = this.constraintService.validateConstraintValues()
@@ -111,13 +111,14 @@ export class GbCohortLandingZoneComponent implements OnInit {
 
     let newSubGroup: SubGroup = {
       name: this.name,
-      timing: this.queryService.queryTimingSameInstance ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any,
-      rootConstraint: this.constraintService.rootConstraint.clone()
+      queryTemporalSetting: this.queryService.queryTiming,
+      timing: this.queryService.queryTiming ? ApiI2b2Timing.sameInstanceNum : ApiI2b2Timing.any,
+      rootSelectionConstraint: this.constraintService.rootSelectionConstraint.clone(),
+      rootSequentialConstraint: this.constraintService.rootSequentialConstraint.clone(),
     }
     this.subGroups.push({ label: this.name, value: newSubGroup })
     this._usedNames.add(this.name)
-    this.clearName()
-    this.constraintService.clearConstraint()
+    this.reset()
 
     this.survivalService.subGroups = this.subGroups.map(({ value }) => value as SubGroup)
     this.selectedSubGroup = null
@@ -133,8 +134,9 @@ export class GbCohortLandingZoneComponent implements OnInit {
 
   loadSubGroup(event: Event) {
     this.name = this.selectedSubGroup.name
-    this.queryService.queryTimingSameInstance = (this.selectedSubGroup.timing === ApiI2b2Timing.sameInstanceNum) ? true : false
-    this.constraintService.rootConstraint = this.selectedSubGroup.rootConstraint.clone()
+    this.queryService.queryTiming = this.selectedSubGroup.queryTemporalSetting
+    this.constraintService.rootSelectionConstraint = this.selectedSubGroup.rootSelectionConstraint.clone()
+    this.constraintService.rootSequentialConstraint = this.selectedSubGroup.rootSequentialConstraint.clone()
   }
 
   clearName() {
@@ -150,14 +152,14 @@ export class GbCohortLandingZoneComponent implements OnInit {
     this._subGroups = new Array()
     this.survivalService.subGroups = new Array()
     this._usedNames = new Set()
-    this.clearName()
-    this.constraintService.clearConstraint()
+    this.reset()
     this.queryService.clearAll()
     this.selectedSubGroup = null
   }
 
   reset() {
     this.clearName()
+    this.queryService.queryTiming = QueryTemporalSetting.independent
     this.constraintService.clearConstraint()
   }
 

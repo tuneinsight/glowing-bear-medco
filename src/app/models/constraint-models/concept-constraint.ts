@@ -53,7 +53,7 @@ export class ConceptConstraint extends Constraint {
     this.valDateConstraint.isObservationDate = false;
     this.obsDateConstraint = new TimeConstraint();
     this.obsDateConstraint.isObservationDate = true;
-    (this as Constraint).textRepresentation = 'Concept';
+    this.textRepresentation = 'Concept';
   }
 
   clone(): ConceptConstraint {

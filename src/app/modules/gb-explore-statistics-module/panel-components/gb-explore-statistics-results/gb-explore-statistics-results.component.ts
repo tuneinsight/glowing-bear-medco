@@ -110,7 +110,7 @@ export class GbExploreStatisticsResultsComponent implements AfterViewInit, OnDes
 
     this.refIntervalsComponents.forEach((c, i) => c.toPDF(pdf, i));
 
-    const timingValue = this.queryService.queryTimingSameInstance;
+    const timingValue = this.queryService.queryTiming;
     const chosenTiming = GbSelectionComponent.timings.filter(t => t.value === timingValue);
     assert(chosenTiming.length > 0);
     pdf.addOneLineText('Counting method: ' + chosenTiming[0].label, 0);
