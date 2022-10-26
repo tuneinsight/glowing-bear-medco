@@ -131,6 +131,38 @@ export class GbExploreComponent implements AfterViewChecked {
     return this.cohortService.cohortName
   }
 
+  set bootR(val: number) {
+    this.exploreStatisticsService._bootR = val
+  }
+  get bootR(): number {
+    return this.exploreStatisticsService._bootR
+  }
+  set minSampleSize(val: number) {
+    this.exploreStatisticsService._minSampleSize = val
+  }
+  get minSampleSize(): number {
+    return this.exploreStatisticsService._minSampleSize
+  }
+  set maxSampleSize(val: number) {
+    this.exploreStatisticsService._maxSampleSize = val
+  }
+  get maxSampleSize(): number {
+    return this.exploreStatisticsService._maxSampleSize
+  }
+  set percentileLow(val: number) {
+    this.exploreStatisticsService._percentileLow = val
+  }
+  get percentileLow(): number {
+    return this.exploreStatisticsService._percentileLow
+  }
+  set percentileHigh(val: number) {
+    this.exploreStatisticsService._percentileHigh = val
+  }
+  get percentileHigh(): number {
+    return this.exploreStatisticsService._percentileHigh
+  }
+
+
   get isUpdating(): boolean {
     return this.queryService.isUpdating
   }

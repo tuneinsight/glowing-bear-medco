@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Injectable, Output } from '@angular/core';
+import { Injectable, Output, Input } from '@angular/core';
 import { Observable, of, ReplaySubject, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiI2b2Panel } from '../models/api-request-models/medco-node/api-i2b2-panel';
@@ -46,23 +46,17 @@ class ReferenceRange {
     readonly CI1: ConfidenceInterval
     readonly CI2: ConfidenceInterval
 
-    constructor(appConfig: AppConfig, intervals: Interval[]) {
-        const bootR = appConfig.getConfig('boot-r') !== '' ?
-            parseInt(appConfig.getConfig('boot-r'), 10) : 1000
+    constructor(intervals: Interval[], bootR: number, minSampleSize: number, maxSampleSize: number,
+        percentileLow: number, percentileHigh: number) {
 
-        const minSampleSize = appConfig.getConfig('min-sample-size') !== '' ?
-            parseInt(appConfig.getConfig('min-sample-size'), 10) : 240
-
-        const maxSampleSize = appConfig.getConfig('max-sample-size') !== '' ?
-            parseInt(appConfig.getConfig('max-sample-size'), 10) : -1
-
-        const percentileLow = appConfig.getConfig('percentile-low') !== '' ?
-            parseFloat(appConfig.getConfig('percentile-low')) : 0.025
-
-        const percentileHigh = appConfig.getConfig('percentile-high') !== '' ?
-            parseFloat(appConfig.getConfig('percentile-high')) : 0.975
-
-        const riComputer = new ReferenceIntervalComputer(intervals, bootR, minSampleSize, maxSampleSize, percentileLow, percentileHigh)
+        const riComputer = new ReferenceIntervalComputer(
+            intervals,
+            bootR,
+            minSampleSize,
+            maxSampleSize,
+            percentileLow,
+            percentileHigh
+        )
         const RI = riComputer.compute()
 
         this.CI1 = RI[0]
@@ -81,13 +75,22 @@ export class ChartInformation {
     readonly referenceRange: ReferenceRange
 
 
-    constructor(private appConfig: AppConfig, intervals: Interval[], unit: string,
-        public readonly treeNodeName: string, public readonly cohortName: string) {
+    constructor(intervals: Interval[], unit: string,
+        public readonly treeNodeName: string, public readonly cohortName: string,
+        bootR: number, minSampleSize: number, maxSampleSize: number,
+        percentileLow: number, percentileHigh: number) {
 
         this.intervals = intervals
         this.unit = unit
 
-        this.referenceRange = new ReferenceRange(appConfig, intervals)
+        this.referenceRange = new ReferenceRange(
+            intervals,
+            bootR,
+            minSampleSize,
+            maxSampleSize,
+            percentileLow,
+            percentileHigh
+        )
 
         this.CI1 = this.referenceRange.CI1
         this.CI2 = this.referenceRange.CI2
@@ -136,6 +139,13 @@ export class ExploreStatisticsService {
     // This observable emits the latest explore statistics query set of analytes
     analytesSubject: Subject<Set<TreeNode>> = new ReplaySubject(1)
 
+    // Number or reference interval operations
+    @Input() _bootR: number = 1000
+    @Input() _minSampleSize: number = 240
+    @Input() _maxSampleSize: number = -1
+    @Input() _percentileLow: number = 0.025
+    @Input() _percentileHigh: number = 0.975
+
     private static getNewQueryID(): string {
         return uuidv4();
     }
@@ -151,6 +161,22 @@ export class ExploreStatisticsService {
         private reverseConstraintMappingService: ConstraintReverseMappingService,
         private navbarService: NavbarService
     ) {
+
+
+    this._bootR = config.getConfig('boot-r') ?
+        parseInt(config.getConfig('boot-r'), 10) : 1000
+
+    this._minSampleSize = config.getConfig('min-sample-size') ?
+        parseInt(config.getConfig('min-sample-size'), 10) : 240
+
+    this._maxSampleSize = config.getConfig('max-sample-size') ?
+        parseInt(config.getConfig('max-sample-size'), 10) : -1
+
+    this._percentileLow = config.getConfig('percentile-low') ?
+        parseFloat(config.getConfig('percentile-low')) : 0.025
+
+    this._percentileHigh = config.getConfig('percentile-high') ?
+        parseFloat(config.getConfig('percentile-high')) : 0.975
 
     }
 
@@ -301,11 +327,14 @@ export class ExploreStatisticsService {
                     }, []);
 
                     const newChartInformation = new ChartInformation(
-                        this.config,
                         intervals,
                         result.unit,
                         result.analyteName,
-                        cohortConstraint.textRepresentation);
+                        cohortConstraint.textRepresentation,
+                        this._bootR,
+                        this._minSampleSize, this._maxSampleSize,
+                        this._percentileLow, this._percentileHigh
+                        );
 
                     if (newChartInformation.numberOfObservations() > 0) {
                         return [
