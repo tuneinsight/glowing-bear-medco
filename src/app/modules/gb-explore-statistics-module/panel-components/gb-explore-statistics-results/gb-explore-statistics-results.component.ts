@@ -61,7 +61,7 @@ export class GbExploreStatisticsResultsComponent implements AfterViewInit, OnDes
   private componentRefs: Array<ComponentRef<any>> = []
 
   private _displayLoadingIcon = false
-  private _currentStep = ""
+  private _currentStep = ''
 
   private exportPDFSubscription: Subscription
 
