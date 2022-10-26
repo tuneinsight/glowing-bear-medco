@@ -23,6 +23,9 @@ import { GenomicAnnotation } from '../models/constraint-models/genomic-annotatio
 import { ErrorHelper } from '../utilities/error-helper';
 import { OperationType } from '../models/operation-models/operation-types';
 import { MessageHelper } from '../utilities/message-helper';
+import { QueryTemporalSetting } from '../models/query-models/query-temporal-setting';
+import { ApiI2b2SequentialOperator } from '../models/api-request-models/medco-node/api-sequence-of-events/api-i2b2-sequential-operator';
+import { SequentialConstraint } from '../models/constraint-models/sequential-constraint';
 
 /**
  * This service concerns with
@@ -32,7 +35,8 @@ import { MessageHelper } from '../utilities/message-helper';
 @Injectable()
 export class ConstraintService {
 
-  private _rootConstraint: CombinationConstraint;
+  private _rootSelectionConstraint: CombinationConstraint;
+  private _rootSequentialConstraint: SequentialConstraint;
 
   /*
    * List keeping track of all available constraints.
@@ -57,7 +61,8 @@ export class ConstraintService {
   private _operationType: OperationType;
 
   // internal states to save when changing operationType
-  private _exploreRootConstraint: CombinationConstraint;
+  private _exploreRootSelectionConstraint: CombinationConstraint;
+  private _exploreRootSequentialConstraint: SequentialConstraint;
 
   public static depthOfConstraint(constraint: Constraint): number {
     let depth = 0;
@@ -70,8 +75,10 @@ export class ConstraintService {
 
   constructor(private treeNodeService: TreeNodeService) {
     // Initialize the root constraints in the 1st step
-    this.rootConstraint = new CombinationConstraint();
-    this.rootConstraint.isRoot = true;
+    this.rootSelectionConstraint = new CombinationConstraint();
+    this.rootSelectionConstraint.isRoot = true;
+    this.rootSequentialConstraint = new SequentialConstraint();
+    this.rootSequentialConstraint.isRoot = true;
 
   }
 
@@ -102,8 +109,15 @@ export class ConstraintService {
     return results;
   }
 
-  public hasConstraint(): Boolean {
-    return ConstraintHelper.hasNonEmptyChildren(this.rootConstraint);
+  public hasSelectionConstraint(): Boolean {
+    return ConstraintHelper.hasNonEmptyChildren(this.rootSelectionConstraint);
+  }
+
+  public hasSequentialConstraint(): Boolean {
+    if (this.rootSequentialConstraint.children.length < 2) {
+      return false;
+    }
+    return ConstraintHelper.hasNonEmptyChildren(this.rootSequentialConstraint);
   }
 
   /**
@@ -112,28 +126,37 @@ export class ConstraintService {
    * is returned by default.
    */
   public validateConstraintValues(): string {
-    if (this.hasConstraint()) {
-      let constraintValidity = this.rootConstraint.inputValueValidity()
+    let constraintValidity = ''
+    if (this.hasSelectionConstraint()) {
+      constraintValidity = this.rootSelectionConstraint.inputValueValidity()
+      if (constraintValidity !== '') {
+        return constraintValidity
+      }
 
-      return constraintValidity
-
-    } else {
-      return ''
     }
+    if (this.hasSequentialConstraint()) {
+      constraintValidity = this.rootSequentialConstraint.inputValueValidity()
+    }
+
+    return constraintValidity
   }
 
   /**
    * Generate the constraint corresponding to the query.
    */
    public generateConstraint(): CombinationConstraint {
-    return this.rootConstraint;
+    return this.rootSelectionConstraint;
   }
 
   /**
    * Clear the patient constraints
    */
   public clearConstraint() {
-    this.rootConstraint.children.length = 0;
+    this.rootSelectionConstraint.children.length = 0;
+    this.rootSequentialConstraint.children.length = 0;
+    if (!!(this.rootSequentialConstraint.temporalSequence)) {
+      this.rootSequentialConstraint.temporalSequence.length = 0;
+    }
   }
 
   // generate the constraint instance based on given node (e.g. tree node)
@@ -204,6 +227,15 @@ export class ConstraintService {
     return constraint;
   }
 
+  get sequentialInfo(): ApiI2b2SequentialOperator[] {
+    return this.rootSequentialConstraint.temporalSequence.map((sequenceInfoElm) => sequenceInfoElm.clone())
+
+  }
+
+  set sequentialInfo(sequenceInfo: ApiI2b2SequentialOperator[]) {
+    this.rootSequentialConstraint.temporalSequence = sequenceInfo.map(sequenceInfoElm => sequenceInfoElm.clone())
+  }
+
   set operationType(opType: OperationType) {
 
     switch (opType) {
@@ -211,8 +243,11 @@ export class ConstraintService {
 
         // reload previous selection
         if (this._operationType === OperationType.ANALYSIS) {
-          if (this._exploreRootConstraint) {
-            this.rootConstraint = this._exploreRootConstraint
+          if (this._exploreRootSelectionConstraint) {
+            this.rootSelectionConstraint = this._exploreRootSelectionConstraint
+          }
+          if (this._exploreRootSequentialConstraint) {
+            this.rootSequentialConstraint = this._exploreRootSequentialConstraint
           }
         }
 
@@ -222,7 +257,8 @@ export class ConstraintService {
 
         // save current selection
         if (this._operationType === OperationType.EXPLORE) {
-          this._exploreRootConstraint = this.rootConstraint.clone()
+          this._exploreRootSelectionConstraint = this.rootSelectionConstraint.clone()
+          this._exploreRootSequentialConstraint = this.rootSequentialConstraint.clone()
           this.clearConstraint()
         }
         this._operationType = opType
@@ -239,12 +275,20 @@ export class ConstraintService {
     return this._operationType
   }
 
-  get rootConstraint(): CombinationConstraint {
-    return this._rootConstraint;
+  get rootSelectionConstraint(): CombinationConstraint {
+    return this._rootSelectionConstraint;
   }
 
-  set rootConstraint(value: CombinationConstraint) {
-    this._rootConstraint = value;
+  set rootSelectionConstraint(value: CombinationConstraint) {
+    this._rootSelectionConstraint = value;
+  }
+
+  get rootSequentialConstraint(): SequentialConstraint {
+    return this._rootSequentialConstraint;
+  }
+
+  set rootSequentialConstraint(value: SequentialConstraint) {
+    this._rootSequentialConstraint = value;
   }
 
   get allConstraints(): Constraint[] {

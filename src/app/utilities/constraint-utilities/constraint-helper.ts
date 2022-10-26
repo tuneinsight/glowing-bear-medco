@@ -10,6 +10,7 @@ import {ConceptConstraint} from '../../models/constraint-models/concept-constrai
 import {ValueType} from '../../models/constraint-models/value-type';
 import {Constraint} from '../../models/constraint-models/constraint';
 import {CombinationConstraint} from '../../models/constraint-models/combination-constraint';
+import { CompositeConstraint } from 'src/app/models/constraint-models/composite-constraint';
 
 export class ConstraintHelper {
 
@@ -80,10 +81,10 @@ export class ConstraintHelper {
    * @return {boolean} true iff the combination has any children other than combinations
    * or this property holds recursively for any of its children.
    */
-  static hasNonEmptyChildren(combination: CombinationConstraint): boolean {
+  static hasNonEmptyChildren(combination: CompositeConstraint): boolean {
     return combination.children.some((child: Constraint) => {
       if (child.className === 'CombinationConstraint') {
-        return this.hasNonEmptyChildren(<CombinationConstraint>child);
+        return this.hasNonEmptyChildren(<CompositeConstraint>child);
       }
       // all other types of constraints count as non-empty children.
       return true;

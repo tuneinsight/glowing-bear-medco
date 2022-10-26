@@ -95,7 +95,7 @@ export class ExploreCohortsService {
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }
 
-  postCohortAllNodes(cohortName: string, cohort: ApiCohort[], exploreQueryID: string): Observable<string> {
+  postCohortAllNodes(cohortName: string, exploreQueryID: string): Observable<string> {
     return this.postCohortSingleNode(cohortName, exploreQueryID)
       .pipe(timeout(ExploreCohortsService.TIMEOUT_MS))
   }

@@ -1,17 +1,19 @@
-<div class="gb-combination-constraint-container" (drop)="onDrop($event)">
+<div (drop)="onDrop($event)">
 
   <div class="{{childContainerClass}}">
     <label *ngIf="(depth === 1) && queryTimingSameInstance" style="margin: 6px;">Same instance:</label>
     <p-checkbox *ngIf="(depth === 1) && queryTimingSameInstance" [(ngModel)]="panelTimingSameInstance" [binary]="true"></p-checkbox>
     <!-- Child Constraints -->
-    <div *ngFor="let child of children">
+    <div *ngFor="let child of children; let i = index">
       <gb-constraint [constraint]="child"
-                     (constraintRemoved)="onConstraintRemoved(child)"></gb-constraint>
-      <div class="gb-constraint-state-container">
-        <button type="button" class="btn btn-outline-primary btn-sm" [ngSwitch]="combinationState">
-          <i *ngSwitchCase="CombinationState.And">and</i>
-          <i *ngSwitchCase="CombinationState.Or">or</i>
-        </button>
+                     (constraintRemoved)="onConstraintRemoved(i)"></gb-constraint>
+      <div class="gb-constraint-state-container" [ngSwitch]="combinationState">
+        <i *ngSwitchCase="CombinationState.And">
+          <button type="button" class="btn btn-outline-primary btn-sm" >and</button>
+        </i>
+        <i *ngSwitchCase="CombinationState.Or">
+          <button type="button" class="btn btn-outline-primary btn-sm">or</button>
+        </i>
       </div>
     </div>
 

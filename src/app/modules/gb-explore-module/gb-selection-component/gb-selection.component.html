@@ -18,12 +18,19 @@
     </div>
   </div>
 
-  <div #criteriaBox
-      class="criteria-box input-label-wrapper">
-    <p title="Drag and drop ontology elements" >Criteria<span *ngIf="isBiorefMode" > (optional)</span>:</p>
-    <gb-constraint #rootConstraintComponent
-                [constraint]="rootConstraint"
-                [isRoot]="true"></gb-constraint>
+  <div class="criteria-box input-label-wrapper">
+    <p>Selection Criteria:</p>
+    <gb-constraint #rootSelectionConstraintComponent
+                   [constraint]="rootSelectionConstraint"
+                   [isRoot]="true"></gb-constraint>
+  </div>
+
+  <div class="criteria-box input-label-wrapper" *ngIf="queryTiming === QueryTemporalSetting.sequential">
+    <p>Sequential Criteria (minimum 2):</p>
+    <gb-constraint #rootSequentialConstraintComponent
+                   [constraint]="rootSequentialConstraint"
+                   [areCohortConstraintsAllowed]="false"
+                   [isRoot]="true"></gb-constraint>
   </div>
 
 

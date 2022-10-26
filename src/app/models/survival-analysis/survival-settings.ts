@@ -19,7 +19,8 @@ export class SurvivalSettings {
     public endsWhen: string,
     public subGroupTextRepresentations: {
       groupId: string,
-      rootConstraint?: string
+      rootSelectionConstraint?: string,
+      rootSequentialConstraint?: string
     }[]
   ) { }
 
@@ -43,8 +44,13 @@ export class SurvivalSettings {
     let data = new Array<string[]>()
     this.subGroupTextRepresentations.forEach(
       sg => {
-        if (sg.rootConstraint) {
-          data.push([sg.groupId, sg.rootConstraint])
+        if (sg.rootSelectionConstraint) {
+          let constraintText = sg.rootSelectionConstraint
+          if (sg.rootSequentialConstraint) {
+            constraintText = 'Selection Constraint: (' + sg.rootSelectionConstraint + ')\n' +
+              'Sequential Constraint:(' + sg.rootSequentialConstraint + ')'
+          }
+          data.push([sg.groupId, constraintText])
 
         } else {
           console.warn(`in formatting sub-group definitions: sub-group ${sg.groupId} has no definition ` +

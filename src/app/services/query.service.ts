@@ -9,7 +9,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { Injectable } from '@angular/core';
+import { Injectable, Query } from '@angular/core';
 import { TreeNodeService } from './tree-node.service';
 import { ExploreQuery } from '../models/query-models/explore-query';
 import { ConstraintService } from './constraint.service';
@@ -30,6 +30,8 @@ import { ApiI2b2Panel } from '../models/api-request-models/medco-node/api-i2b2-p
 import { ApiI2b2Timing } from '../models/api-request-models/medco-node/api-i2b2-timing';
 import { OperationType } from '../models/operation-models/operation-types';
 import { UserInputError } from '../utilities/user-input-error';
+import { QueryTemporalSetting } from '../models/query-models/query-temporal-setting';
+import { ApiI2b2SequentialOperator } from '../models/api-request-models/medco-node/api-sequence-of-events/api-i2b2-sequential-operator';
 
 /**
  * This service concerns with updating subject counts.
@@ -55,10 +57,10 @@ export class QueryService {
   private _lastSuccessfulSet = new Subject<number[]>()
 
   // i2b2 query-level timing policy
-  private _queryTimingSameInstance = false;
+  private _queryTiming = QueryTemporalSetting.independent;
 
   // keep track queryTiming when switching tab
-  private _exploreQueryTimingSameInstance: boolean;
+  private _exploreQueryTiming: QueryTemporalSetting;
 
 
   constructor(private appConfig: AppConfig,
@@ -76,7 +78,7 @@ export class QueryService {
     this.queryResults.next();
     this.isUpdating = false;
     this.isDirty = false;
-    this.queryTimingSameInstance = false
+    this.queryTiming = QueryTemporalSetting.independent;
     this.constraintService.clearConstraint();
     this.query = new ExploreQuery();
   }
@@ -102,7 +104,8 @@ export class QueryService {
     // prepare and execute query
     this.query.generateUniqueId();
     this.query.constraint = this.constraintService.generateConstraint();
-    this.query.queryTimingSameInstanceNum = this.queryTimingSameInstance;
+    this.query.sequentialConstraint = this.constraintService.rootSequentialConstraint;
+    this.query.queryTimingSameInstanceNum = this.queryTiming === QueryTemporalSetting.sameinstance
 
     this.genomicAnnotationsService.addVariantIdsToConstraints(this.query.constraint).pipe(
       catchError((err) => {
@@ -117,7 +120,7 @@ export class QueryService {
         }
         this.queryResults.next(parsedResults);
         this.isUpdating = false;
-        this.isDirty = this.constraintService.hasConstraint().valueOf();
+        this.isDirty = this.constraintService.hasSelectionConstraint().valueOf();
       },
       (err) => {
         if (err instanceof UserInputError) {
@@ -129,30 +132,6 @@ export class QueryService {
         this.isDirty = true;
       }
     );
-  }
-
-  public getExploreResultObserver(): NextObserver<ExploreQueryResult> {
-    const qs = this
-    return new class implements NextObserver<ExploreQueryResult> {
-      next(parsedResults: ExploreQueryResult) {
-        if (parsedResults.resultInstanceID) {
-          qs._lastSuccessfulSet.next(parsedResults.resultInstanceID)
-        }
-        qs.queryResults.next(parsedResults);
-        qs.isUpdating = false;
-        qs.isDirty = qs.constraintService.hasConstraint().valueOf();
-      }
-
-      error(err) {
-        if (err instanceof UserInputError) {
-          console.warn(`[EXPLORE] Interrupted explore query ${qs.query.uniqueId} due to user input error.`, err);
-        } else {
-          ErrorHelper.handleError(`Error during explore query ${qs.query.uniqueId}.`, err);
-        }
-        qs.isUpdating = false;
-        qs.isDirty = true;
-      }
-    }
   }
 
   get query(): ExploreQuery {
@@ -249,20 +228,32 @@ export class QueryService {
   get lastSuccessfulSet(): Observable<number[]> {
     return this._lastSuccessfulSet.asObservable()
   }
-  get queryTimingSameInstance(): boolean {
-    return this._queryTimingSameInstance
+  get queryTiming(): QueryTemporalSetting {
+    return this._queryTiming
   }
 
-  set queryTimingSameInstance(val: boolean) {
-    this._queryTimingSameInstance = val
+  set queryTiming(val: QueryTemporalSetting) {
+    this._queryTiming = val
   }
 
-  get lastDefinition(): ApiI2b2Panel[] {
-    return this.exploreQueryService.lastDefinition
+  set sequentialInfo(val: ApiI2b2SequentialOperator[]) {
+    this.constraintService.sequentialInfo = val
+  }
+
+  get lastSelectionDefinition(): ApiI2b2Panel[] {
+    return this.exploreQueryService.lastSelectionDefinition
+  }
+
+  get lastSequenceDefinition(): ApiI2b2Panel[] {
+    return this.exploreQueryService.lastSequentialDefinition
   }
 
   get lastTiming(): ApiI2b2Timing {
     return this.exploreQueryService.lastQueryTiming
+  }
+
+  get lastTimingSequence(): ApiI2b2SequentialOperator[] {
+    return this.exploreQueryService.lastTimingSequence
   }
 
   set operationType(opType: OperationType) {
@@ -271,8 +262,8 @@ export class QueryService {
 
         // reload previous selection
         if (this.operationType === OperationType.ANALYSIS) {
-          if (this._exploreQueryTimingSameInstance !== null) {
-            this.queryTimingSameInstance = this._exploreQueryTimingSameInstance
+          if (this._exploreQueryTiming !== null) {
+            this.queryTiming = this._exploreQueryTiming
           }
         }
 
@@ -282,7 +273,8 @@ export class QueryService {
 
         // save current selection
         if (this.operationType === OperationType.EXPLORE) {
-          this._exploreQueryTimingSameInstance = this.queryTimingSameInstance
+          this._exploreQueryTiming = this.queryTiming
+          this.queryTiming = QueryTemporalSetting.independent
         }
         this.constraintService.operationType = opType
         break;
