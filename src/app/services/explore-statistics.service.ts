@@ -47,11 +47,20 @@ class ReferenceRange {
     readonly CI2: ConfidenceInterval
 
     constructor(appConfig: AppConfig, intervals: Interval[]) {
-        const bootR = appConfig.getConfig('boot-r') !== "" ? parseInt(appConfig.getConfig('boot-r')) : 1000
-        const minSampleSize = appConfig.getConfig('min-sample-size') !== "" ? parseInt(appConfig.getConfig('min-sample-size')) : 240
-        const maxSampleSize = appConfig.getConfig('max-sample-size') !== "" ? parseInt(appConfig.getConfig('max-sample-size')) : -1
-        const percentileLow = appConfig.getConfig('percentile-low') !== "" ? parseFloat(appConfig.getConfig('percentile-low')) : 0.025
-        const percentileHigh = appConfig.getConfig('percentile-high') !== "" ? parseFloat(appConfig.getConfig('percentile-high')) : 0.975
+        const bootR = appConfig.getConfig('boot-r') !== '' ?
+            parseInt(appConfig.getConfig('boot-r'), 10) : 1000
+
+        const minSampleSize = appConfig.getConfig('min-sample-size') !== '' ?
+            parseInt(appConfig.getConfig('min-sample-size'), 10) : 240
+
+        const maxSampleSize = appConfig.getConfig('max-sample-size') !== '' ?
+            parseInt(appConfig.getConfig('max-sample-size'), 10) : -1
+
+        const percentileLow = appConfig.getConfig('percentile-low') !== '' ?
+            parseFloat(appConfig.getConfig('percentile-low')) : 0.025
+
+        const percentileHigh = appConfig.getConfig('percentile-high') !== '' ?
+            parseFloat(appConfig.getConfig('percentile-high')) : 0.975
 
         const riComputer = new ReferenceIntervalComputer(intervals, bootR, minSampleSize, maxSampleSize, percentileLow, percentileHigh)
         const RI = riComputer.compute()

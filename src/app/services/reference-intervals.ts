@@ -108,7 +108,13 @@ export class ReferenceIntervalComputer {
 
     }
 
-    constructor(intervals: Interval[], bootR = 1000, minSampleSize = 240, maxSampleSize = -1, percentileLow = 0.025, percentileHigh = 0.975) {
+    constructor(intervals: Interval[],
+        bootR = 1000,
+        minSampleSize = 240,
+        maxSampleSize = -1,
+        percentileLow = 0.025,
+        percentileHigh = 0.975
+    ) {
         this.intervals = intervals.map(i => new NumericInterval(i))
         this._bootR = bootR
         this._minSampleSize = minSampleSize
