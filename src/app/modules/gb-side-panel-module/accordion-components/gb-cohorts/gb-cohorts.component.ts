@@ -127,7 +127,7 @@ export class GbCohortsComponent implements AfterViewInit, OnInit {
   }
   sortByDate() {
     let sorted = this.cohortService.cohorts.sort((a, b) => (!b.creationDate ||
-      a.creationDate && a.lastUpdateDate() > b.lastUpdateDate()
+      a.creationDate && a.updateDate > b.updateDate
     ) ? -1 : 1)
 
     this.cohortService.cohorts = sorted

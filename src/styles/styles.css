@@ -480,7 +480,7 @@ form.term-search .ui-togglebutton.ui-button.ui-state-focus {
 form.term-search p-header > .ui-button-text {
   padding: 0.1em 0.2em 0.1em 1.9em;
   color: #404040 !important;
-  
+
 }
 
 form.term-search a:focus,
@@ -713,4 +713,8 @@ input.input-field {
 
 .small-font {
   font-size: small;
+}
+
+p-dynamicdialog .ui-dialog .ui-dialog-content {
+  overflow-y: visible;
 }

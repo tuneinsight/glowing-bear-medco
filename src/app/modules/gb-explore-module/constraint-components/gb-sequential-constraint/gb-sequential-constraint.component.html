@@ -1,0 +1,43 @@
+<div (drop)="onDrop($event)">
+
+  <div class="{{childContainerClass}}">
+    <!-- Child Constraints -->
+    <div *ngFor="let child of children; let i = index">
+      <gb-constraint [constraint]="child"
+                     (constraintRemoved)="onConstraintRemoved(i)"></gb-constraint>
+
+      <div class="gb-constraint-state-container" >
+        <button *ngIf="i !== (children.length - 1)" icon="fa fa-cog" type="button" [hidden]="i === (children.length - 1)" (click)="showTemporal(i)" class="btn btn-outline-primary btn-sm">
+          {{temporalStringRepresentation(temporalSequence[i].when)}}
+          <i class="fa fa-cog"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <div class="form-inline input-field-margin">
+
+      <button *ngIf="allowGroupChildren()"
+              type="button"
+              (click)="addChildCombinationConstraint()"
+              class="btn btn-outline-secondary gb-composite-constraint-add-btn"
+              pTooltip="Add group constraint">
+        <span class="fa fa-plus"></span>
+      </button>
+      <p-autoComplete #autoComplete
+                      [(ngModel)]="selectedConstraint"
+                      [suggestions]="searchResults"
+                      field="textRepresentation"
+                      (completeMethod)="onSearch($event)"
+                      (onSelect)="onSelect($event)"
+                      [style]="{'width':'100%'}"
+                      [inputStyle]="{'width':'100%'}"
+                      size="60"
+                      dropdown="true"
+                      (onDropdownClick)="onDropdown($event)"
+                      placeholder="add criterion"></p-autoComplete>
+
+    </div>
+  </div>
+
+</div>

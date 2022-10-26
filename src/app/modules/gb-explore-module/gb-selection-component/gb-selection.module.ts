@@ -17,12 +17,18 @@ import { PanelModule } from 'primeng';
 import { MultiSelectModule } from 'primeng';
 import { GbTooltipComponent } from '../constraint-components/gb-concept-constraint/gb-tooltip/gb-tooltip.component';
 import { GbUtilsModule } from '../../gb-utils-module/gb-utils.module';
+import { GbTemporalSequenceComponent } from '../constraint-components/gb-sequential-constraint/gb-temporal-sequence/gb-temporal-sequence.component';
+import { GbCompositeConstraintComponent } from '../constraint-components/gb-composite-constraint/gb-composite-constraint.component';
+import { GbSequentialConstraintComponent } from '../constraint-components/gb-sequential-constraint/gb-sequential-constraint.component';
 
 
 
 @NgModule({
   declarations: [
     GbCombinationConstraintComponent,
+    GbCompositeConstraintComponent,
+    GbSequentialConstraintComponent,
+    GbTemporalSequenceComponent,
     GbConstraintComponent,
     GbConceptConstraintComponent,
     GbTooltipComponent,
@@ -46,6 +52,8 @@ import { GbUtilsModule } from '../../gb-utils-module/gb-utils.module';
   ],
   exports: [
     GbCombinationConstraintComponent,
+    GbCompositeConstraintComponent,
+    GbSequentialConstraintComponent,
     GbConstraintComponent,
     GbConceptConstraintComponent,
     GbTooltipComponent,

@@ -5,34 +5,34 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import { v4 as uuidv4 } from 'uuid';
-import { Injectable } from '@angular/core';
-import { AuthenticationService } from './authentication.service';
-import { CryptoService } from './crypto.service';
-import { MedcoNetworkService } from './api/medco-network.service';
-import { forkJoin, Observable, of } from 'rxjs';
-import { ExploreSearchService } from './api/medco-node/explore-search.service';
-import { ApiSurvivalAnalysisService } from './api/medco-node/api-survival-analysis.service';
-import { CohortService } from './cohort.service';
-import { Concept } from '../models/constraint-models/concept';
-import { ApiI2b2Panel } from '../models/api-request-models/medco-node/api-i2b2-panel';
-import { ClearGroup } from '../models/survival-analysis/clear-group';
-import { ApiSurvivalAnalysisResponse } from '../models/api-response-models/survival-analysis/survival-analysis-response';
-import { SurvivalAnalysisClear } from '../models/survival-analysis/survival-analysis-clear';
-import { Granularity } from '../models/survival-analysis/granularity-type';
-import { ErrorHelper } from '../utilities/error-helper';
-import { ConstraintMappingService } from './constraint-mapping.service';
-import { When } from '../models/survival-analysis/when-type';
-import { SurvivalSettings } from '../models/survival-analysis/survival-settings';
-import { ApiSurvivalAnalysis } from '../models/api-request-models/survival-analyis/api-survival-analysis';
-import { CombinationConstraint } from '../models/constraint-models/combination-constraint';
-import { map } from 'rxjs/operators';
-import { ApiI2b2Timing } from '../models/api-request-models/medco-node/api-i2b2-timing';
+import {v4 as uuidv4} from 'uuid';
+import {Injectable} from '@angular/core';
+import {AuthenticationService} from './authentication.service';
+import {CryptoService} from './crypto.service';
+import {MedcoNetworkService} from './api/medco-network.service';
+import {ExploreSearchService} from './api/medco-node/explore-search.service';
+import {ApiSurvivalAnalysisService} from './api/medco-node/api-survival-analysis.service';
+import {CohortService} from './cohort.service';
+import {Concept} from '../models/constraint-models/concept';
+import {Granularity} from '../models/survival-analysis/granularity-type';
+import {ErrorHelper} from '../utilities/error-helper';
+import {ConstraintMappingService} from './constraint-mapping.service';
+import {When} from '../models/survival-analysis/when-type';
+import {SurvivalSettings} from '../models/survival-analysis/survival-settings';
+import {ApiSurvivalAnalysis} from '../models/api-request-models/survival-analyis/api-survival-analysis';
+import {CombinationConstraint} from '../models/constraint-models/combination-constraint';
+import {ApiI2b2Timing} from '../models/api-request-models/medco-node/api-i2b2-timing';
+import {QueryTemporalSetting} from '../models/query-models/query-temporal-setting';
+import {SequentialConstraint} from '../models/constraint-models/sequential-constraint';
+import {QueryService} from './query.service';
 
 export class SubGroup {
   name: string
   timing: ApiI2b2Timing
-  rootConstraint: CombinationConstraint
+
+  queryTemporalSetting: QueryTemporalSetting
+  rootSelectionConstraint: CombinationConstraint
+  rootSequentialConstraint: SequentialConstraint
 }
 
 @Injectable()
@@ -124,6 +124,7 @@ export class SurvivalService {
     private medcoNetworkService: MedcoNetworkService,
     private exploreSearchService: ExploreSearchService,
     private apiSurvivalAnalysisService: ApiSurvivalAnalysisService,
+    private queryService: QueryService,
     private cohortService: CohortService,
     private constraintMappingService: ConstraintMappingService) {
     this._patientGroupIds = new Map<string, number[]>()
@@ -131,19 +132,6 @@ export class SurvivalService {
     ).bind(this))
 
 
-  }
-
-
-  generatePanels(subGroup: SubGroup): ApiI2b2Panel[] {
-
-    if (!subGroup.rootConstraint) {
-      return null
-    }
-
-    let constraint = subGroup.rootConstraint
-
-    return this.constraintMappingService.mapConstraint(constraint,
-      subGroup.timing === ApiI2b2Timing.sameInstanceNum ? true : false)
   }
 
   runSurvivalAnalysis() {
@@ -185,7 +173,19 @@ export class SurvivalService {
 
     apiSurvivalAnalysis.cohortQueryID = this.cohortService.selectedCohort.exploreQueryId;
     apiSurvivalAnalysis.subGroupsDefinitions = this.subGroups.map(
-      sg => { return { name: sg.name, timing: sg.timing, panels: this.generatePanels(sg) } }
+      sg => {
+        return {
+          name: sg.name,
+          constraint: {
+            queryTiming: sg.timing,
+            selectionPanels: this.constraintMappingService.mapConstraint(sg.rootSelectionConstraint,
+              this.queryService.queryTiming === QueryTemporalSetting.independent),
+            sequentialPanels: this.constraintMappingService.mapConstraint(sg.rootSequentialConstraint,
+              this.queryService.queryTiming === QueryTemporalSetting.independent),
+            sequentialOperators: sg.rootSequentialConstraint.temporalSequence,
+          }
+        }
+      }
     )
 
 
@@ -197,7 +197,8 @@ export class SurvivalService {
     let subGroupsTextualRepresentations = this._subGroups.map(sg => {
       return {
         groupId: sg.name,
-        rootConstraint: sg.rootConstraint ? sg.rootConstraint.textRepresentation : null
+        rootSelectionConstraint: sg.rootSelectionConstraint ? sg.rootSelectionConstraint.textRepresentation : null,
+        rootSequentialConstraint: sg.rootSequentialConstraint ? sg.rootSequentialConstraint.textRepresentation : null
       }
     })
     return new SurvivalSettings(

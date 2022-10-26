@@ -31,15 +31,17 @@
 
           <span>
             <!-- disabled button during query -->
-            <button *ngIf="!isUpdating && ((isBiorefMode && hasAnalytes) || hasConstraint); else disabledButton" type="button" (click)="execQuery($event)"
+            <button *ngIf="!isUpdating && ((isBiorefMode && hasAnalytes) || hasDefinitions); else disabledButton" type="button" (click)="execQuery($event)"
               class="btn btn-outline-primary btn-sm gb-data-selection-update-btn
-              {{isDirty? 'gb-explore-query-btn-dirty' : ''}}">
+              {{isDirty? 'gb-explore-query-btn-dirty' : ''}}" >
               Run
             </button>
             <ng-template #disabledButton>
-              <button type="button" disabled class="btn btn-outline-primary btn-sm gb-data-selection-update-btn">
-                Run
-              </button>
+              <span pTooltip="{{ runDisabledReason }}" >
+                <button type="button" disabled class="btn btn-outline-primary btn-sm gb-data-selection-update-btn">
+                  Run
+                </button>
+              </span>
             </ng-template>
 
             <i *ngIf="isUpdating" class="fa fa-circle-o-notch fa-spin"
@@ -55,42 +57,42 @@
         </span>
       </div>
   </div>
+  <div *ngIf="isBiorefMode" #analytesDropzones class="input-label-wrapper analytes-explore-container">
+    <div title="Variable to analyze" class="title-label">
+      Analytes:
+    </div>
+    <gb-analytes-dropzones></gb-analytes-dropzones>
+    <br>
+    <p-accordion class="gb-additional-param-wrapper">
+      <p-accordionTab header="Additional settings" [selected]="false">
+        <p>Defaults recommended by the CLSI guidelines</p>
+        <div class="gb-additional-param"><label>Number of Bootstrap iterations</label><br>
+          <input type="number" [(ngModel)]="bootR" pInputText placeholder="Number of Bootstrap iterations" />
+        </div>
+    
+        <div class="gb-additional-param"><label>Minimum Sample Size</label><br>
+          <input type="number" value="240" [(ngModel)]="minSampleSize" pInputText placeholder="Minimum Sample Size" />
+        </div>
+    
+        <div class="gb-additional-param"><label>Maximum Sample Size (-1 is no maximum)</label><br>
+          <input type="number" [(ngModel)]="maxSampleSize" pInputText placeholder="Maximum Sample Size" />
+        </div>
+    
+        <div class="gb-additional-param"><label>Low percentile</label><br>
+          <input type="number" [(ngModel)]="percentileLow" pInputText placeholder="Low percentile" />
+        </div>
+    
+        <div class="gb-additional-param"><label>High percentile</label><br>
+          <input type="number" [(ngModel)]="percentileHigh" pInputText placeholder="High percentile" />
+        </div>
+      </p-accordionTab>
+    </p-accordion>
+  </div>
   <div style="margin-top: 1em;">
     <div *ngIf="isBiorefMode" class="title-label">
       Cohort definition:
     </div>
     <gb-selection [operationType]="OperationType.EXPLORE"></gb-selection>
   </div>
-  <div *ngIf="isBiorefMode" #analytesDropzones class="input-label-wrapper small-font analytes-explore-container">
-    <div title="Variable to analyze" class="title-label">
-        Analytes:
-    </div>
-    <gb-analytes-dropzones></gb-analytes-dropzones>
-    <br>
-    <p-accordion>
-      <p-accordionTab header="Additional settings" [selected]="false">
-        <div class="gb-additional-param"><label>Number of Bootstrap iterations</label><br>
-        <input type="number" [(ngModel)]="bootR" pInputText placeholder="Number of Bootstrap iterations" />
-        </div>
-
-        <div class="gb-additional-param"><label>Minimum Sample Size</label><br>
-        <input type="number" value="240" [(ngModel)]="minSampleSize" pInputText placeholder="Minimum Sample Size" />
-        </div>
-
-        <div class="gb-additional-param"><label>Maximum Sample Size (-1 is no maximum)</label><br>
-        <input type="number" [(ngModel)]="maxSampleSize" pInputText placeholder="Maximum Sample Size" />
-        </div>
-
-        <div class="gb-additional-param"><label>Low percentile</label><br>
-        <input type="number" [(ngModel)]="percentileLow" pInputText placeholder="Low percentile" />
-        </div>
-
-        <div class="gb-additional-param"><label>High percentile</label><br>
-        <input type="number" [(ngModel)]="percentileHigh" pInputText placeholder="High percentile" />
-        </div>
-      </p-accordionTab>
-    </p-accordion>
-  </div>
-
 
 </div>

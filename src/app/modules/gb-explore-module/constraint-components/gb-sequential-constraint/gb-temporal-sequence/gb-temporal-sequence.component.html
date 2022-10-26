@@ -1,0 +1,28 @@
+<div style="display: block; text-align: center; line-height: 3rem; font-size: small;">
+  <p-dropdown [style]="{'text-align': 'left'}" dropdownIcon="pi pi-caret-down white-color" [(ngModel)]="whichDateFirst"
+              [options]="whichDate"></p-dropdown>
+  &nbsp;of&nbsp;<p-dropdown [style]="{'text-align': 'left'}" dropdownIcon="pi pi-caret-down white-color" [(ngModel)]="whichObservationFirst"
+                            [options]="whichObservation"></p-dropdown> Observation A
+  <br>
+  occurs <p-dropdown [style]="{'text-align': 'left', 'min-width': '11rem'}" dropdownIcon="pi pi-caret-down white-color"
+                     [(ngModel)]="whenOperator" [options]="when"></p-dropdown>
+  <br>
+  <p-dropdown [style]="{'text-align': 'left'}" dropdownIcon="pi pi-caret-down white-color" [(ngModel)]="whichDateSecond"
+              [options]="whichDate">
+  </p-dropdown>
+  &nbsp;of&nbsp;<p-dropdown [style]="{'text-align': 'left'}" dropdownIcon="pi pi-caret-down white-color"
+                            [(ngModel)]="whichObservationSecond" [options]="whichObservation"></p-dropdown> Observation B
+  <br>
+  <br>
+  <p-checkbox  [(ngModel)]="firstSpanEnabled" [binary]="true"></p-checkbox> by <p-dropdown [style]="{'text-align': 'left'}"  [options]="spanOperator" [(ngModel)]="firstSpan.operator" [disabled]="!firstSpanEnabled"></p-dropdown>&nbsp;
+  <p-inputNumber [(ngModel)]="firstSpan.value" [disabled]="!firstSpanEnabled"></p-inputNumber>&nbsp;
+  <p-dropdown [style]="{'text-align': 'left'}" [options]="spanUnits" [(ngModel)]="firstSpan.units" [disabled]="!firstSpanEnabled"></p-dropdown>
+  <br>
+  <p-checkbox [(ngModel)]="secondSpanEnabled" [binary]="true" [disabled]="!firstSpanEnabled"></p-checkbox> and <p-dropdown [style]="{'text-align': 'left'}"  [options]="spanOperator" [(ngModel)]="secondSpan.operator" [disabled]="!secondSpanEnabled"></p-dropdown>&nbsp;
+  <p-inputNumber [(ngModel)]="secondSpan.value" [disabled]="!secondSpanEnabled"></p-inputNumber>&nbsp;
+  <p-dropdown [style]="{'text-align': 'left'}" [options]="spanUnits" [(ngModel)]="secondSpan.units" [disabled]="!secondSpanEnabled"></p-dropdown>
+  <br>
+  <div style="text-align: right;">
+    <p-button label="OK" icon="fa fa-check" (onClick)="validate()"></p-button>
+  </div>
+</div>

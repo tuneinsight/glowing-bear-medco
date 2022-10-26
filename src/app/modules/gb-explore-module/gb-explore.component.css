@@ -76,6 +76,10 @@
   opacity: .5;
 }
 
+.gb-additional-param-wrapper {
+  font-size: small;
+}
+
 .gb-additional-param {
   margin-bottom: 10px;
 }
