@@ -147,11 +147,11 @@ export class ExploreStatisticsService {
     analytesSubject: Subject<Set<TreeNode>> = new ReplaySubject(1)
 
     // Number or reference interval operations
-    @Input() _bootR: number = 1000
-    @Input() _minSampleSize: number = 240
-    @Input() _maxSampleSize: number = -1
-    @Input() _percentileLow: number = 0.025
-    @Input() _percentileHigh: number = 0.975
+    @Input() _bootR = 1000
+    @Input() _minSampleSize = 240
+    @Input() _maxSampleSize = -1
+    @Input() _percentileLow = 0.025
+    @Input() _percentileHigh = 0.975
 
     private static getNewQueryID(): string {
         return uuidv4();
