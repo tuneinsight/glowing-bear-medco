@@ -22,6 +22,11 @@ export class ReferenceIntervalComputer {
     private intervals: NumericInterval[]
 
     private _binWidth: number
+    private _bootR: number
+    private _minSampleSize: number
+    private _maxSampleSize: number
+    private _percentileLow: number
+    private _percentileHigh: number
 
     // https://stackoverflow.com/questions/11935175/sampling-a-random-subset-from-an-array
     private static getRandomSubarray<T>(arr: T[], size: number) {
@@ -35,13 +40,17 @@ export class ReferenceIntervalComputer {
     }
 
 
-    static bootstrapReferenceInterval(fullData: number[], sampleSize = 240,
+    static bootstrapReferenceInterval(fullData: number[], minSampleSize = 240, maxSampleSize = -1,
         bootR = 1000, percentileLow = 0.025, percentileHigh = 0.975): Bootstrapping {
         const riLow = []
         const riHigh = []
 
-        if (fullData.length > sampleSize) {
+        let sampleSize = minSampleSize
+        if (fullData.length > minSampleSize) {
             sampleSize = fullData.length
+        }
+        if (maxSampleSize > 0 && sampleSize > maxSampleSize) {
+            sampleSize = maxSampleSize
         }
 
 
@@ -99,8 +108,13 @@ export class ReferenceIntervalComputer {
 
     }
 
-    constructor(intervals: Interval[]) {
+    constructor(intervals: Interval[], bootR = 1000, minSampleSize = 240, maxSampleSize = -1, percentileLow = 0.025, percentileHigh = 0.975) {
         this.intervals = intervals.map(i => new NumericInterval(i))
+        this._bootR = bootR
+        this._minSampleSize = minSampleSize
+        this._maxSampleSize = maxSampleSize
+        this._percentileLow = percentileLow
+        this._percentileHigh = percentileHigh
         this.calcBinWidth()
     }
 
@@ -146,7 +160,15 @@ export class ReferenceIntervalComputer {
 
     compute(): [ConfidenceInterval, ConfidenceInterval] {
         const fullData = this.recreateData()
-        const bootstrapping = ReferenceIntervalComputer.bootstrapReferenceInterval(fullData)
+        const bootstrapping = ReferenceIntervalComputer.bootstrapReferenceInterval(
+            fullData,
+            this._minSampleSize,
+            this._maxSampleSize,
+            this._bootR,
+            this._percentileLow,
+            this._percentileHigh
+        )
+
         const CILow = ReferenceIntervalComputer.calcBootRI(bootstrapping.RILow)
         const CIHigh = ReferenceIntervalComputer.calcBootRI(bootstrapping.RIHigh)
         console.log('Computed RI: ', CILow, CIHigh)

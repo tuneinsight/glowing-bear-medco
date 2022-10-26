@@ -50,6 +50,11 @@ ENV GB_MEDCO_NODE_URL="http://localhost:3100" \
     GB_KEYCLOAK_URL="http://localhost:8080/auth" \
     GB_KEYCLOAK_REALM="ti-realm" \
     GB_KEYCLOAK_CLIENT_ID="glowing-bear" \
-    GB_FOOTER_TEXT=""
+    GB_FOOTER_TEXT="" \
+    GB_BOOTR="" \
+    GB_MIN_SAMPLE_SIZE="" \
+    GB_MAX_SAMPLE_SIZE="" \
+    GB_PERCENTILE_LOW="" \
+    GB_PERCENTILE_HIGH=""
 
 ENTRYPOINT /bin/bash -c "/write-gb-config.sh && exec nginx -g 'daemon off;'"

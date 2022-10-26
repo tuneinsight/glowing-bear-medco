@@ -46,8 +46,14 @@ class ReferenceRange {
     readonly CI1: ConfidenceInterval
     readonly CI2: ConfidenceInterval
 
-    constructor(intervals: Interval[]) {
-        const riComputer = new ReferenceIntervalComputer(intervals)
+    constructor(appConfig: AppConfig, intervals: Interval[]) {
+        const bootR = appConfig.getConfig('boot-r') !== "" ? parseInt(appConfig.getConfig('boot-r')) : 1000
+        const minSampleSize = appConfig.getConfig('min-sample-size') !== "" ? parseInt(appConfig.getConfig('min-sample-size')) : 240
+        const maxSampleSize = appConfig.getConfig('max-sample-size') !== "" ? parseInt(appConfig.getConfig('max-sample-size')) : -1
+        const percentileLow = appConfig.getConfig('percentile-low') !== "" ? parseFloat(appConfig.getConfig('percentile-low')) : 0.025
+        const percentileHigh = appConfig.getConfig('percentile-high') !== "" ? parseFloat(appConfig.getConfig('percentile-high')) : 0.975
+
+        const riComputer = new ReferenceIntervalComputer(intervals, bootR, minSampleSize, maxSampleSize, percentileLow, percentileHigh)
         const RI = riComputer.compute()
 
         this.CI1 = RI[0]
@@ -66,13 +72,13 @@ export class ChartInformation {
     readonly referenceRange: ReferenceRange
 
 
-    constructor(intervals: Interval[], unit: string,
+    constructor(private appConfig: AppConfig, intervals: Interval[], unit: string,
         public readonly treeNodeName: string, public readonly cohortName: string) {
 
         this.intervals = intervals
         this.unit = unit
 
-        this.referenceRange = new ReferenceRange(intervals)
+        this.referenceRange = new ReferenceRange(appConfig, intervals)
 
         this.CI1 = this.referenceRange.CI1
         this.CI2 = this.referenceRange.CI2
@@ -286,6 +292,7 @@ export class ExploreStatisticsService {
                     }, []);
 
                     const newChartInformation = new ChartInformation(
+                        this.config,
                         intervals,
                         result.unit,
                         result.analyteName,
