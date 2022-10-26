@@ -237,7 +237,7 @@ export class ExploreStatisticsService {
         };
 
         this.displayLoadingIcon.next(true);
-        this.ProcessingStep.next("Querying the results...");
+        this.ProcessingStep.next('Querying the results...');
 
         const observableRequest = this.sendRequest(apiRequest);
 
@@ -245,7 +245,7 @@ export class ExploreStatisticsService {
         this.navbarService.navigateToExploreStatisticsTab();
 
         observableRequest.subscribe((answers: ApiExploreStatisticsResponse[]) => {
-            this.ProcessingStep.next("Results received. Processing results...");
+            this.ProcessingStep.next('Results received. Processing results...');
             this.handleAnswer(answers, cohortConstraint);
             this.queryService.isUpdating = false;
         }, err => {
@@ -276,7 +276,7 @@ export class ExploreStatisticsService {
         }
 
 
-        this.ProcessingStep.next("Results received and decrypted. Bootstrapping for the reference interval...");
+        this.ProcessingStep.next('Results received and decrypted. Bootstrapping for the reference interval...');
         setTimeout(() => { // Allow the UI to update before starting the bootstrap
 
             const chartsInformations =
@@ -304,10 +304,10 @@ export class ExploreStatisticsService {
 
             if (chartsInformations.length) {
                 // waiting for the intervals to be bootstrapped and emit the chart information to external listeners.
-                this.ProcessingStep.next("Done.");
+                this.ProcessingStep.next('Done');
                 this.chartsDataSubject.next(chartsInformations);
             }
-            this.ProcessingStep.next("");
+            this.ProcessingStep.next('');
             this.displayLoadingIcon.next(false);
         }, 20);
     }
@@ -354,7 +354,7 @@ export class ExploreStatisticsService {
                         };
                   });
 
-                  this.ProcessingStep.next("Results received and decrypted. Processing...");
+                  this.ProcessingStep.next('Results received and decrypted. Processing...');
 
                   return [{
                       globalTimers: [],
