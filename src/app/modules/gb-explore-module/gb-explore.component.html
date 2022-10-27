@@ -62,6 +62,31 @@
       Analytes:
     </div>
     <gb-analytes-dropzones></gb-analytes-dropzones>
+    <br>
+    <p-accordion class="gb-additional-param-wrapper">
+      <p-accordionTab header="Additional settings" [selected]="false">
+        <p>Defaults recommended by the CLSI guidelines</p>
+        <div class="gb-additional-param"><label>Number of Bootstrap iterations</label><br>
+          <input type="number" [(ngModel)]="bootR" pInputText placeholder="Number of Bootstrap iterations" />
+        </div>
+    
+        <div class="gb-additional-param"><label>Minimum Sample Size</label><br>
+          <input type="number" value="240" [(ngModel)]="minSampleSize" pInputText placeholder="Minimum Sample Size" />
+        </div>
+    
+        <div class="gb-additional-param"><label>Maximum Sample Size (-1 is no maximum)</label><br>
+          <input type="number" [(ngModel)]="maxSampleSize" pInputText placeholder="Maximum Sample Size" />
+        </div>
+    
+        <div class="gb-additional-param"><label>Low percentile</label><br>
+          <input type="number" [(ngModel)]="percentileLow" pInputText placeholder="Low percentile" />
+        </div>
+    
+        <div class="gb-additional-param"><label>High percentile</label><br>
+          <input type="number" [(ngModel)]="percentileHigh" pInputText placeholder="High percentile" />
+        </div>
+      </p-accordionTab>
+    </p-accordion>
   </div>
   <div style="margin-top: 1em;">
     <div *ngIf="isBiorefMode" class="title-label">
@@ -69,7 +94,5 @@
     </div>
     <gb-selection [operationType]="OperationType.EXPLORE"></gb-selection>
   </div>
-
-
 
 </div>

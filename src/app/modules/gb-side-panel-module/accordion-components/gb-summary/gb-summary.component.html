@@ -1,11 +1,16 @@
 <div>
   <!-- <h6>Project: {{projectName}}</h6> -->
+  <p-dialog *ngIf="isBiorefMode" [style]="{'float': 'right'}">
+    <a href="http://bioref.ch" target="_blank"><img title="Swiss BioRef" style="margin-right: 5px" width="180px" src="assets/icons/swiss-bioref-logo.png" /></a>
+  </p-dialog>
+  <ul>
   <h6>Participants <span><button pButton class="ui-button-secondary no-background" [disabled]="isRefreshingNodes"
       [ngStyle]="{'color': isRefreshingNodes ? 'var(--gb-light-light-clinical-green)':'var(--gb-ti-main-color)'}"
       type="button" pTooltip="Refresh participants" tooltipPosition="top" (click)="refreshNodes()" icon="fa fa-refresh">
     </button>
   </span></h6>
-  <ul>
+  
+  
     <li *ngFor="let node of getNodes; let nodeIdx = index" [pTooltip]="getTooltipMessage(node.name)" class="participant-node" [ngClass]="{'node_is_up': isNodeUp(node.name), 'not-in-project': !isNodeInProject(node.name)}">
       {{node.name}}
       <span *ngIf="node.current"> (you)</span>
