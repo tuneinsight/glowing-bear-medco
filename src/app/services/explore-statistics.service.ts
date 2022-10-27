@@ -343,7 +343,7 @@ export class ExploreStatisticsService {
                         this._bootR,
                         this._minSampleSize, this._maxSampleSize,
                         this._percentileLow, this._percentileHigh
-                        );
+                    );
                     console.log('chart for result ' + index + ' computed in ' + Math.round(performance.now() - start) + ' ms')
 
                     if (newChartInformation.numberOfObservations() > 0) {
