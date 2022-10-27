@@ -285,7 +285,7 @@ export class ExploreStatisticsService {
         };
 
         this.displayLoadingIcon.next(true);
-        this.ProcessingStep.next('Querying the results...');
+        this.ProcessingStep.next('Querying the data...');
 
         const observableRequest = this.sendRequest(apiRequest);
 
@@ -408,7 +408,7 @@ export class ExploreStatisticsService {
                                   higherBound: `${bounds[1]}.00000`
                                 };
                           }),
-                          unit: ' test value 2',
+                          unit: '',
                           timers: []
                         };
                   });
