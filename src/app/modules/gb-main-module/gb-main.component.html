@@ -37,6 +37,14 @@
 
       <p-button *ngIf="isBiorefMode" (click)="showCopyrightDialog()" icon="pi pi-external-link" label="Copyright notice"></p-button>
       <p-dialog *ngIf="isBiorefMode" header="Copyright notice" [(visible)]="displayCopyright" [style]="{width: '50vw'}">
+        
+        <h3>Software License</h3>
+        <p>
+          This version of the software is developed and maintained by <a href="https://tuneinsight.com">Tune Insight</a>.<br>
+          The web interface is based on <a href="https://github.com/tuneinsight/glowing-bear-medco">Glowing Bear</a> and under the <a href="https://github.com/tuneinsight/glowing-bear-medco/blob/main/LICENSE">Mozilla Public License Version 2.0</a>.<br>
+        </p>
+        <br>
+        <h3>Ontology copyright notice</h3>
         <p>
           <b>GMDN</b>: GMDN ® is a registered trademark of The <a target="_blank" rel="noopener noreferrer"
             href="https://www.gmdnagency.org/">GMDN Agency</a>. All rights reserved. The copyright and database
