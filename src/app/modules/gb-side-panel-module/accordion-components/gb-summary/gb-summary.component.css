@@ -12,3 +12,13 @@
     background-color: transparent !important;
     box-shadow: none !important;
 }
+
+.gb-participants-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.gb-participants-list {
+    min-width: fit-content;
+    margin-right: 5px;
+}
