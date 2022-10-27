@@ -332,6 +332,10 @@ export class LineChartComponent extends ChartComponent {
     private buildInterpolatedConfig(data: ChartData): ChartConfiguration {
 
 
+        let xUnit = ''
+        if (this.chartInfo.unit) {
+            xUnit = ' [' + this.chartInfo.unit + ']'
+        }
 
         return {
             type: this.chartJSType,
@@ -356,7 +360,7 @@ export class LineChartComponent extends ChartComponent {
                         type: 'linear',
                         title: {
                             display: true,
-                            text: this.chartInfo.treeNodeName + ' [' + this.chartInfo.unit + ']',
+                            text: this.chartInfo.treeNodeName + xUnit,
                         }
                     },
                     y: {
