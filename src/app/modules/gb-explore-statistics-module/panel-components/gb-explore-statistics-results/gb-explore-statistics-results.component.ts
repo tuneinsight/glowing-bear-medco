@@ -61,6 +61,7 @@ export class GbExploreStatisticsResultsComponent implements AfterViewInit, OnDes
   private componentRefs: Array<ComponentRef<any>> = []
 
   private _displayLoadingIcon = false
+  private _currentStep = ''
 
   private exportPDFSubscription: Subscription
 
@@ -134,7 +135,6 @@ export class GbExploreStatisticsResultsComponent implements AfterViewInit, OnDes
 
   private displayCharts(chartsInfo: ChartInformation[]) {
 
-
     // Clean the content of the canvas container: remove the previous charts from the canvas container
     this.canvasContainer.clear()
 
@@ -168,12 +168,22 @@ export class GbExploreStatisticsResultsComponent implements AfterViewInit, OnDes
     return this._displayLoadingIcon
   }
 
+  get currentStep() {
+    return this._currentStep
+  }
+
   ngOnInit() {
     Chart.register(annotationPlugin);
     Chart.register(...registerables) // for the x and y scales options in the config of chart js
 
     this.exploreStatisticsService.displayLoadingIcon.subscribe((display: boolean) => {
       this._displayLoadingIcon = display
+      this.cdref.detectChanges();
+    })
+
+    this.exploreStatisticsService.ProcessingStep.subscribe((step: string) => {
+      console.log(step)
+      this._currentStep = step
       this.cdref.detectChanges();
     })
   }

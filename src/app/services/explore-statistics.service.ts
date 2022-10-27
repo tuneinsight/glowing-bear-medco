@@ -1,5 +1,5 @@
 import {v4 as uuidv4} from 'uuid';
-import {Injectable, Output} from '@angular/core';
+import { Injectable, Output, Input } from '@angular/core';
 import {Observable, of, ReplaySubject, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {ApiI2b2Panel} from '../models/api-request-models/medco-node/api-i2b2-panel';
@@ -53,8 +53,17 @@ class ReferenceRange {
     readonly CI1: ConfidenceInterval
     readonly CI2: ConfidenceInterval
 
-    constructor(intervals: Interval[]) {
-        const riComputer = new ReferenceIntervalComputer(intervals)
+    constructor(intervals: Interval[], bootR: number, minSampleSize: number, maxSampleSize: number,
+        percentileLow: number, percentileHigh: number) {
+
+        const riComputer = new ReferenceIntervalComputer(
+            intervals,
+            bootR,
+            minSampleSize,
+            maxSampleSize,
+            percentileLow,
+            percentileHigh
+        )
         const RI = riComputer.compute()
 
         this.CI1 = RI[0]
@@ -74,12 +83,21 @@ export class ChartInformation {
 
 
     constructor(intervals: Interval[], unit: string,
-        public readonly treeNodeName: string, public readonly cohortName: string) {
+        public readonly treeNodeName: string, public readonly cohortName: string,
+        bootR: number, minSampleSize: number, maxSampleSize: number,
+        percentileLow: number, percentileHigh: number) {
 
         this.intervals = intervals
         this.unit = unit
 
-        this.referenceRange = new ReferenceRange(intervals)
+        this.referenceRange = new ReferenceRange(
+            intervals,
+            bootR,
+            minSampleSize,
+            maxSampleSize,
+            percentileLow,
+            percentileHigh
+        )
 
         this.CI1 = this.referenceRange.CI1
         this.CI2 = this.referenceRange.CI2
@@ -120,10 +138,20 @@ export class ExploreStatisticsService {
     // Emits whenever an export of the statistical results as a pdf document needs to be generated.
     exportPDF: Subject<any> = new Subject();
 
+    // ProcessingStep
+    @Output() ProcessingStep: Subject<string> = new ReplaySubject(1)
+
     // This observable emits the latest query's cohort inclusion criteria for the explore statistics query
     rootConstraint: Subject<CombinationConstraint> = new ReplaySubject(1)
     // This observable emits the latest explore statistics query set of analytes
     analytesSubject: Subject<Set<TreeNode>> = new ReplaySubject(1)
+
+    // Number or reference interval operations
+    @Input() _bootR = 1000
+    @Input() _minSampleSize = 240
+    @Input() _maxSampleSize = -1
+    @Input() _percentileLow = 0.025
+    @Input() _percentileHigh = 0.975
 
     private static getNewQueryID(): string {
         return uuidv4();
@@ -140,6 +168,22 @@ export class ExploreStatisticsService {
         private reverseConstraintMappingService: ConstraintReverseMappingService,
         private navbarService: NavbarService
     ) {
+
+
+    this._bootR = config.getConfig('boot-r') ?
+        parseInt(config.getConfig('boot-r'), 10) : 1000
+
+    this._minSampleSize = config.getConfig('min-sample-size') ?
+        parseInt(config.getConfig('min-sample-size'), 10) : 240
+
+    this._maxSampleSize = config.getConfig('max-sample-size') ?
+        parseInt(config.getConfig('max-sample-size'), 10) : -1
+
+    this._percentileLow = config.getConfig('percentile-low') ?
+        parseFloat(config.getConfig('percentile-low')) : 0.025
+
+    this._percentileHigh = config.getConfig('percentile-high') ?
+        parseFloat(config.getConfig('percentile-high')) : 0.975
 
     }
 
@@ -241,6 +285,7 @@ export class ExploreStatisticsService {
         };
 
         this.displayLoadingIcon.next(true);
+        this.ProcessingStep.next('Querying the results...');
 
         const observableRequest = this.sendRequest(apiRequest);
 
@@ -248,6 +293,7 @@ export class ExploreStatisticsService {
         this.navbarService.navigateToExploreStatisticsTab();
 
         observableRequest.subscribe((answers: ApiExploreStatisticsResponse[]) => {
+            this.ProcessingStep.next('Results received. Processing results...');
             this.handleAnswer(answers, cohortConstraint);
             this.queryService.isUpdating = false;
         }, err => {
@@ -278,39 +324,47 @@ export class ExploreStatisticsService {
             throw ErrorHelper.handleNewError('Empty server response. Please verify you selected an analyte.');
         }
 
-        const chartsInformations =
-            serverResponse.results.reduce((responseResult, result: ApiExploreStatisticResult, index) => {
-                const intervals = result.intervals.reduce((intervalsResult, i) => {
+
+        this.ProcessingStep.next('Results received and decrypted. Bootstrapping for the reference interval...');
+        setTimeout(() => { // Allow the UI to update before starting the bootstrap
+
+            const chartsInformations =
+                serverResponse.results.reduce((responseResult, result: ApiExploreStatisticResult, index) => {
+                    const intervals = result.intervals.reduce((intervalsResult, i) => {
                         return [ ...intervalsResult, new Interval(i.lowerBound, i.higherBound, i.count) ];
-                    }, []
-                );
-                const start = performance.now()
-                console.log('computing chart and referece intervals for result ' + index)
-                const newChartInformation = new ChartInformation(
-                    intervals,
-                    result.unit,
-                    result.analyteName,
-                    cohortConstraint.textRepresentation);
-                console.log('chart for result ' + index + ' computed in ' + Math.round(performance.now() - start) + ' ms')
+                    }, []);
+                    const start = performance.now()
+                    console.log('computing chart and reference intervals for result ' + index)
+                    const newChartInformation = new ChartInformation(
+                        intervals,
+                        result.unit,
+                        result.analyteName,
+                        cohortConstraint.textRepresentation,
+                        this._bootR,
+                        this._minSampleSize, this._maxSampleSize,
+                        this._percentileLow, this._percentileHigh
+                        );
+                    console.log('chart for result ' + index + ' computed in ' + Math.round(performance.now() - start) + ' ms')
 
-                if (newChartInformation.numberOfObservations() > 0) {
-                    return [
-                        ...responseResult,
-                        newChartInformation
-                    ];
-                } else {
-                    MessageHelper.alert('info', `0 observations for the ${result.analyteName} analyte.`);
-                    return responseResult;
-                }
-            }, []);
+                    if (newChartInformation.numberOfObservations() > 0) {
+                        return [
+                            ...responseResult,
+                            newChartInformation
+                        ];
+                    } else {
+                        MessageHelper.alert('info', `0 observations for the ${result.analyteName} analyte.`);
+                        return responseResult;
+                    }
+                }, []);
 
-
-        if (chartsInformations.length) {
-           console.log('waiting for the intervals to be decrypted')
-            // waiting for the intervals to be decrypted by the crypto service to emit the chart information to external listeners.
-            this.chartsDataSubject.next(chartsInformations);
-        }
-        this.displayLoadingIcon.next(false);
+            if (chartsInformations.length) {
+                // waiting for the intervals to be bootstrapped and emit the chart information to external listeners.
+                this.ProcessingStep.next('Done');
+                this.chartsDataSubject.next(chartsInformations);
+            }
+            this.ProcessingStep.next('');
+            this.displayLoadingIcon.next(false);
+        }, 20);
     }
 
     private sendRequest(apiRequest: ApiExploreStatistics): Observable<ApiExploreStatisticsResponse[]> {
@@ -359,6 +413,8 @@ export class ExploreStatisticsService {
                         };
                   });
                 console.log('decryption took ' + Math.round(performance.now() - start_dec) + ' ms')
+
+                  this.ProcessingStep.next('Results received and decrypted. Processing...');
 
                   return [{
                       globalTimers: [],
