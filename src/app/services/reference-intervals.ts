@@ -109,9 +109,9 @@ export class ReferenceIntervalComputer {
     }
 
     // getRandomHist returns a random histogram of the same distribution as the original histogram
-    private getRandomHist(arr: number[], sampleSize: number, fullDataLength: number): number[] {
+    private getRandomHist(arr: number[], sampleSize: number, histLength: number): number[] {
 
-        let sampled = new Array(fullDataLength); // Initialized to 0
+        let sampled = new Array(histLength); // Initialized to 0
         for (let i = 0; i < sampleSize; i++) {
             sampled[arr[Math.floor(Math.random() * arr.length)]]++;
         }
@@ -139,7 +139,7 @@ export class ReferenceIntervalComputer {
 
         let i = 0
         while (i <= bootR) {
-            const bootSample = this.getRandomHist(fullData, sampleSize, fullData.length)
+            const bootSample = this.getRandomHist(fullData, sampleSize, this.intervals.length)
 
             let cumulSum = bootSample[0]
             let k = 0
