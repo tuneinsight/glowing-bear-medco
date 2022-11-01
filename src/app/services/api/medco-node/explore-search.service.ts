@@ -40,14 +40,16 @@ export class ExploreSearchService {
     private apiEndpointService: ApiEndpointService,
     private injector: Injector,
     private keycloakService: KeycloakService,
-    private treeNodeService: TreeNodeService) { }
+    // private treeNodeService: TreeNodeService
+    ) { }
 
     private mapSearchResults(searchResp) {
-      if (this.treeNodeService.isLoading && searchResp.error) {
-        console.error(searchResp.error);
-        alert(`Error while getting initial tree. Maybe i2b2 service is not running? Please contact an administrator. You will now be logged out.`);
-        this.keycloakService.logout();
-      }
+      // if (this.treeNodeService.isLoading && searchResp.error) {
+      //   console.error(searchResp.error);
+      //   alert(`Error while getting initial tree. \
+      // Maybe i2b2 service is not running? Please contact an administrator. You will now be logged out.`);
+      //   this.keycloakService.logout();
+      // }
       return (searchResp.results.searchResult || []).map((treeNodeObj) => {
         let treeNode = new TreeNode();
         treeNode.path = treeNodeObj['path'];

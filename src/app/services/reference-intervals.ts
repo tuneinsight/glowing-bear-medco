@@ -39,59 +39,6 @@ export class ReferenceIntervalComputer {
         return sampled;
     }
 
-    private getRandomHist(arr: number[], size: number, length: number): number[] {
-
-        let sampled = new Array(length);//Initialized to 0
-        for (let i = 0; i < size; i++) {
-          sampled[arr[Math.floor(Math.random() * arr.length)]]++;
-        }
-
-        return sampled;
-    }
-
-    bootstrapReferenceInterval_new(fullData: number[], minSampleSize = 240, maxSampleSize = -1,
-        bootR = 1000, percentileLow = 0.025, percentileHigh = 0.975): Bootstrapping {
-        const riLow = []
-        const riHigh = []
-
-        let sampleSize = minSampleSize
-        if (fullData.length > minSampleSize) {
-            sampleSize = fullData.length
-        }
-        if (maxSampleSize > 0 && sampleSize > maxSampleSize) {
-            sampleSize = maxSampleSize
-        }
-
-
-        const riLowIndex = Math.floor(sampleSize * percentileLow)
-        const riHighIndex = Math.floor(sampleSize * percentileHigh)
-
-
-        let i = 0
-        while (i <= bootR) {
-            const bootSample = this.getRandomHist(fullData, sampleSize, fullData.length)
-
-            let cumsum =bootSample[0]
-            let k=0
-            while (riLowIndex>=cumsum){
-                cumsum+=bootSample[++k]
-            }
-            riLow.push((this.intervals[k].lowerBound + this._binWidth/2))
-
-            cumsum =sampleSize-bootSample[bootSample.length-1]
-            k=bootSample.length-1
-            while (riHighIndex<cumsum){
-                cumsum-=bootSample[--k]
-            }
-            riHigh.push((this.intervals[k].lowerBound + this._binWidth/2))
-
-            i++
-        }
-
-
-        return new Bootstrapping(riLow, riHigh)
-    }
-
     static bootstrapReferenceInterval(fullData: number[], minSampleSize = 240, maxSampleSize = -1,
         bootR = 1000, percentileLow = 0.025, percentileHigh = 0.975): Bootstrapping {
         const riLow = []
@@ -126,6 +73,7 @@ export class ReferenceIntervalComputer {
         return new Bootstrapping(riLow, riHigh)
     }
 
+
     static sortAscending(arr: number[]) {
         arr.sort((x, y) => x - y)
     }
@@ -158,6 +106,59 @@ export class ReferenceIntervalComputer {
         const [CILow, CIHigh] = ReferenceIntervalComputer.quantile(RI)
         return new ConfidenceInterval(CILow, RIMean, CIHigh)
 
+    }
+
+    // getRandomHist returns a random histogram of the same distribution as the original histogram
+    private getRandomHist(arr: number[], sampleSize: number, fullDataLength: number): number[] {
+
+        let sampled = new Array(fullDataLength); // Initialized to 0
+        for (let i = 0; i < sampleSize; i++) {
+            sampled[arr[Math.floor(Math.random() * arr.length)]]++;
+        }
+
+        return sampled;
+    }
+
+    bootstrapReferenceInterval_new(fullData: number[], minSampleSize = 240, maxSampleSize = -1,
+        bootR = 1000, percentileLow = 0.025, percentileHigh = 0.975): Bootstrapping {
+        const riLow = []
+        const riHigh = []
+
+        let sampleSize = minSampleSize
+        if (fullData.length > minSampleSize) {
+            sampleSize = fullData.length
+        }
+        if (maxSampleSize > 0 && sampleSize > maxSampleSize) {
+            sampleSize = maxSampleSize
+        }
+
+
+        const riLowIndex = Math.floor(sampleSize * percentileLow)
+        const riHighIndex = Math.floor(sampleSize * percentileHigh)
+
+
+        let i = 0
+        while (i <= bootR) {
+            const bootSample = this.getRandomHist(fullData, sampleSize, fullData.length)
+
+            let cumulSum = bootSample[0]
+            let k = 0
+            while (riLowIndex >= cumulSum) {
+                cumulSum += bootSample[++k]
+            }
+            riLow.push((this.intervals[k].lowerBound + this._binWidth / 2))
+
+            cumulSum = sampleSize - bootSample[bootSample.length - 1]
+            k = this.intervals.length - 1
+            while (riHighIndex < cumulSum) {
+                cumulSum -= bootSample[--k]
+            }
+            riHigh.push((this.intervals[k].lowerBound + this._binWidth / 2))
+
+            i++
+        }
+
+        return new Bootstrapping(riLow, riHigh)
     }
 
     constructor(intervals: Interval[],
@@ -219,24 +220,16 @@ export class ReferenceIntervalComputer {
         * given intervals = { lowerBound = [2, 3, 4, 5], count = [4, 2, 0, 1]},
         * binWidth = 1 it will return [2, 2, 2, 2, 3, 3, 5] + .5 =  [2.5, 2.5, 2.5, 2.5, 3.5, 3.5, 5.5]
         */
-        // @ts-ignore
-        return this.intervals.flatMap((i,ind) => {
+       // @ts-ignore
+       return this.intervals.flatMap((i, ind) => {
             return Array(i.count).fill(ind)
         })
     }
 
 
     compute(): [ConfidenceInterval, ConfidenceInterval] {
-        const fullData = this.helperVector()//this.recreateData()
-        /*const bootstrapping = ReferenceIntervalComputer.bootstrapReferenceInterval_new(
-            fullData,
-            this._minSampleSize,
-            this._maxSampleSize,
-            this._bootR,
-            this._percentileLow,
-            this._percentileHigh
-        )*/
-        const bootstrapping = ReferenceIntervalComputer.bootstrapReferenceInterval_new(
+        const fullData = this.helperVector()
+        const bootstrapping = this.bootstrapReferenceInterval_new(
             fullData,
             this._minSampleSize,
             this._maxSampleSize,
@@ -247,7 +240,22 @@ export class ReferenceIntervalComputer {
 
         const CILow = ReferenceIntervalComputer.calcBootRI(bootstrapping.RILow)
         const CIHigh = ReferenceIntervalComputer.calcBootRI(bootstrapping.RIHigh)
-        console.log('Computed RI: ', CILow, CIHigh)
+        return [CILow, CIHigh]
+    }
+
+    compute_old(): [ConfidenceInterval, ConfidenceInterval] {
+        const fullData = this.recreateData()
+        const bootstrapping = ReferenceIntervalComputer.bootstrapReferenceInterval(
+            fullData,
+            this._minSampleSize,
+            this._maxSampleSize,
+            this._bootR,
+            this._percentileLow,
+            this._percentileHigh
+        )
+
+        const CILow = ReferenceIntervalComputer.calcBootRI(bootstrapping.RILow)
+        const CIHigh = ReferenceIntervalComputer.calcBootRI(bootstrapping.RIHigh)
         return [CILow, CIHigh]
     }
 

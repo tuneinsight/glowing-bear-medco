@@ -31,7 +31,6 @@ import { AuthenticationService } from './authentication.service';
 import { MedcoNetworkService } from './api/medco-network.service';
 import { NavbarService } from './navbar.service';
 
-
 @Injectable()
 export class TreeNodeService {
   // the variable that holds the entire tree structure, used by the tree on the left side bar
