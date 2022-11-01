@@ -111,9 +111,10 @@ export class ReferenceIntervalComputer {
     // getRandomHist returns a random histogram of the same distribution as the original histogram
     private getRandomHist(arr: number[], sampleSize: number, histLength: number): number[] {
 
-        let sampled = new Array(histLength); // Initialized to 0
+        let sampled = new Array(histLength).fill(0); // Initialized to 0
         for (let i = 0; i < sampleSize; i++) {
-            sampled[arr[Math.floor(Math.random() * arr.length)]]++;
+            const sampleIndex = arr[Math.floor(Math.random() * arr.length)]
+            sampled[sampleIndex]++;
         }
 
         return sampled;
@@ -132,15 +133,12 @@ export class ReferenceIntervalComputer {
             sampleSize = maxSampleSize
         }
 
-
         const riLowIndex = Math.floor(sampleSize * percentileLow)
         const riHighIndex = Math.floor(sampleSize * percentileHigh)
-
 
         let i = 0
         while (i <= bootR) {
             const bootSample = this.getRandomHist(fullData, sampleSize, this.intervals.length)
-
             let cumulSum = bootSample[0]
             let k = 0
             while (riLowIndex >= cumulSum) {
@@ -240,6 +238,8 @@ export class ReferenceIntervalComputer {
 
         const CILow = ReferenceIntervalComputer.calcBootRI(bootstrapping.RILow)
         const CIHigh = ReferenceIntervalComputer.calcBootRI(bootstrapping.RIHigh)
+        console.log('CILow', CILow)
+        console.log('CIHigh', CIHigh)
         return [CILow, CIHigh]
     }
 
@@ -256,6 +256,9 @@ export class ReferenceIntervalComputer {
 
         const CILow = ReferenceIntervalComputer.calcBootRI(bootstrapping.RILow)
         const CIHigh = ReferenceIntervalComputer.calcBootRI(bootstrapping.RIHigh)
+        console.log('CILow', CILow)
+        console.log('CIHigh', CIHigh)
+
         return [CILow, CIHigh]
     }
 
