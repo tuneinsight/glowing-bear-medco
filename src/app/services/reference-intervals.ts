@@ -39,6 +39,58 @@ export class ReferenceIntervalComputer {
         return sampled;
     }
 
+    private getRandomHist(arr: number[], size: number, length: number): number[] {
+
+        let sampled = new Array(length);//Initialized to 0
+        for (let i = 0; i < size; i++) {
+          sampled[arr[Math.floor(Math.random() * arr.length)]]++;
+        }
+
+        return sampled;
+    }
+
+    bootstrapReferenceInterval_new(fullData: number[], minSampleSize = 240, maxSampleSize = -1,
+        bootR = 1000, percentileLow = 0.025, percentileHigh = 0.975): Bootstrapping {
+        const riLow = []
+        const riHigh = []
+
+        let sampleSize = minSampleSize
+        if (fullData.length > minSampleSize) {
+            sampleSize = fullData.length
+        }
+        if (maxSampleSize > 0 && sampleSize > maxSampleSize) {
+            sampleSize = maxSampleSize
+        }
+
+
+        const riLowIndex = Math.floor(sampleSize * percentileLow)
+        const riHighIndex = Math.floor(sampleSize * percentileHigh)
+
+
+        let i = 0
+        while (i <= bootR) {
+            const bootSample = this.getRandomHist(fullData, sampleSize, fullData.length)
+
+            let cumsum =bootSample[0]
+            let k=0
+            while (riLowIndex>=cumsum){
+                cumsum+=bootSample[++k]
+            }
+            riLow.push((this.intervals[k].lowerBound + this._binWidth/2))
+
+            cumsum =sampleSize-bootSample[bootSample.length-1]
+            k=bootSample.length-1
+            while (riHighIndex<cumsum){
+                cumsum-=bootSample[--k]
+            }
+            riHigh.push((this.intervals[k].lowerBound + this._binWidth/2))
+
+            i++
+        }
+
+
+        return new Bootstrapping(riLow, riHigh)
+    }
 
     static bootstrapReferenceInterval(fullData: number[], minSampleSize = 240, maxSampleSize = -1,
         bootR = 1000, percentileLow = 0.025, percentileHigh = 0.975): Bootstrapping {
@@ -162,11 +214,29 @@ export class ReferenceIntervalComputer {
         })
     }
 
+    helperVector(): number[] {
+        /*
+        * given intervals = { lowerBound = [2, 3, 4, 5], count = [4, 2, 0, 1]},
+        * binWidth = 1 it will return [2, 2, 2, 2, 3, 3, 5] + .5 =  [2.5, 2.5, 2.5, 2.5, 3.5, 3.5, 5.5]
+        */
+        // @ts-ignore
+        return this.intervals.flatMap((i,ind) => {
+            return Array(i.count).fill(ind)
+        })
+    }
 
 
     compute(): [ConfidenceInterval, ConfidenceInterval] {
-        const fullData = this.recreateData()
-        const bootstrapping = ReferenceIntervalComputer.bootstrapReferenceInterval(
+        const fullData = this.helperVector()//this.recreateData()
+        /*const bootstrapping = ReferenceIntervalComputer.bootstrapReferenceInterval_new(
+            fullData,
+            this._minSampleSize,
+            this._maxSampleSize,
+            this._bootR,
+            this._percentileLow,
+            this._percentileHigh
+        )*/
+        const bootstrapping = ReferenceIntervalComputer.bootstrapReferenceInterval_new(
             fullData,
             this._minSampleSize,
             this._maxSampleSize,
