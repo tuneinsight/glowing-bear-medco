@@ -334,7 +334,7 @@ export class ExploreStatisticsService {
                         return [ ...intervalsResult, new Interval(i.lowerBound, i.higherBound, i.count) ];
                     }, []);
                     const start = performance.now()
-                    console.log('computing chart and reference intervals for result ' + index)
+                    console.log('computing chart and reference intervals for result with index: ' + index)
                     const newChartInformation = new ChartInformation(
                         intervals,
                         result.unit,
@@ -344,7 +344,7 @@ export class ExploreStatisticsService {
                         this._minSampleSize, this._maxSampleSize,
                         this._percentileLow, this._percentileHigh
                     );
-                    console.log('chart for result ' + index + ' computed in ' + Math.round(performance.now() - start) + ' ms')
+                    console.log('chart for result with index ' + index + ' computed in ' + Math.round(performance.now() - start) / 1000 + ' s')
 
                     if (newChartInformation.numberOfObservations() > 0) {
                         return [
@@ -385,12 +385,12 @@ export class ExploreStatisticsService {
           )
           .pipe(
               map((exploreStatsResponse) => {
-                console.log('received statistics query response after ' + Math.round(performance.now() - start) + ' ms')
+                console.log('received statistics query response after ' + Math.round(performance.now() - start) / 1000 + ' s')
                   const resultsArr = Object.values(exploreStatsResponse.results);
                   const start_dec = performance.now();
                   const formattedResults = resultsArr.map((value: any, index) => {
                       if (value.type === 'ciphertable') {
-                        console.log('decrypting statistics query value ' + index)
+                        console.log('decrypting statistics query result with index: ' + index)
                         const valueInUint8 = this.cryptoService.decodeBase64Url(value.value) as Uint8Array;
                         const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
                         if (isCipherFormat(decryptedValue)) {

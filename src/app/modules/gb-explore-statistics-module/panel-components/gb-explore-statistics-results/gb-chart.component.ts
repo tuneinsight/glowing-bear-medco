@@ -72,10 +72,7 @@ export abstract class ChartComponent implements AfterViewInit, OnDestroy, SVGCon
         // TODO debug: ExpressionChangedAfterItHasBeenCheckedError (maybe use angular chart js?)
         // the reference to the `canvas` on which the chart will be drawn. See the @Component to see the canvas.
         const context = this.canvasRef.nativeElement.getContext('2d');
-        console.log('building chart');
-        const start = performance.now();
         /* this.chart = */ this.draw(context)
-        console.log('building chart took' + Math.round(performance.now() - start) + ' ms')
         // this.chart.update()
     }
 
@@ -390,13 +387,9 @@ export class LineChartComponent extends ChartComponent {
 
         }
 
-        const build_points_start = performance.now();
         const data = this.buildPoints(this.chartInfo)
-        console.log('building points took' + Math.round(performance.now() - build_points_start) + ' ms')
 
-        const build_config_start = performance.now();
         const config = this.buildInterpolatedConfig(data) as any
-        console.log('building config took' + Math.round(performance.now() - build_config_start) + ' ms')
 
         config.options.plugins.annotation = {
             annotations: {
