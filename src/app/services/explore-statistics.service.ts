@@ -298,6 +298,7 @@ export class ExploreStatisticsService {
             this.queryService.isUpdating = false;
         }, err => {
             if (err.error === undefined) {
+                console.error(err);
                 ErrorHelper.handleNewError('An error occurred during the request execution.')
             } else {
                 ErrorHelper.handleNewError(err.error.message)
@@ -386,33 +387,36 @@ export class ExploreStatisticsService {
           .pipe(
               map((exploreStatsResponse) => {
                 console.log('received statistics query response after ' + Math.round(performance.now() - start) + ' ms')
-                  const resultsArr = Object.values(exploreStatsResponse.results);
-                  const start_dec = performance.now();
-                  const formattedResults = resultsArr.map((value: any, index) => {
-                      if (value.type === 'ciphertable') {
-                        console.log('decrypting statistics query value ' + index)
-                        const valueInUint8 = this.cryptoService.decodeBase64Url(value.value) as Uint8Array;
-                        const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
-                        if (isCipherFormat(decryptedValue)) {
-                            value.data = decryptedValue.data;
+                    const resultsArr = Object.values(exploreStatsResponse.results);
+                    const start_dec = performance.now();
+                    const formattedResults = resultsArr.map((value: any, index) => {
+                        if (value.type === 'ciphertable') {
+                            console.log('decrypting statistics query value ' + index)
+                            const valueInUint8 = this.cryptoService.decodeBase64Url(value.value) as Uint8Array;
+                            const decryptedValue = this.cryptoService.decryptCipherTable(valueInUint8);
+                            if (isCipherFormat(decryptedValue)) {
+                                value.data = decryptedValue.data;
+                            }
+                            value.type = 'floatMatrix';
                         }
-                        value.type = 'floatMatrix';
-                      }
-                      return {
-                          analyteName: this._analytes[index].displayName,
-                          intervals: value.data[0].map((dataValue, dataIndex) => {
-                              const bounds = JSON.parse(value.columns[dataIndex]);
-                              return {
-                                  count: Math.abs(Math.round(dataValue)),
-                                  lowerBound : `${bounds[0]}.00000`,
-                                  higherBound: `${bounds[1]}.00000`
+                        value.data[0] = value.data[0].slice(0, value.columns.length); // remove the last column which is the count
+                        const result = {
+                            analyteName: this._analytes[index].displayName,
+                            intervals: value.data[0].map((dataValue, dataIndex) => {
+                                const bounds = JSON.parse(value.columns[dataIndex]);
+                                const bound = {
+                                    count: Math.abs(Math.round(dataValue)),
+                                    lowerBound: `${bounds[0]}.00000`,
+                                    higherBound: `${bounds[1]}.00000`
                                 };
-                          }),
-                          unit: '',
-                          timers: []
-                        };
-                  });
-                console.log('decryption took ' + Math.round(performance.now() - start_dec) + ' ms')
+                                return bound
+                            }),
+                            unit: '',
+                            timers: []
+                        }
+                        return result;
+                    });
+                    console.log('decryption took ' + Math.round(performance.now() - start_dec) + ' ms')
 
                   this.ProcessingStep.next('Results received and decrypted. Processing...');
 
