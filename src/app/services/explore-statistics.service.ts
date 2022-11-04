@@ -53,14 +53,14 @@ class ReferenceRange {
     readonly CI1: ConfidenceInterval
     readonly CI2: ConfidenceInterval
 
-    constructor(intervals: Interval[], bootR: number, minSampleSize: number, maxSampleSize: number,
+    constructor(intervals: Interval[], bootR: number, minBootSampleSize: number, maxBootSampleSize: number,
         percentileLow: number, percentileHigh: number) {
 
         const riComputer = new ReferenceIntervalComputer(
             intervals,
             bootR,
-            minSampleSize,
-            maxSampleSize,
+            minBootSampleSize,
+            maxBootSampleSize,
             percentileLow,
             percentileHigh
         )
@@ -84,7 +84,7 @@ export class ChartInformation {
 
     constructor(intervals: Interval[], unit: string,
         public readonly treeNodeName: string, public readonly cohortName: string,
-        bootR: number, minSampleSize: number, maxSampleSize: number,
+        bootR: number, minBootSampleSize: number, maxBootSampleSize: number,
         percentileLow: number, percentileHigh: number) {
 
         this.intervals = intervals
@@ -93,8 +93,8 @@ export class ChartInformation {
         this.referenceRange = new ReferenceRange(
             intervals,
             bootR,
-            minSampleSize,
-            maxSampleSize,
+            minBootSampleSize,
+            maxBootSampleSize,
             percentileLow,
             percentileHigh
         )
@@ -146,10 +146,12 @@ export class ExploreStatisticsService {
     // This observable emits the latest explore statistics query set of analytes
     analytesSubject: Subject<Set<TreeNode>> = new ReplaySubject(1)
 
-    // Number or reference interval operations
+    // Number or reference interval significance
+    @Input() _minSampleSize = 120
+    // Number or reference interval bootstrap operations
     @Input() _bootR = 1000
-    @Input() _minSampleSize = 240
-    @Input() _maxSampleSize = -1
+    @Input() _minBootSampleSize = 240
+    @Input() _maxBootSampleSize = -1
     @Input() _percentileLow = 0.025
     @Input() _percentileHigh = 0.975
 
@@ -174,10 +176,13 @@ export class ExploreStatisticsService {
         parseInt(config.getConfig('boot-r'), 10) : 1000
 
     this._minSampleSize = config.getConfig('min-sample-size') ?
-        parseInt(config.getConfig('min-sample-size'), 10) : 240
+        parseInt(config.getConfig('min-sample-size'), 10) : 120
 
-    this._maxSampleSize = config.getConfig('max-sample-size') ?
-        parseInt(config.getConfig('max-sample-size'), 10) : -1
+    this._minBootSampleSize = config.getConfig('min-boot-sample-size') ?
+        parseInt(config.getConfig('min-boot-sample-size'), 10) : 240
+
+    this._maxBootSampleSize = config.getConfig('max-boot-sample-size') ?
+        parseInt(config.getConfig('max-boot-sample-size'), 10) : -1
 
     this._percentileLow = config.getConfig('percentile-low') ?
         parseFloat(config.getConfig('percentile-low')) : 0.025
@@ -343,16 +348,20 @@ export class ExploreStatisticsService {
                         result.analyteName,
                         cohortConstraint.textRepresentation,
                         this._bootR,
-                        this._minSampleSize, this._maxSampleSize,
+                        this._minBootSampleSize, this._maxBootSampleSize,
                         this._percentileLow, this._percentileHigh
                     );
                     console.log('chart for result with index ' + index + ' computed in ' + Math.round(performance.now() - start) / 1000 + ' s')
 
-                    if (newChartInformation.numberOfObservations() > 0) {
+                    const numberOfObservations = newChartInformation.numberOfObservations();
+                    if (numberOfObservations >= this._minSampleSize) {
                         return [
                             ...responseResult,
                             newChartInformation
                         ];
+                    } else if (numberOfObservations > 0) {
+                        MessageHelper.alert('info', `Number of observations (${numberOfObservations}) insufficient for the Reference Interval. Minimum ${this._minSampleSize} required`);
+                        return responseResult;
                     } else {
                         MessageHelper.alert('info', `0 observations for the ${result.analyteName} analyte.`);
                         return responseResult;

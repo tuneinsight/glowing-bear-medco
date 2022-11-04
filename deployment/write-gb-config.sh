@@ -10,9 +10,10 @@ cat > "$NGINX_ROOT/glowing-bear/app/config/config.docker-deployment.json" <<EOL
   "keycloak-client-id": "${GB_KEYCLOAK_CLIENT_ID}",
 
   "footer-text": "${GB_FOOTER_TEXT}",
-  "boot-r": "${GB_BOOTR}",
   "min-sample-size": "${GB_MIN_SAMPLE_SIZE}",
-  "max-sample-size": "${GB_MAX_SAMPLE_SIZE}",
+  "boot-r": "${GB_BOOTR}",
+  "min-boot-sample-size": "${GB_MIN_BOOT_SAMPLE_SIZE}",
+  "max-boot-sample-size": "${GB_MAX_BOOT_SAMPLE_SIZE}",
   "percentile-low": "${GB_PERCENTILE_LOW}",
   "percentile-high": "${GB_PERCENTILE_HIGH}"
 }

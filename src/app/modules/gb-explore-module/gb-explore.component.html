@@ -65,17 +65,25 @@
     <br>
     <p-accordion class="gb-additional-param-wrapper">
       <p-accordionTab header="Additional settings" [selected]="false">
-        <p>Defaults recommended by the CLSI guidelines</p>
-        <div class="gb-additional-param"><label>Number of Bootstrap iterations</label><br>
-          <input type="number" [(ngModel)]="bootR" pInputText placeholder="Number of Bootstrap iterations" />
+        <h5>Defaults recommended by the CLSI guidelines</h5>
+
+        <h6>Reference Interval real sample parameters:<h6>
+        <div class="gb-additional-param"><label>Minimum sample size</label><br>
+          <input type="number" value="240" [(ngModel)]="minSampleSize" pInputText placeholder="Minimum sample size" />
+        </div>
+
+
+        <h6>Reference Interval Bootstrapping parameters:<h6>
+        <div class="gb-additional-param"><label>Number of bootstrap iterations</label><br>
+          <input type="number" [(ngModel)]="bootR" pInputText placeholder="Number of bootstrap iterations" />
         </div>
     
-        <div class="gb-additional-param"><label>Minimum Sample Size</label><br>
-          <input type="number" value="240" [(ngModel)]="minSampleSize" pInputText placeholder="Minimum Sample Size" />
+        <div class="gb-additional-param"><label>Minimum bootstrap sample size</label><br>
+          <input type="number" value="240" [(ngModel)]="minBootSampleSize" pInputText placeholder="Minimum bootstrap sample size" />
         </div>
     
-        <div class="gb-additional-param"><label>Maximum Sample Size (-1 is no maximum)</label><br>
-          <input type="number" [(ngModel)]="maxSampleSize" pInputText placeholder="Maximum Sample Size" />
+        <div class="gb-additional-param"><label>Maximum bootstrap sample size (-1 is no maximum)</label><br>
+          <input type="number" [(ngModel)]="maxBootSampleSize" pInputText placeholder="Maximum bootstrap sample size" />
         </div>
     
         <div class="gb-additional-param"><label>Low percentile</label><br>

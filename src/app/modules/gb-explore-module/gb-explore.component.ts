@@ -144,11 +144,17 @@ export class GbExploreComponent implements AfterViewChecked {
   get minSampleSize(): number {
     return this.exploreStatisticsService._minSampleSize
   }
-  set maxSampleSize(val: number) {
-    this.exploreStatisticsService._maxSampleSize = val
+  set minBootSampleSize(val: number) {
+    this.exploreStatisticsService._minBootSampleSize = val
   }
-  get maxSampleSize(): number {
-    return this.exploreStatisticsService._maxSampleSize
+  get minBootSampleSize(): number {
+    return this.exploreStatisticsService._minBootSampleSize
+  }
+  set maxBootSampleSize(val: number) {
+    this.exploreStatisticsService._maxBootSampleSize = val
+  }
+  get maxBootSampleSize(): number {
+    return this.exploreStatisticsService._maxBootSampleSize
   }
   set percentileLow(val: number) {
     this.exploreStatisticsService._percentileLow = val
