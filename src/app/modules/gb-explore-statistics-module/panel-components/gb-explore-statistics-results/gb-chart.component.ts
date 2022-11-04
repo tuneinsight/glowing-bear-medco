@@ -288,7 +288,7 @@ export class LineChartComponent extends ChartComponent {
             labels: xValues,
             datasets: [
                 {
-                    label: 'interpolated',
+                    label: '',
                     data: yValues,
                     borderColor: ChartComponent.getBackgroundColor(0),
                     fill: {
@@ -301,7 +301,7 @@ export class LineChartComponent extends ChartComponent {
                     }
                 },
                 {
-                    label: 'extreme',
+                    label: 'extreme data',
                     data: extremeData,
                     grouped: false,
                     type: 'bar',
@@ -309,14 +309,14 @@ export class LineChartComponent extends ChartComponent {
 
                 },
                 {
-                    label: 'CI data',
+                    label: 'confidence interval',
                     data: confidenceIntervalData,
                     grouped: false,
                     type: 'bar',
                     backgroundColor: CIColour,
                 },
                 {
-                    label: 'center data',
+                    label: '',
                     data: centerData,
                     grouped: false,
                     type: 'bar',
