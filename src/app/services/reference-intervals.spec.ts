@@ -1,7 +1,6 @@
 import { Interval } from './explore-statistics.service';
 import { ReferenceIntervalComputer } from './reference-intervals';
 
-
 describe('ReferenceInterval0', () => {
 
     let intervals: Interval[] = [

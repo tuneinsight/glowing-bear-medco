@@ -27,8 +27,6 @@ import { Modifier } from '../models/constraint-models/modifier';
 import { ConfirmationService } from 'primeng';
 import { KeycloakService } from 'keycloak-angular';
 import { MessageHelper } from '../utilities/message-helper';
-import { AuthenticationService } from './authentication.service';
-import { MedcoNetworkService } from './api/medco-network.service';
 import { NavbarService } from './navbar.service';
 
 @Injectable()
@@ -47,7 +45,6 @@ export class TreeNodeService {
   private apiEndpointService: ApiEndpointService;
   private confirmationService: ConfirmationService;
   private keycloakService: KeycloakService;
-  private medcoNetworkService: MedcoNetworkService;
   private navbarService: NavbarService;
 
   constructor(private injector: Injector) {}
@@ -63,7 +60,6 @@ export class TreeNodeService {
       this.constraintService = this.injector.get(ConstraintService);
       this.apiEndpointService = this.injector.get(ApiEndpointService);
       this.confirmationService = this.injector.get(ConfirmationService);
-      this.medcoNetworkService = this.injector.get(MedcoNetworkService);
       this.navbarService = this.injector.get(NavbarService);
 
       this.constraintService.conceptLabels = [];
