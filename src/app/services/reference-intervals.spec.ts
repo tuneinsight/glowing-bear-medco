@@ -44,20 +44,6 @@ describe('ReferenceInterval0', () => {
         expect(RI[1].lowerBound).toBe(1.5);
         expect(RI[1].higherBound).toBe(1.5);
     });
-    it('should run the old bootstrapping method', () => {
-
-        let start = new Date().getTime();
-        let RI = riComputer.compute_old()
-        let end = new Date().getTime();
-        console.log('Time to create ref interval computer with old method: ' + (end - start) + 'ms');
-        console.log(RI);
-        expect(RI[0]).toBeDefined();
-        expect(RI[1]).toBeDefined();
-        expect(RI[0].lowerBound).toBe(0.5);
-        expect(RI[0].higherBound).toBe(0.5);
-        expect(RI[1].lowerBound).toBe(1.5);
-        expect(RI[1].higherBound).toBe(1.5);
-    });
 });
 
 describe('ReferenceInterval1', () => {
@@ -120,20 +106,6 @@ describe('ReferenceInterval1', () => {
         let RI = riComputer.compute()
         let end = new Date().getTime();
         console.log('Time to create ref interval computer: ' + (end - start) + 'ms');
-        console.log(RI);
-        expect(RI[0]).toBeDefined();
-        expect(RI[1]).toBeDefined();
-        expect(RI[0].lowerBound).toBe(1.5);
-        expect(RI[0].higherBound).toBe(1.5);
-        expect(RI[1].lowerBound).toBe(4.5);
-        expect(RI[1].higherBound).toBe(4.5);
-    });
-    it('should run the old bootstrapping method', () => {
-
-        let start = new Date().getTime();
-        let RI = riComputer.compute_old()
-        let end = new Date().getTime();
-        console.log('Time to create ref interval computer with old method: ' + (end - start) + 'ms');
         console.log(RI);
         expect(RI[0]).toBeDefined();
         expect(RI[1]).toBeDefined();
@@ -225,20 +197,6 @@ describe('ReferenceInterval2', () => {
         let RI = riComputer.compute()
         let end = new Date().getTime();
         console.log('Time to create ref interval computer: ' + (end - start) + 'ms');
-        console.log(RI);
-        expect(RI[0]).toBeDefined();
-        expect(RI[1]).toBeDefined();
-        expect(RI[0].lowerBound).toBe(3.5);
-        expect(RI[0].higherBound).toBe(4.5);
-        expect(RI[1].lowerBound).toBe(7.5);
-        expect(RI[1].higherBound).toBe(8.5);
-    });
-    it('should run the old bootstrapping method', () => {
-
-        let start = new Date().getTime();
-        let RI = riComputer.compute_old()
-        let end = new Date().getTime();
-        console.log('Time to create ref interval computer with old method: ' + (end - start) + 'ms');
         console.log(RI);
         expect(RI[0]).toBeDefined();
         expect(RI[1]).toBeDefined();
