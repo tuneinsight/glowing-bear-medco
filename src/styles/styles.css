@@ -64,6 +64,10 @@ button {
 .loading-message .spinner-intro {
   margin-bottom: 30px;
 }
+.sphn-logo-intro{
+  width: 200px;
+  margin-top: 40px;
+}
 
 body .gb-spinner {
   display: none;

@@ -298,7 +298,9 @@ export class ExploreStatisticsService {
             this.queryService.isUpdating = false;
         }, err => {
             if (err.error === undefined) {
-                ErrorHelper.handleNewError('An error occurred during the request execution.')
+                console.error(err);
+                ErrorHelper.handleNewError('An error occurred while processing the received results. ' +
+                  'Please check the console for more details.')
             } else {
                 ErrorHelper.handleNewError(err.error.message)
             }
