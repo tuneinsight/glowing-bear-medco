@@ -8,15 +8,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Injectable, Injector } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { AppConfig } from '../../../config/app.config';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators'
 import { TreeNode } from '../../../models/tree-models/tree-node';
 import { TreeNodeType } from '../../../models/tree-models/tree-node-type';
 import { ValueType } from '../../../models/constraint-models/value-type';
-import { MedcoNetworkService } from '../medco-network.service';
 import { ApiEndpointService } from '../../api-endpoint.service';
 import {ApiValueMetadata, DataType} from '../../../models/api-response-models/medco-node/api-value-metadata';
 import {MessageHelper} from '../../../utilities/message-helper';
@@ -35,17 +33,16 @@ export class ExploreSearchService {
    * @param injector
    */
   constructor(private config: AppConfig,
-    private http: HttpClient,
-    private medcoNetworkService: MedcoNetworkService,
     private apiEndpointService: ApiEndpointService,
-    private injector: Injector,
     private keycloakService: KeycloakService,
-    private treeNodeService: TreeNodeService) { }
+    private treeNodeService: TreeNodeService
+    ) { }
 
     private mapSearchResults(searchResp) {
       if (this.treeNodeService.isLoading && searchResp.error) {
         console.error(searchResp.error);
-        alert(`Error while getting initial tree. Maybe i2b2 service is not running? Please contact an administrator. You will now be logged out.`);
+        alert(`Error while getting initial tree. \
+      Maybe i2b2 service is not running? Please contact an administrator. You will now be logged out.`);
         this.keycloakService.logout();
       }
       return (searchResp.results.searchResult || []).map((treeNodeObj) => {
