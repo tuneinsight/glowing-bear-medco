@@ -362,7 +362,7 @@ export class ExploreStatisticsService {
                             newChartInformation
                         ];
                     } else if (numberOfObservations > 0) {
-                        MessageHelper.alert('info', `Number of observations (${numberOfObservations}) insufficient for the Reference Interval. Minimum ${this._minSampleSize} required`);
+                        MessageHelper.alert('info', `Number of observations (${numberOfObservations}) insufficient to compute reference interval (minimum ${this._minSampleSize})`);
                         this.navbarService.navigateToExploreTab();
                         return responseResult;
                     } else {
