@@ -23,6 +23,7 @@ import { ConstraintService } from '../../services/constraint.service';
 import { QueryService } from '../../services/query.service';
 import { FormatHelper } from '../../utilities/format-helper';
 import { QueryTemporalSetting } from 'src/app/models/query-models/query-temporal-setting';
+import { isDevMode } from '@angular/core';
 
 @Component({
   selector: 'gb-explore',
@@ -207,6 +208,10 @@ export class GbExploreComponent implements AfterViewChecked {
 
   get isBiorefMode(): boolean {
     return this.config.getConfig('isBiorefMode');
+  }
+
+  get isDevMode(): boolean {
+    return isDevMode()
   }
 
   get isGlobalCountOrPatientList(): boolean {
