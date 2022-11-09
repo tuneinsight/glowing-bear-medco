@@ -35,9 +35,12 @@
     <div class="gb-bottom-panel">
       <span>{{footerText}}</span>
 
-      <p-dialog header='TI4Health Acceptable Use Policy' [closable]='false' (onHide)="closePrivacyDialog()"  [(visible)]="privacyDialog" [style]="{width: '55vw'}">
+      <p-dialog header='TI4Health Acceptable Use Policy' [closable]='false' (onHide)="closeTermsAndConditionsDialog()"  [(visible)]="privacyDialog" [style]="{width: '55vw'}">
         <p><iframe src="https://docs.google.com/document/d/e/2PACX-1vTCuqGrunA009ayjvaAZj8gobO9MqI7qxHBkMF2K_-v5MLqpaeWYo-U8HI_1W1WNBeOGdboD9iXW8L6/pub?embedded=true" width='750' height='250'></iframe></p>
-        <p [style]="{display: 'flex', 'justify-content': 'end'}" ><p-button (click)="closePrivacyDialog()" [style]="{display: 'flex', padding: '0.5em 0.1em 0.4em 0.5em'}">Accept</p-button></p>
+        <p [style]="{display: 'flex', 'justify-content': 'end'}" >
+          <p-button (click)="logout()" [style]="{margin: '0.4em', display: 'flex', padding: '0.5em 0.1em 0.4em 0.5em'}">Decline</p-button>
+          <p-button (click)="closeTermsAndConditionsDialog()" [style]="{margin: '0.4em', display: 'flex', padding: '0.5em 0.1em 0.4em 0.5em'}">Accept</p-button>
+        </p>
       </p-dialog>
 
       <p-button *ngIf="isBiorefMode" (click)="showCopyrightDialog()" icon="pi pi-external-link" label="Copyright notice"></p-button>

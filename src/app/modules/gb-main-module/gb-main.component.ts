@@ -47,7 +47,7 @@ export class GbMainComponent implements OnInit {
     ) {
   }
 
-  closePrivacyDialog() {
+  closeTermsAndConditionsDialog() {
     this.cookieService.set('TermsAndConditionsAcceptedBy_' + this.keycloakService.getUsername(), 'true', 1);
     this.privacyDialog = false;
   }
@@ -170,6 +170,10 @@ export class GbMainComponent implements OnInit {
 
   get actualMode() {
     return this._actualMode;
+  }
+
+  logout() {
+    this.keycloakService.logout();
   }
 
 }
