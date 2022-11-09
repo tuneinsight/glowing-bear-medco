@@ -48,7 +48,6 @@ export class GbMainComponent implements OnInit {
   }
 
   closePrivacyDialog() {
-    console.log("closePrivacyDialog")
     this.cookieService.set('PrivacyDialogViewedBy_' + this.keycloakService.getUsername(), 'true', 365);
     this.privacyDialog = false;
   }
