@@ -29,7 +29,7 @@ export class GbMainComponent implements OnInit {
   isGutterDragged: boolean;
   x_pos: number; // Stores x coordinate of the mouse pointer
   x_gap: number; // Stores x gap (edge) between mouse and gutter
-  privacyDialog = (this.cookieService.get('PrivacyDialogViewedBy_' + this.keycloakService.getUsername()) !== 'true');
+  privacyDialog = (this.cookieService.get('TermsAndConditionsAcceptedBy_' + this.keycloakService.getUsername()) !== 'true');
   displayCopyright = false;
   displayCredits = false;
   isModeSelected = false;
@@ -48,7 +48,7 @@ export class GbMainComponent implements OnInit {
   }
 
   closePrivacyDialog() {
-    this.cookieService.set('PrivacyDialogViewedBy_' + this.keycloakService.getUsername(), 'true', 365);
+    this.cookieService.set('TermsAndConditionsAcceptedBy_' + this.keycloakService.getUsername(), 'true', 1);
     this.privacyDialog = false;
   }
   showCopyrightDialog() {
