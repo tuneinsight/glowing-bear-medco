@@ -288,12 +288,12 @@ export class LineChartComponent extends ChartComponent {
             labels: xValues,
             datasets: [
                 {
-                    label: '',
+                    label: 'frequency', // Filtered out by the legend plugin
                     data: yValues,
                     borderColor: ChartComponent.getBackgroundColor(0),
                     fill: {
                         target: 1,
-                        above: 'rgb(255, 0, 0)' // colour of the fill above the origin
+                        above: 'rgb(255, 0, 0)' // color of the fill above the origin
                     },
                     cubicInterpolationMode: 'monotone',
                     segment: {
@@ -316,7 +316,7 @@ export class LineChartComponent extends ChartComponent {
                     backgroundColor: CIColour,
                 },
                 {
-                    label: '',
+                    label: 'frequency', // Filtered out by the legend plugin
                     data: centerData,
                     grouped: false,
                     type: 'bar',
@@ -349,7 +349,9 @@ export class LineChartComponent extends ChartComponent {
                         text: 'Interpolated line plot for the `' + this.chartInfo.treeNodeName + '` analyte',
                     },
                     legend: {
-                        display: true,
+                        labels: {
+                            filter: (l) => (l.text !== 'frequency' && l.text !== '')
+                        }
                     },
                 },
                 interaction: {
@@ -369,7 +371,7 @@ export class LineChartComponent extends ChartComponent {
                             text: 'Frequency',
                         }
                     },
-                }
+                },
             },
         };
     }
