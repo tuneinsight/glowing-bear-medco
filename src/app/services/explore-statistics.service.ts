@@ -316,6 +316,7 @@ export class ExploreStatisticsService {
 
     private handleAnswer(answers: ApiExploreStatisticsResponse[], cohortConstraint: Constraint) {
         if (answers === undefined || answers.length === 0) {
+            this.navbarService.navigateToExploreTab();
             throw ErrorHelper.handleNewError('Empty server response. Empty result in explore-statistics.');
         }
 
@@ -328,6 +329,7 @@ export class ExploreStatisticsService {
 
         if (serverResponse.results === undefined || serverResponse.results === null) {
             this.displayLoadingIcon.next(false);
+            this.navbarService.navigateToExploreTab();
             throw ErrorHelper.handleNewError('Empty server response. Please verify you selected an analyte.');
         }
 
@@ -361,9 +363,11 @@ export class ExploreStatisticsService {
                         ];
                     } else if (numberOfObservations > 0) {
                         MessageHelper.alert('info', `Number of observations (${numberOfObservations}) insufficient for the Reference Interval. Minimum ${this._minSampleSize} required`);
+                        this.navbarService.navigateToExploreTab();
                         return responseResult;
                     } else {
                         MessageHelper.alert('info', `0 observations for the ${result.analyteName} analyte.`);
+                        this.navbarService.navigateToExploreTab();
                         return responseResult;
                     }
                 }, []);
