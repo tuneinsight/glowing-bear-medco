@@ -35,6 +35,15 @@
     <div class="gb-bottom-panel">
       <span>{{footerText}}</span>
 
+      <p-dialog *ngIf="isBiorefMode" header="Privacy notice" (onHide)="closePrivacyDialog()"  [(visible)]="privacyDialog" [style]="{width: '50vw'}">
+        <p>To complete</p>
+        <p>To complete</p>
+        <p>To complete</p>
+        <p>To complete</p>
+        <p>To complete</p>
+        <p [style]="{display: 'flex', 'justify-content': 'end'}" ><p-button (click)="closePrivacyDialog()" [style]="{display: 'flex', padding: '0.5em 0.1em 0.4em 0.5em'}">Close</p-button></p>
+      </p-dialog>
+
       <p-button *ngIf="isBiorefMode" (click)="showCopyrightDialog()" icon="pi pi-external-link" label="Copyright notice"></p-button>
       <p-dialog *ngIf="isBiorefMode" header="Copyright notice" [(visible)]="displayCopyright" [style]="{width: '50vw'}">
         

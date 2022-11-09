@@ -11,11 +11,13 @@ import { AuthenticationService } from '../../services/authentication.service';
 import { AppConfig } from '../../config/app.config';
 import { NavbarService } from 'src/app/services/navbar.service';
 import { KeycloakService } from 'keycloak-angular';
+import { CookieService } from 'ngx-cookie-service'; // Only to display or not the privacy popup
 
 @Component({
   selector: 'gb-main',
   templateUrl: './gb-main.component.html',
-  styleUrls: ['./gb-main.component.css']
+  styleUrls: ['./gb-main.component.css'],
+  providers: [CookieService]
 })
 export class GbMainComponent implements OnInit {
 
@@ -27,6 +29,7 @@ export class GbMainComponent implements OnInit {
   isGutterDragged: boolean;
   x_pos: number; // Stores x coordinate of the mouse pointer
   x_gap: number; // Stores x gap (edge) between mouse and gutter
+  privacyDialog = (this.cookieService.get('PrivacyDialogViewedBy_' + this.keycloakService.getUsername()) !== 'true');
   displayCopyright = false;
   displayCredits = false;
   isModeSelected = false;
@@ -39,9 +42,16 @@ export class GbMainComponent implements OnInit {
   constructor(public authenticationService: AuthenticationService,
     private config: AppConfig,
     private keycloakService: KeycloakService,
-    private navbarService: NavbarService) {
+    private navbarService: NavbarService,
+    private cookieService: CookieService
+    ) {
   }
 
+  closePrivacyDialog() {
+    console.log("closePrivacyDialog")
+    this.cookieService.set('PrivacyDialogViewedBy_' + this.keycloakService.getUsername(), 'true', 365);
+    this.privacyDialog = false;
+  }
   showCopyrightDialog() {
     this.displayCopyright = true;
   }
