@@ -285,7 +285,7 @@ export class ExploreStatisticsService {
         };
 
         this.displayLoadingIcon.next(true);
-        this.ProcessingStep.next('Querying the data...');
+        this.ProcessingStep.next('Querying data...');
 
         const observableRequest = this.sendRequest(apiRequest);
 
@@ -406,8 +406,8 @@ export class ExploreStatisticsService {
                               const bounds = JSON.parse(value.columns[dataIndex]);
                               return {
                                   count: Math.abs(Math.round(dataValue)),
-                                  lowerBound : `${bounds[0]}.00000`,
-                                  higherBound: `${bounds[1]}.00000`
+                                  lowerBound : `${bounds[1]}.00000`,
+                                  higherBound: `${bounds[2]}.00000`
                                 };
                           }),
                           unit: '',

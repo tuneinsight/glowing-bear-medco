@@ -69,30 +69,6 @@ export class ExploreQueryService {
 
   //  ------------------- api calls ----------------------
 
-  /**
-   * @returns {Observable<number>} the resultId
-   * @param queryId
-   * @param queryTiming
-   * @param userPublicKey
-   * @param panels
-   * @param node
-   * @param sync
-   */
-  // private exploreQuerySingleNode(queryId: string, panels: ApiI2b2Panel[],
-  //   queryTiming: ApiI2b2Timing, node: ApiNodeMetadata, sync: boolean = true): Observable<[ApiNodeMetadata, ApiExploreQueryResult]> {
-  //   return this.apiEndpointService.postCall(
-  //     'node/explore/query?sync=' + sync,
-  //     {
-  //       id: queryId,
-  //       query: {
-  //         queryTiming: queryTiming,
-  //         panels: panels
-  //       }
-  //     },
-  //     node.url
-  //   ).pipe(map((expQueryResp) => [node, expQueryResp['result']]));
-  // }
-
   public exploreQuerySingleNode(queryId: string, selectionPanels: ApiI2b2Panel[], sequentialPanels: ApiI2b2Panel[],
                                 queryTiming: ApiI2b2Timing, queryTimingSequence: ApiI2b2SequentialOperator[],
                                 publicKey: string): Observable<ExploreQueryResult> {
