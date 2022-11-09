@@ -23,8 +23,8 @@ export class ReferenceIntervalComputer {
 
     private _binWidth: number
     private _bootR: number
-    private _minSampleSize: number
-    private _maxSampleSize: number
+    private _minBootSampleSize: number
+    private _maxBootSampleSize: number
     private _percentileLow: number
     private _percentileHigh: number
 
@@ -116,15 +116,15 @@ export class ReferenceIntervalComputer {
 
     constructor(intervals: Interval[],
         bootR = 1000,
-        minSampleSize = 240,
-        maxSampleSize = -1,
+        minBootSampleSize = 240,
+        maxBootSampleSize = -1,
         percentileLow = 0.025,
         percentileHigh = 0.975
     ) {
         this.intervals = intervals.map(i => new NumericInterval(i))
         this._bootR = bootR
-        this._minSampleSize = minSampleSize
-        this._maxSampleSize = maxSampleSize
+        this._minBootSampleSize = minBootSampleSize
+        this._maxBootSampleSize = maxBootSampleSize
         this._percentileLow = percentileLow
         this._percentileHigh = percentileHigh
         this.calcBinWidth()
@@ -184,8 +184,8 @@ export class ReferenceIntervalComputer {
         const fullData = this.helperVector()
         const bootstrapping = this.bootstrapReferenceInterval(
             fullData,
-            this._minSampleSize,
-            this._maxSampleSize,
+            this._minBootSampleSize,
+            this._maxBootSampleSize,
             this._bootR,
             this._percentileLow,
             this._percentileHigh

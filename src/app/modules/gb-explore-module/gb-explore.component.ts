@@ -23,6 +23,7 @@ import { ConstraintService } from '../../services/constraint.service';
 import { QueryService } from '../../services/query.service';
 import { FormatHelper } from '../../utilities/format-helper';
 import { QueryTemporalSetting } from 'src/app/models/query-models/query-temporal-setting';
+import { isDevMode } from '@angular/core';
 
 @Component({
   selector: 'gb-explore',
@@ -144,11 +145,17 @@ export class GbExploreComponent implements AfterViewChecked {
   get minSampleSize(): number {
     return this.exploreStatisticsService._minSampleSize
   }
-  set maxSampleSize(val: number) {
-    this.exploreStatisticsService._maxSampleSize = val
+  set minBootSampleSize(val: number) {
+    this.exploreStatisticsService._minBootSampleSize = val
   }
-  get maxSampleSize(): number {
-    return this.exploreStatisticsService._maxSampleSize
+  get minBootSampleSize(): number {
+    return this.exploreStatisticsService._minBootSampleSize
+  }
+  set maxBootSampleSize(val: number) {
+    this.exploreStatisticsService._maxBootSampleSize = val
+  }
+  get maxBootSampleSize(): number {
+    return this.exploreStatisticsService._maxBootSampleSize
   }
   set percentileLow(val: number) {
     this.exploreStatisticsService._percentileLow = val
@@ -201,6 +208,10 @@ export class GbExploreComponent implements AfterViewChecked {
 
   get isBiorefMode(): boolean {
     return this.config.getConfig('isBiorefMode');
+  }
+
+  get isDevMode(): boolean {
+    return isDevMode()
   }
 
   get isGlobalCountOrPatientList(): boolean {
