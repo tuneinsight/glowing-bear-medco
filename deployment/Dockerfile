@@ -53,7 +53,8 @@ ENV GB_MEDCO_NODE_URL="http://localhost:3100" \
     GB_FOOTER_TEXT="" \
     GB_BOOTR="" \
     GB_MIN_SAMPLE_SIZE="" \
-    GB_MAX_SAMPLE_SIZE="" \
+    GB_MIN_BOOT_SAMPLE_SIZE="" \
+    GB_MAX_BOOT_SAMPLE_SIZE="" \
     GB_PERCENTILE_LOW="" \
     GB_PERCENTILE_HIGH=""
 
