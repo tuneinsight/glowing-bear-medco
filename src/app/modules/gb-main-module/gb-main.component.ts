@@ -11,11 +11,13 @@ import { AuthenticationService } from '../../services/authentication.service';
 import { AppConfig } from '../../config/app.config';
 import { NavbarService } from 'src/app/services/navbar.service';
 import { KeycloakService } from 'keycloak-angular';
+import { CookieService } from 'ngx-cookie-service'; // Only to display or not the privacy popup
 
 @Component({
   selector: 'gb-main',
   templateUrl: './gb-main.component.html',
-  styleUrls: ['./gb-main.component.css']
+  styleUrls: ['./gb-main.component.css'],
+  providers: [CookieService]
 })
 export class GbMainComponent implements OnInit {
 
@@ -27,6 +29,7 @@ export class GbMainComponent implements OnInit {
   isGutterDragged: boolean;
   x_pos: number; // Stores x coordinate of the mouse pointer
   x_gap: number; // Stores x gap (edge) between mouse and gutter
+  _termsAndConditionsDialog = (this.cookieService.get('TermsAndConditionsAcceptedBy_' + this.keycloakService.getUsername()) !== 'true');
   displayCopyright = false;
   displayCredits = false;
   isModeSelected = false;
@@ -39,9 +42,15 @@ export class GbMainComponent implements OnInit {
   constructor(public authenticationService: AuthenticationService,
     private config: AppConfig,
     private keycloakService: KeycloakService,
-    private navbarService: NavbarService) {
+    private navbarService: NavbarService,
+    private cookieService: CookieService
+    ) {
   }
 
+  closeTermsAndConditionsDialog() {
+    this.cookieService.set('TermsAndConditionsAcceptedBy_' + this.keycloakService.getUsername(), 'true', 1);
+    this._termsAndConditionsDialog = false;
+  }
   showCopyrightDialog() {
     this.displayCopyright = true;
   }
@@ -148,11 +157,16 @@ export class GbMainComponent implements OnInit {
   get needToChooseRoles(): boolean {
     return  this.authenticationService.hasAnalysisAuth &&
             this.authenticationService.hasExploreStatsRole() &&
+            !this.termsAndConditionsDialog &&
             !this.isModeSelected;
   }
 
   set needToChooseRoles(_) {
     this.isModeSelected = true;
+  }
+
+  get termsAndConditionsDialog(): boolean {
+    return this._termsAndConditionsDialog
   }
 
   get modes() {
@@ -161,6 +175,10 @@ export class GbMainComponent implements OnInit {
 
   get actualMode() {
     return this._actualMode;
+  }
+
+  logout() {
+    this.keycloakService.logout();
   }
 
 }
