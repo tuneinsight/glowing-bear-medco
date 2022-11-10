@@ -57,11 +57,12 @@
         </span>
       </div>
   </div>
-  <div *ngIf="isDevMode && isBiorefMode" #analytesDropzones class="input-label-wrapper analytes-explore-container">
+  <div *ngIf="isBiorefMode" #analytesDropzones class="input-label-wrapper analytes-explore-container">
     <div title="Variable to analyze" class="title-label">
       Analytes:
     </div>
     <gb-analytes-dropzones></gb-analytes-dropzones>
+    <div *ngIf="isDevMode">
     <br>
     <p-accordion class="gb-additional-param-wrapper">
       <p-accordionTab header="Additional settings" [selected]="false">
@@ -76,24 +77,25 @@
         <div class="gb-additional-param"><label>Number of bootstrap iterations</label><br>
           <input type="number" [(ngModel)]="bootR" pInputText placeholder="Number of bootstrap iterations" />
         </div>
-    
+
         <div class="gb-additional-param"><label>Minimum bootstrap sample size</label><br>
           <input type="number" value="240" [(ngModel)]="minBootSampleSize" pInputText placeholder="Minimum bootstrap sample size" />
         </div>
-    
+
         <div class="gb-additional-param"><label>Maximum bootstrap sample size (-1 is no maximum)</label><br>
           <input type="number" [(ngModel)]="maxBootSampleSize" pInputText placeholder="Maximum bootstrap sample size" />
         </div>
-    
+
         <div class="gb-additional-param"><label>Low percentile</label><br>
           <input type="number" [(ngModel)]="percentileLow" pInputText placeholder="Low percentile" />
         </div>
-    
+
         <div class="gb-additional-param"><label>High percentile</label><br>
           <input type="number" [(ngModel)]="percentileHigh" pInputText placeholder="High percentile" />
         </div>
       </p-accordionTab>
     </p-accordion>
+    </div>
   </div>
   <div style="margin-top: 1em;">
     <div *ngIf="isBiorefMode" class="title-label">
