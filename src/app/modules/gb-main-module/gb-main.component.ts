@@ -29,7 +29,7 @@ export class GbMainComponent implements OnInit {
   isGutterDragged: boolean;
   x_pos: number; // Stores x coordinate of the mouse pointer
   x_gap: number; // Stores x gap (edge) between mouse and gutter
-  privacyDialog = (this.cookieService.get('TermsAndConditionsAcceptedBy_' + this.keycloakService.getUsername()) !== 'true');
+  _termsAndConditionsDialog = (this.cookieService.get('TermsAndConditionsAcceptedBy_' + this.keycloakService.getUsername()) !== 'true');
   displayCopyright = false;
   displayCredits = false;
   isModeSelected = false;
@@ -49,7 +49,7 @@ export class GbMainComponent implements OnInit {
 
   closeTermsAndConditionsDialog() {
     this.cookieService.set('TermsAndConditionsAcceptedBy_' + this.keycloakService.getUsername(), 'true', 1);
-    this.privacyDialog = false;
+    this._termsAndConditionsDialog = false;
   }
   showCopyrightDialog() {
     this.displayCopyright = true;
@@ -157,11 +157,16 @@ export class GbMainComponent implements OnInit {
   get needToChooseRoles(): boolean {
     return  this.authenticationService.hasAnalysisAuth &&
             this.authenticationService.hasExploreStatsRole() &&
+            !this.termsAndConditionsDialog &&
             !this.isModeSelected;
   }
 
   set needToChooseRoles(_) {
     this.isModeSelected = true;
+  }
+
+  get termsAndConditionsDialog(): boolean {
+    return this._termsAndConditionsDialog
   }
 
   get modes() {

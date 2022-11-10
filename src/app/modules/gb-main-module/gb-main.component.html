@@ -1,4 +1,4 @@
-<div #parentContainer class="gb-container" [ngStyle]="{'filter': needToChooseRoles ? 'blur(8px)' : 'unset'}">
+<div #parentContainer class="gb-container" [ngStyle]="{'filter': needToChooseRoles || termsAndConditionsDialog ? 'blur(8px)' : 'unset'}">
   <div class="gb-container">
     <!-- Top panel -->
     <div class="gb-top-panel">
@@ -34,14 +34,6 @@
     <!-- Bottom panel -->
     <div class="gb-bottom-panel">
       <span>{{footerText}}</span>
-
-      <p-dialog header='TI4Health Acceptable Use Policy' [closable]='false' (onHide)="closeTermsAndConditionsDialog()"  [(visible)]="privacyDialog" [style]="{width: '55vw'}">
-        <p><iframe src="https://docs.google.com/document/d/e/2PACX-1vTCuqGrunA009ayjvaAZj8gobO9MqI7qxHBkMF2K_-v5MLqpaeWYo-U8HI_1W1WNBeOGdboD9iXW8L6/pub?embedded=true" width='750' height='250'></iframe></p>
-        <p [style]="{display: 'flex', 'justify-content': 'end'}" >
-          <p-button (click)="logout()" [style]="{margin: '0.4em', display: 'flex', padding: '0.5em 0.1em 0.4em 0.5em'}">Decline</p-button>
-          <p-button (click)="closeTermsAndConditionsDialog()" [style]="{margin: '0.4em', display: 'flex', padding: '0.5em 0.1em 0.4em 0.5em'}">Accept</p-button>
-        </p>
-      </p-dialog>
 
       <p-button *ngIf="isBiorefMode" (click)="showCopyrightDialog()" icon="pi pi-external-link" label="Copyright notice"></p-button>
       <p-dialog *ngIf="isBiorefMode" header="Copyright notice" [(visible)]="displayCopyright" [style]="{width: '50vw'}">
@@ -115,6 +107,16 @@
         <a href="https://docs.tuneinsight.com" target="_blank" ><p-button icon="pi pi-external-link" label="Documentation"></p-button></a>
     </div>
   </div>
+</div>
+
+<div *ngIf="termsAndConditionsDialog">
+  <p-dialog header="TI4Health Acceptable Use Policy" [closable]='false' [(visible)]="termsAndConditionsDialog" [style]="{width: '55vw'}">
+    <p><embed width='100%' height='350px' src='assets/TI4Health_Acceptable_Use_Policy_v1.pdf'/></p>
+    <p [style]="{display: 'flex', 'justify-content': 'end'}" >
+      <p-button (click)="logout()" [style]="{margin: '0.4em', display: 'flex', padding: '0.5em 0.1em 0.4em 0.5em'}">Decline</p-button>
+      <p-button (click)="closeTermsAndConditionsDialog()" [style]="{margin: '0.4em', display: 'flex', padding: '0.5em 0.1em 0.4em 0.5em'}">Accept</p-button>
+    </p>
+  </p-dialog>
 </div>
 
 <div *ngIf="needToChooseRoles">
