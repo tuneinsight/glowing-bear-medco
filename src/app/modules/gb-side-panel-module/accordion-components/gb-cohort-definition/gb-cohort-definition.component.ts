@@ -43,7 +43,7 @@ export class GbCohortDefinitionComponent implements OnDestroy {
     private cohortService: CohortService,
     private componentFactoryResolver: ComponentFactoryResolver) {
 
-    this.exploreStatisticsService.rootConstraint.subscribe(constraint => {
+    this.exploreStatisticsService.rootSelectionConstraint.subscribe(constraint => {
       this.rootConstraint = constraint
     })
 

@@ -11,10 +11,10 @@ import { ApiI2b2Timing } from './api-i2b2-timing';
 import {ApiI2b2SequentialOperator} from './api-sequence-of-events/api-i2b2-sequential-operator';
 
 export class ApiQueryDefinition {
-  selectionPanels: ApiI2b2Panel[];
+  selectionPanels?: ApiI2b2Panel[];
   // queryTiming is not sent to the backend, always "any" is sent.
   // this variable is only used to decide whether to send the panel timing or not.
-  queryTiming: ApiI2b2Timing;
-  sequentialPanels: ApiI2b2Panel[];
-  sequentialOperators: ApiI2b2SequentialOperator[];
+  queryTiming?: ApiI2b2Timing;
+  sequentialPanels?: ApiI2b2Panel[];
+  sequentialOperators?: ApiI2b2SequentialOperator[];
 }
