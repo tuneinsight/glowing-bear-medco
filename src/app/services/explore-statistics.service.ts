@@ -13,6 +13,7 @@ import {
   ApiExploreStatisticsResponse
 } from '../models/api-response-models/explore-statistics/explore-statistics-response';
 import {CombinationConstraint} from '../models/constraint-models/combination-constraint';
+import {SequentialConstraint} from '../models/constraint-models/sequential-constraint';
 import {Constraint} from '../models/constraint-models/constraint';
 import {TreeNode} from '../models/tree-models/tree-node';
 import {ErrorHelper} from '../utilities/error-helper';
@@ -29,6 +30,7 @@ import {ReferenceIntervalComputer} from './reference-intervals';
 import {isCipherFormat} from 'src/app/utilities/is-cipher-format';
 import {MessageHelper} from '../utilities/message-helper';
 import {QueryTemporalSetting} from '../models/query-models/query-temporal-setting';
+import {ApiQueryDefinition} from '../models/api-request-models/medco-node/api-query-definition';
 
 export class ConfidenceInterval {
     constructor(public readonly lowerBound: number, public readonly middle: number, public readonly higherBound: number) {
@@ -126,7 +128,8 @@ export class ExploreStatisticsService {
     // 1 minute timeout
 
     private _lastQueryTiming: ApiI2b2Timing;
-    private _lastCohortDefinition: ApiI2b2Panel[] = []
+    private _lastSelectionPanels: ApiI2b2Panel[] = []
+    private _lastSequentialPanels: ApiI2b2Panel[] = []
     // Sends the result of the latest query when is available
     @Output() chartsDataSubject: Subject<ChartInformation[]> = new ReplaySubject(1)
 
@@ -142,7 +145,9 @@ export class ExploreStatisticsService {
     @Output() ProcessingStep: Subject<string> = new ReplaySubject(1)
 
     // This observable emits the latest query's cohort inclusion criteria for the explore statistics query
-    rootConstraint: Subject<CombinationConstraint> = new ReplaySubject(1)
+    rootSelectionConstraint: Subject<CombinationConstraint> = new ReplaySubject(1)
+    // This observable emits the latest query's cohort inclusion criteria for the explore statistics query
+    rootSequentialConstraint: Subject<SequentialConstraint> = new ReplaySubject(1)
     // This observable emits the latest explore statistics query set of analytes
     analytesSubject: Subject<Set<TreeNode>> = new ReplaySubject(1)
 
@@ -196,7 +201,7 @@ export class ExploreStatisticsService {
 
 
     // The panels returned by the constraint service have a tendency to be out of date. Use this method to refresh them.
-    private refreshConstraint(constraint: CombinationConstraint): Observable<CombinationConstraint> {
+    private refreshSelectionConstraint(constraint: CombinationConstraint): Observable<CombinationConstraint> {
         const i2b2Panels: ApiI2b2Panel[] = this.constraintMappingService.mapConstraint(constraint,
           this.queryService.queryTiming === QueryTemporalSetting.independent)
 
@@ -217,6 +222,29 @@ export class ExploreStatisticsService {
             return comb
         }))
     }
+
+  // The panels returned by the constraint service have a tendency to be out of date. Use this method to refresh them
+  private refreshSequentialConstraint(constraint: SequentialConstraint): Observable<SequentialConstraint> {
+    const i2b2Panels: ApiI2b2Panel[] = this.constraintMappingService.mapConstraint(constraint,
+      this.queryService.queryTiming === QueryTemporalSetting.independent)
+
+    if (i2b2Panels.length === 0) {
+      /* Return an empty constraint if the passed parameter is empty.
+      * This can happen if the exclusion criteria is empty for example.  */
+      return of(new SequentialConstraint())
+    }
+
+    const mappedConstraint = this.reverseConstraintMappingService.mapPanels(i2b2Panels)
+
+    return mappedConstraint.pipe(map(c => {
+      if (c instanceof SequentialConstraint) {
+        return c as SequentialConstraint
+      }
+      const seq = new SequentialConstraint()
+      seq.addChild(c)
+      return seq
+    }))
+  }
 
 
     /*
@@ -242,76 +270,95 @@ export class ExploreStatisticsService {
 
     private processQuery(bucketSize: number, minObservations: number) {
 
-        const uniqueAnalytes = new Set(this._analytes);
-        this.analytesSubject.next(uniqueAnalytes)
+      const uniqueAnalytes = new Set(this._analytes);
+      this.analytesSubject.next(uniqueAnalytes)
 
 
-        const cohortConstraint = this.constraintService.generateConstraint();
+      const cohortConstraint = this.constraintService.generateConstraint();
 
-        this.refreshConstraint(this.constraintService.generateConstraint()).subscribe(refreshed => {
-          /* There are problems with the current version of the code. Hence it is necessary to use
-          * the hackish method refreshConstraint so that the summary of the used constraints is up to date.
-          * If a user replaces a concept with another by dropping the selected concept on the
-          * previously selected concept in the explore statistics form, the newer concept wont be displayed
-          * in the summary of the query. The newer concept will still be sent to the backend because
-          * mapConstraint will returned the latest up to date i2b2 tree.
-          */
-          this.rootConstraint.next(refreshed)
-        })
+      this.refreshSelectionConstraint(this.constraintService.generateConstraint()).subscribe(refreshed => {
+        /* There are problems with the current version of the code. Hence it is necessary to use
+        * the hackish method refreshSelectionConstraint so that the summary of the used constraints is up to date.
+        * If a user replaces a concept with another by dropping the selected concept on the
+        * previously selected concept in the explore statistics form, the newer concept wont be displayed
+        * in the summary of the query. The newer concept will still be sent to the backend because
+        * mapConstraint will return the latest up to date i2b2 tree.
+        */
+        this.rootSelectionConstraint.next(refreshed)
+      })
 
-        const analytes = Array.from(uniqueAnalytes);
+      this.refreshSequentialConstraint(this.constraintService.rootSequentialConstraint).subscribe(refreshed => {
+        /* There are problems with the current version of the code. Hence it is necessary to use
+        * the hackish method refreshSelectionConstraint so that the summary of the used constraints is up to date.
+        * If a user replaces a concept with another by dropping the selected concept on the
+        * previously selected concept in the explore statistics form, the newer concept wont be displayed
+        * in the summary of the query. The newer concept will still be sent to the backend because
+        * mapConstraint will return the latest up to date i2b2 tree.
+        */
+        this.rootSequentialConstraint.next(refreshed)
+      })
 
-        if (analytes.length === 0) {
-            this.queryService.isUpdating = false
-            this.displayLoadingIcon.next(false)
-            throw ErrorHelper.handleNewUserInputError('No analytes have been specified (numerical medical concepts).');
-        }
+      const analytes = Array.from(uniqueAnalytes);
 
-        // the analytes split into two groups: modifiers and concepts
-        const { modifiers } = this.extractConceptsAndModifiers(analytes);
+      if (analytes.length === 0) {
+          this.queryService.isUpdating = false
+          this.displayLoadingIcon.next(false)
+          throw ErrorHelper.handleNewUserInputError('No analytes have been specified (numerical medical concepts).');
+      }
 
-        this._lastCohortDefinition = this.constraintMappingService.mapConstraint(cohortConstraint,
-          this.queryService.queryTiming === QueryTemporalSetting.independent)
-        this._lastQueryTiming = this.queryService.lastTiming
+      // the analytes split into two groups: modifiers and concepts
+      const { modifiers } = this.extractConceptsAndModifiers(analytes);
+
+      this._lastSelectionPanels = this.constraintMappingService.mapConstraint(cohortConstraint,
+        this.queryService.queryTiming === QueryTemporalSetting.independent)
+      this._lastSequentialPanels = this.constraintMappingService.mapConstraint(this.constraintService.rootSequentialConstraint,
+      this.queryService.queryTiming === QueryTemporalSetting.independent)
+      this._lastQueryTiming = this.queryService.lastTiming
 
 
-        const panelEmpty = cohortConstraint === undefined || (
-            (cohortConstraint instanceof CombinationConstraint) && (cohortConstraint as CombinationConstraint).children.length === 0
-        )
+      const panelEmpty = cohortConstraint === undefined || (
+          (cohortConstraint instanceof CombinationConstraint) && (cohortConstraint as CombinationConstraint).children.length === 0
+      )
 
-        const apiRequest: ApiExploreStatistics = {
-            id: ExploreStatisticsService.getNewQueryID(),
-            analytes: [...modifiers],
-            userPublicKey: this.cryptoService.ephemeralPublicKey,
-            bucketSize,
-            minObservations,
-            panels: this._lastCohortDefinition,
-            isPanelEmpty: panelEmpty
-        };
+      const constraint: ApiQueryDefinition = {
+        selectionPanels: this._lastSelectionPanels,
+        sequentialPanels: this._lastSequentialPanels,
+        sequentialOperators: this.constraintService.rootSequentialConstraint.temporalSequence
+      }
 
-        this.displayLoadingIcon.next(true);
-        this.ProcessingStep.next('Querying data...');
+      const apiRequest: ApiExploreStatistics = {
+          id: ExploreStatisticsService.getNewQueryID(),
+          analytes: [...modifiers],
+          userPublicKey: this.cryptoService.ephemeralPublicKey,
+          bucketSize,
+          minObservations,
+          constraint: constraint,
+          isPanelEmpty: panelEmpty
+      };
 
-        const observableRequest = this.sendRequest(apiRequest);
+      this.displayLoadingIcon.next(true);
+      this.ProcessingStep.next('Querying data...');
 
-        this.chartsDataSubject = new ReplaySubject(1);
-        this.navbarService.navigateToExploreStatisticsTab();
+      const observableRequest = this.sendRequest(apiRequest);
 
-        observableRequest.subscribe((answers: ApiExploreStatisticsResponse[]) => {
-            this.ProcessingStep.next('Results received. Processing results...');
-            this.handleAnswer(answers, cohortConstraint);
-            this.queryService.isUpdating = false;
-        }, err => {
-            if (err.error === undefined) {
-                console.error(err);
-                ErrorHelper.handleNewError('An error occurred while processing the received results. ' +
-                  'Please check the console for more details.')
-            } else {
-                ErrorHelper.handleNewError(err.error.message)
-            }
-            this.displayLoadingIcon.next(false);
-            this.queryService.isUpdating = false;
-        });
+      this.chartsDataSubject = new ReplaySubject(1);
+      this.navbarService.navigateToExploreStatisticsTab();
+
+      observableRequest.subscribe((answers: ApiExploreStatisticsResponse[]) => {
+          this.ProcessingStep.next('Results received. Processing results...');
+          this.handleAnswer(answers, cohortConstraint);
+          this.queryService.isUpdating = false;
+      }, err => {
+          if (err.error === undefined) {
+              console.error(err);
+              ErrorHelper.handleNewError('An error occurred while processing the received results. ' +
+                'Please check the console for more details.')
+          } else {
+              ErrorHelper.handleNewError(err.error.message)
+          }
+          this.displayLoadingIcon.next(false);
+          this.queryService.isUpdating = false;
+      });
     }
 
     private handleAnswer(answers: ApiExploreStatisticsResponse[], cohortConstraint: Constraint) {
@@ -479,9 +526,9 @@ export class ExploreStatisticsService {
     }
 
     saveCohortStatistics() {
-        this.rootConstraint.subscribe(
+        this.rootSelectionConstraint.subscribe(
             rootConstraint => {
-                const cohort = this.lastCohortDefinition
+                const cohort = this.lastSelectionPanels
                 const timing = this.lastQueryTiming
                 this.cohortService.saveCohort(timing)
             })
@@ -496,8 +543,8 @@ export class ExploreStatisticsService {
         this.exportPDF.next(1)
     }
 
-    get lastCohortDefinition(): ApiI2b2Panel[] {
-        return this._lastCohortDefinition
+    get lastSelectionPanels(): ApiI2b2Panel[] {
+        return this._lastSelectionPanels
     }
 
     get lastQueryTiming(): ApiI2b2Timing {

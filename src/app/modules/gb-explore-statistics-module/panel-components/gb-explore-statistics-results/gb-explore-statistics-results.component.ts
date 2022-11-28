@@ -75,7 +75,7 @@ export class GbExploreStatisticsResultsComponent implements AfterViewInit, OnDes
     private queryService: QueryService,
     private cdref: ChangeDetectorRef) {
 
-    this.exploreStatisticsService.rootConstraint.subscribe(constraint => {
+    this.exploreStatisticsService.rootSelectionConstraint.subscribe(constraint => {
       this.rootConstraint = constraint
     })
 

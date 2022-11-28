@@ -8,6 +8,7 @@
 
 import { ApiI2b2Panel } from '../medco-node/api-i2b2-panel'
 import { ApiI2b2Timing } from '../medco-node/api-i2b2-timing'
+import {ApiQueryDefinition} from '../medco-node/api-query-definition';
 
 export class ModifierApiObjet {
   modifier: {
@@ -37,6 +38,6 @@ export class ApiExploreStatistics {
   * The information specified by `cohortDefinition` defines
   * the population upon which the explore statistic is run.
   */
-  panels: ApiI2b2Panel[];
+  constraint: ApiQueryDefinition;
   isPanelEmpty: boolean;
 }
