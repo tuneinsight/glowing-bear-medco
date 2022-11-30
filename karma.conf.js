@@ -42,7 +42,7 @@ module.exports = function (config) {
       }
     },
     browserDisconnectTolerance: 2,
-    browserNoActivityTimeout: 100000,
+    browserNoActivityTimeout: 300000,
     singleRun: false
   });
 };
