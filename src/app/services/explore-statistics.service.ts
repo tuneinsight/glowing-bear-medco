@@ -202,8 +202,10 @@ export class ExploreStatisticsService {
 
     // The panels returned by the constraint service have a tendency to be out of date. Use this method to refresh them.
     private refreshSelectionConstraint(constraint: CombinationConstraint): Observable<CombinationConstraint> {
-        const i2b2Panels: ApiI2b2Panel[] = this.constraintMappingService.mapConstraint(constraint,
-          this.queryService.queryTiming === QueryTemporalSetting.independent)
+        const i2b2Panels: ApiI2b2Panel[] = this.constraintMappingService.mapConstraint(
+            constraint,
+            this.queryService.queryTiming === QueryTemporalSetting.sameinstance
+        )
 
         if (i2b2Panels.length === 0) {
             /* Return an empty constraint if the passed parameter is empty.
@@ -225,8 +227,10 @@ export class ExploreStatisticsService {
 
   // The panels returned by the constraint service have a tendency to be out of date. Use this method to refresh them
   private refreshSequentialConstraint(constraint: SequentialConstraint): Observable<SequentialConstraint> {
-    const i2b2Panels: ApiI2b2Panel[] = this.constraintMappingService.mapConstraint(constraint,
-      this.queryService.queryTiming === QueryTemporalSetting.independent)
+    const i2b2Panels: ApiI2b2Panel[] = this.constraintMappingService.mapConstraint(
+        constraint,
+        this.queryService.queryTiming === QueryTemporalSetting.sameinstance
+    )
 
     if (i2b2Panels.length === 0) {
       /* Return an empty constraint if the passed parameter is empty.
@@ -310,9 +314,9 @@ export class ExploreStatisticsService {
       const { modifiers } = this.extractConceptsAndModifiers(analytes);
 
       this._lastSelectionPanels = this.constraintMappingService.mapConstraint(cohortConstraint,
-        this.queryService.queryTiming === QueryTemporalSetting.independent)
+        this.queryService.queryTiming === QueryTemporalSetting.sameinstance)
       this._lastSequentialPanels = this.constraintMappingService.mapConstraint(this.constraintService.rootSequentialConstraint,
-      this.queryService.queryTiming === QueryTemporalSetting.independent)
+      this.queryService.queryTiming === QueryTemporalSetting.sameinstance)
       this._lastQueryTiming = this.queryService.lastTiming
 
 
@@ -386,9 +390,16 @@ export class ExploreStatisticsService {
 
             const chartsInformations =
                 serverResponse.results.reduce((responseResult, result: ApiExploreStatisticResult, index) => {
+                    let totalObservation = 0
                     const intervals = result.intervals.reduce((intervalsResult, i) => {
+                        totalObservation += i.count
                         return [ ...intervalsResult, new Interval(i.lowerBound, i.higherBound, i.count) ];
                     }, []);
+                    if (totalObservation <= this._minSampleSize || totalObservation <= 0) {
+                        MessageHelper.alert('info', `No observations (${totalObservation}) insufficient to compute reference interval (minimum ${this._minSampleSize})`);
+                        this.navbarService.navigateToExploreTab();
+                        return responseResult;
+                    }
                     const start = performance.now()
                     console.log('computing chart and reference intervals for result with index: ' + index)
                     const newChartInformation = new ChartInformation(
