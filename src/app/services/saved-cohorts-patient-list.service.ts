@@ -37,16 +37,6 @@ export class SavedCohortsPatientListService {
 
   _statusSubjectStorage = new Map<string, Subject<OperationStatus>>()
 
-  /*
-  * Generates a newID for a query.
-  */
-  private static generateId(): string {
-    let d = new Date();
-    let id = `MedCo_Cohorts_Patient_List_${d.getUTCFullYear()}${d.getUTCMonth()}${d.getUTCDate()}${d.getUTCHours()}` +
-      `${d.getUTCMinutes()}${d.getUTCSeconds()}${d.getUTCMilliseconds()}`;
-
-    return id
-  }
 
   constructor(private cryptoService: CryptoService,
     private exploreCohortsService: ExploreCohortsService,

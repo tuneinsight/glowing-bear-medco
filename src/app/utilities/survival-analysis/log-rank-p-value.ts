@@ -113,7 +113,6 @@ export function logRank2Groups(group1: Array<SurvivalPoint>, group2: Array<Survi
 }
 
 function computeTotalRisks(groups: Array<Array<SurvivalPoint>>): Map<number, number> {
-  let res = new Map<number, number>()
   // initial value
   let remaining = groups.map(group => (group.length > 0) ? group[0].atRisk : 0).reduce((a, b) => a + b)
 

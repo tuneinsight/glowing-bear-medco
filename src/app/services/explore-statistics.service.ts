@@ -122,11 +122,6 @@ export class ChartInformation {
 })
 export class ExploreStatisticsService {
 
-
-    private static TIMEOUT_MS = 1000 * 60 * 1;
-
-    // 1 minute timeout
-
     private _lastQueryTiming: ApiI2b2Timing;
     private _lastSelectionPanels: ApiI2b2Panel[] = []
     private _lastSequentialPanels: ApiI2b2Panel[] = []

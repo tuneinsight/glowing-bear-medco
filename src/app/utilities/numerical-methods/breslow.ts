@@ -91,7 +91,6 @@ export function derivative(timePoints: TimePoint[], beta: number[]): number[] {
 
 
   let expo = 0
-  let currentTime = 0
   for (let i = 0; i < timePoints.length; i++) {
     reset(e)
     reset(g)
