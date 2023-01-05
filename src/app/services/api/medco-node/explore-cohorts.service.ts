@@ -9,15 +9,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Injectable } from '@angular/core';
 import { MedcoNetworkService } from '../medco-network.service';
-import { Observable, forkJoin } from 'rxjs';
-import { map, timeout } from 'rxjs/operators';
-import {ApiNodeMetadata} from '../../../models/api-response-models/medco-network/api-node-metadata';
+import { Observable } from 'rxjs';
+import { timeout } from 'rxjs/operators';
 import {AppConfig} from '../../../config/app.config';
-import {ApiCohortsPatientLists} from '../../../models/api-request-models/medco-node/api-cohorts-patient-lists';
-import {ApiCohortsPatientListsResponse} from '../../../models/api-response-models/medco-node/api-cohorts-patient-list-response';
 import {ApiCohortResponse} from '../../../models/api-response-models/medco-node/api-cohort-response';
 import {ApiEndpointService} from '../../api-endpoint.service';
-import {ApiCohort} from '../../../models/api-request-models/medco-node/api-cohort';
 import { KeycloakService } from 'keycloak-angular';
 
 @Injectable()

@@ -20,10 +20,8 @@ import { ConstraintHelper } from '../utilities/constraint-utilities/constraint-h
 import { TreeNodeType } from '../models/tree-models/tree-node-type';
 import { GenomicAnnotationConstraint } from '../models/constraint-models/genomic-annotation-constraint';
 import { GenomicAnnotation } from '../models/constraint-models/genomic-annotation';
-import { ErrorHelper } from '../utilities/error-helper';
 import { OperationType } from '../models/operation-models/operation-types';
 import { MessageHelper } from '../utilities/message-helper';
-import { QueryTemporalSetting } from '../models/query-models/query-temporal-setting';
 import { ApiI2b2SequentialOperator } from '../models/api-request-models/medco-node/api-sequence-of-events/api-i2b2-sequential-operator';
 import { SequentialConstraint } from '../models/constraint-models/sequential-constraint';
 

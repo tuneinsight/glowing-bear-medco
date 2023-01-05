@@ -8,15 +8,11 @@
  */
 
 import { Injectable } from '@angular/core';
-import {forkJoin, Observable, Subject, throwError} from 'rxjs';
-import { of } from 'rxjs';
-import {catchError, map, switchMap, tap} from 'rxjs/operators';
+import { Observable, Subject} from 'rxjs';
 import { ExploreCohortsService } from './api/medco-node/explore-cohorts.service';
 import { AuthenticationService } from './authentication.service';
 import { CryptoService } from './crypto.service';
 import {ApiNodeMetadata} from '../models/api-response-models/medco-network/api-node-metadata';
-import {MessageHelper} from '../utilities/message-helper';
-import {ApiCohortsPatientLists} from '../models/api-request-models/medco-node/api-cohorts-patient-lists';
 import {OperationStatus} from '../models/operation-status';
 import {ExploreQueryType} from '../models/query-models/explore-query-type';
 import {ErrorHelper} from '../utilities/error-helper';

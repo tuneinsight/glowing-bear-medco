@@ -6,8 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { ApiI2b2Panel } from '../medco-node/api-i2b2-panel'
-import { ApiI2b2Timing } from '../medco-node/api-i2b2-timing'
+
 import {ApiQueryDefinition} from '../medco-node/api-query-definition';
 
 export class ModifierApiObjet {

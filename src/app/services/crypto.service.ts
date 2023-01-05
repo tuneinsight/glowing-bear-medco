@@ -8,11 +8,11 @@
  */
 
 import {Injectable, Injector, OnDestroy} from '@angular/core';
-import {BehaviorSubject, Observable, throwError} from 'rxjs';
+import {BehaviorSubject, throwError} from 'rxjs';
 import GeCoCryptoLib, {GeCoCryptoLibLoad} from '@tuneinsight/geco-cryptolib';
 import { KeycloakService } from 'keycloak-angular';
 import { ApiEndpointService } from './api-endpoint.service';
-import { catchError, exhaust, map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable()
 export class CryptoService implements OnDestroy {

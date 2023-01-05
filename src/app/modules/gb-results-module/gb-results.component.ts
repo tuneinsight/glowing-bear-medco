@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {NavbarService} from '../../services/navbar.service';
-import {NavigationEnd, Router} from '@angular/router';
+import { Router} from '@angular/router';
 
 @Component({
   selector: 'gb-results',
