@@ -1,12 +1,12 @@
 <div>
   <p-accordion [multiple]="true">
-
+    
     <div>
       <p-accordionTab header="Project" [selected]="true">
         <gb-summary></gb-summary>
       </p-accordionTab>
     </div>
-
+    
     <div *ngIf="navbarService.isExplore ||  navbarService.isAnalysis">
       <p-accordionTab header="Ontology" [selected]="true">
         <div class="gb-sidepanel-navbar">
@@ -17,43 +17,44 @@
           <input value="{{termSearchService.searchTerm}}" class="ui-inputtext" (input)="termSearchService.onTermChange($event)" placeholder="Search in Ontology (min. 3 characters)" />
           <p-button label="Search" (onClick)="termSearchService.onSearch()"></p-button>
           <span class="no-result-text" *ngIf="termSearchService.isNoResults">No results</span>
+          <p *ngIf="termSearchService.results.length > 0" style="margin: 0; padding-top: 1em; opacity: 0.7; font-size: 0.8em;" >Please open the results with ">" to confirm the Ontology path</p>
           <p-accordionTab #accordionTab *ngFor="let ontologyElement of termSearchService.results" draggable="true"
-              class="ui-ontology-elements">
-              <p-header class="ui-ontology-elements" draggable="true">
-                <span class="ui-button-text ui-unselectable-text">{{ontologyElement.name}}</span>
-              </p-header>
-              <span class="full-path" style="font-size: 0.8em;" *ngFor="let nodePath of ontologyElement.fullPath; let last = last">
-                <span [ngClass]="{'bold': !!nodePath.isBold}">{{nodePath.name}}</span>
-                <span *ngIf="!last" class="path-separator">></span>
-              </span>
-          </p-accordionTab>
-          <div *ngIf="termSearchService.isLoading" style="margin: auto;">
-            <p class="loading-blink"><span>•</span><span>•</span><span>•</span></p>
-          </div>
-        </form>
-      </p-accordionTab>
-    </div>
+          class="ui-ontology-elements">
+          <p-header class="ui-ontology-elements" draggable="true">
+            <span class="ui-button-text ui-unselectable-text" title="{{ ontologyElement.fullPathString }}">{{ontologyElement.name}}</span><span title="{{ ontologyElement.fullPathString }}" style="display:block; opacity: 0.7; font-size: 0.8em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ ontologyElement.fullPathString }}</span>
+          </p-header>
+          <span class="full-path" style="font-size: 0.8em;" *ngFor="let nodePath of ontologyElement.fullPath; let last = last">
+            <span [ngClass]="{'bold': !!nodePath.isBold}">{{nodePath.name}}</span>
+            <span *ngIf="!last" class="path-separator">></span>
+          </span>
+        </p-accordionTab>
+        <div *ngIf="termSearchService.isLoading" style="margin: auto;">
+          <p class="loading-blink"><span>•</span><span>•</span><span>•</span></p>
+        </div>
+      </form>
+    </p-accordionTab>
+  </div>
+  
+  <div *ngIf="!isBiorefMode && isGlobalCountOrPatientList && !inSelectProjectTab()">
+    <p-accordionTab header="Saved Cohorts" [selected]="true">
+      <gb-cohorts></gb-cohorts>
+    </p-accordionTab>
+  </div>
+  
+  <div *ngIf="inExploreStatsTab()">
+    <p-accordionTab header="Generate PDF report" [selected]="true">
+      <button type="button" (click)="exportStatsPDF()" alt="generate a PDF report with the statistical information"
+      class="btn btn-outline-primary btn-sm gb-data-selection-overview-panel-btn">
+      <span>Export</span>
+    </button>
+  </p-accordionTab>
+</div>
 
-    <div *ngIf="!isBiorefMode && isGlobalCountOrPatientList && !inSelectProjectTab()">
-      <p-accordionTab header="Saved Cohorts" [selected]="true">
-        <gb-cohorts></gb-cohorts>
-      </p-accordionTab>
-    </div>
+</p-accordion>
 
-    <div *ngIf="inExploreStatsTab()">
-      <p-accordionTab header="Generate PDF report" [selected]="true">
-        <button type="button" (click)="exportStatsPDF()" alt="generate a PDF report with the statistical information"
-          class="btn btn-outline-primary btn-sm gb-data-selection-overview-panel-btn">
-          <span>Export</span>
-        </button>
-      </p-accordionTab>
-    </div>
-
-  </p-accordion>
-
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
+<br>
+<br>
+<br>
+<br>
+<br>
 </div>

@@ -24,6 +24,7 @@ interface NodeFullPath {
 
 interface ResultType {
   name: string;
+  fullPathString: string;
   fullPath: NodeFullPath[];
   handleFuncStart?: (e: Event) => void;
   conceptCode: string;
@@ -61,6 +62,7 @@ export class TermSearchService {
     const formattedResult: ResultType = {
       name: node.name,
       conceptCode: node.conceptCode,
+      fullPathString: displayNameList.map(( displayName) => displayName).reverse().join(' > '),
       fullPath: displayNameList.reduce((result, displayName) => [
         ...result, {
           name: displayName,
