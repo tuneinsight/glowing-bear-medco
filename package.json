@@ -26,7 +26,7 @@
     "@angular/platform-server": "^9.1.13",
     "@angular/router": "^9.1.13",
     "@fullcalendar/core": "^5.10.1",
-    "@tuneinsight/geco-cryptolib": "^0.4.4-ti4health-main-1b6de47",
+    "@tuneinsight/geco-cryptolib": "^0.4.4-ti4health-main-5fa2db44c",
     "@types/chart.js": "^2.9.34",
     "@types/elliptic": "^6.4.12",
     "@types/file-saver": "^2.0.1",
