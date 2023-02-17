@@ -26,6 +26,7 @@ import { ExploreQueryResult } from 'src/app/models/query-models/explore-query-re
 import { isCipherFormat } from 'src/app/utilities/is-cipher-format';
 import { NavbarService } from '../../navbar.service';
 import { MessageHelper } from '../../../utilities/message-helper';
+import { AuthenticationService } from '../../authentication.service';
 
 @Injectable()
 export class ExploreQueryService {
@@ -65,6 +66,7 @@ export class ExploreQueryService {
     private constraintMappingService: ConstraintMappingService,
     private cryptoService: CryptoService,
     private keycloakService: KeycloakService,
+    private authenticationService: AuthenticationService,
     private navbarService: NavbarService) { }
 
   //  ------------------- api calls ----------------------
@@ -74,10 +76,18 @@ export class ExploreQueryService {
                                 publicKey: string): Observable<ExploreQueryResult> {
     const start = performance.now(); // to measure performance
     const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
+    let aggregationType: string;
+    if (this.authenticationService.hasPatientListRole()) {
+      aggregationType = 'per_node';
+    } else if (this.authenticationService.hasGlobalCountRole()) {
+      aggregationType = 'aggregated';
+    } else {
+      aggregationType = 'obfuscated';
+    }
     return this.apiEndpointService.postCall(
       `projects/${this.config.projectId}/datasource/query`,
       {
-        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        aggregationType: aggregationType,
         operation: 'exploreQuery',
         broadcast: true,
         outputDataObjectsNames: haveRightsForPatientList ? ['patientList', 'count'] : ['count', 'patientList'],

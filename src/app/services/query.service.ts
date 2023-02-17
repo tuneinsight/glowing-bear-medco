@@ -172,26 +172,26 @@ export class QueryService {
     // map authorization to query type
     let authorizedTypes = this.authService.userRoles.map((role) => {
       switch (role) {
-        case ExploreQueryType.PATIENT_LIST.id:
+        case AuthenticationService.GECO_PATIENT_LIST_ROLE:
           return ExploreQueryType.PATIENT_LIST;
 
-        case ExploreQueryType.COUNT_PER_SITE.id:
-          return ExploreQueryType.COUNT_PER_SITE;
+        // case ExploreQueryType.COUNT_PER_SITE.id:
+        //   return ExploreQueryType.COUNT_PER_SITE;
 
-        case ExploreQueryType.COUNT_PER_SITE_OBFUSCATED.id:
-          return ExploreQueryType.COUNT_PER_SITE_OBFUSCATED;
+        // case ExploreQueryType.COUNT_PER_SITE_OBFUSCATED.id:
+        //   return ExploreQueryType.COUNT_PER_SITE_OBFUSCATED;
 
-        case ExploreQueryType.COUNT_PER_SITE_SHUFFLED.id:
-          return ExploreQueryType.COUNT_PER_SITE_SHUFFLED;
+        // case ExploreQueryType.COUNT_PER_SITE_SHUFFLED.id:
+        //   return ExploreQueryType.COUNT_PER_SITE_SHUFFLED;
 
-        case ExploreQueryType.COUNT_PER_SITE_SHUFFLED_OBFUSCATED.id:
-          return ExploreQueryType.COUNT_PER_SITE_SHUFFLED_OBFUSCATED;
+        // case ExploreQueryType.COUNT_PER_SITE_SHUFFLED_OBFUSCATED.id:
+        //   return ExploreQueryType.COUNT_PER_SITE_SHUFFLED_OBFUSCATED;
 
-        case ExploreQueryType.COUNT_GLOBAL_OBFUSCATED.id:
-          return ExploreQueryType.COUNT_GLOBAL_OBFUSCATED;
+        case AuthenticationService.GECO_GLOBAL_COUNT_OBFUSCATED_ROLE:
+          return ExploreQueryType.GLOBAL_COUNT_OBFUSCATED;
 
-        case ExploreQueryType.COUNT_GLOBAL.id:
-          return ExploreQueryType.COUNT_GLOBAL;
+          case AuthenticationService.GECO_GLOBAL_COUNT_ROLE:
+          return ExploreQueryType.GLOBAL_COUNT;
 
         default:
           return null;

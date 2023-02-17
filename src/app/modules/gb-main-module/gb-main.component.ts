@@ -82,7 +82,7 @@ export class GbMainComponent implements OnInit {
 
     if (!this.config.getConfig('isModeChanged')) {
       // Only retrieve the mode from keycloak service when it wasn't manually selected
-      this.config.setConfig('isBiorefMode', !this.keycloakService.isUserInRole(AuthenticationService.GECO_SURVIVAL_ANALYSIS_ROLE));
+      this.config.setConfig('isBiorefMode', !this.keycloakService.isUserInRole(AuthenticationService.GECO_SURVIVAL_QUERY_ROLE));
     }
 
   }
@@ -155,8 +155,8 @@ export class GbMainComponent implements OnInit {
   }
 
   get needToChooseRoles(): boolean {
-    return  this.authenticationService.hasAnalysisAuth &&
-            this.authenticationService.hasExploreStatsRole() &&
+    return  this.authenticationService.hasSurvivalQueryRole &&
+            this.authenticationService.hasStatisticsQueryRole() &&
             !this.termsAndConditionsDialog &&
             !this.isModeSelected;
   }

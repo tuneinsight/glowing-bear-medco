@@ -9,7 +9,7 @@
  */
 
 import { AfterViewChecked, ChangeDetectorRef, Component, Input } from '@angular/core';
-import { KeycloakService } from 'keycloak-angular';
+import { AuthenticationService } from '../../services/authentication.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppConfig } from 'src/app/config/app.config';
@@ -50,7 +50,7 @@ export class GbExploreComponent implements AfterViewChecked {
     private changeDetectorRef: ChangeDetectorRef,
     private exploreStatisticsService: ExploreStatisticsService,
     private medcoNetworkService: MedcoNetworkService,
-    private keycloakService: KeycloakService) {
+    private authenticationService: AuthenticationService) {
     this.queryService.lastSuccessfulSet.subscribe(resIDs => {
       this.lastSuccessfulSet = resIDs
     })
@@ -214,9 +214,10 @@ export class GbExploreComponent implements AfterViewChecked {
     return isDevMode()
   }
 
-  get isGlobalCountOrPatientList(): boolean {
-    return this.keycloakService.isUserInRole('global_count') ||
-            this.keycloakService.isUserInRole('patient_list');
+  get userHasRolesForSavedCohorts(): boolean {
+    return this.authenticationService.hasGlobalCountObfuscatedRole() ||
+          this.authenticationService.hasGlobalCountRole() ||
+          this.authenticationService.hasPatientListRole();
   }
 
 
