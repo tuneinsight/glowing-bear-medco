@@ -8,17 +8,14 @@
  */
 import { Injectable } from '@angular/core';
 import { AppConfig } from '../../../config/app.config';
-import {Observable, forkJoin, throwError} from 'rxjs';
+import {Observable, throwError} from 'rxjs';
 import {timeout, map, tap, catchError} from 'rxjs/operators';
 import { ApiI2b2Panel } from '../../../models/api-request-models/medco-node/api-i2b2-panel';
 import { ConstraintMappingService } from '../../constraint-mapping.service';
 import { ApiEndpointService } from '../../api-endpoint.service';
-import { GenomicAnnotationsService } from '../genomic-annotations.service';
-import { ApiExploreQueryResult } from '../../../models/api-response-models/medco-node/api-explore-query-result';
 import { MedcoNetworkService } from '../medco-network.service';
 import { ExploreQuery } from '../../../models/query-models/explore-query';
 import { CryptoService } from '../../crypto.service';
-import { ApiNodeMetadata } from '../../../models/api-response-models/medco-network/api-node-metadata';
 import { ApiI2b2Timing } from '../../../models/api-request-models/medco-node/api-i2b2-timing';
 import { ApiI2b2SequentialOperator } from 'src/app/models/api-request-models/medco-node/api-sequence-of-events/api-i2b2-sequential-operator';
 import { KeycloakService } from 'keycloak-angular';
@@ -55,7 +52,7 @@ export class ExploreQueryService {
   private _lastTimingSequence: ApiI2b2SequentialOperator[]
 
   /**
-   * Last query ID used in query that successed to return anything
+   * Last query ID used in query that succeeded to return anything
    */
    private _lastQueryId: string
 
@@ -175,14 +172,6 @@ export class ExploreQueryService {
           }
       })
     ) as Observable<ExploreQueryResult>;
-  }
-
-  public getDataobjectData(dataObjectSharedId: string): Observable<any> {
-    return this.apiEndpointService.getCall(`shared-dataobjects/${dataObjectSharedId}/data`, {
-      headers: {
-        Accept: '*/*'
-      }
-    }).pipe(map((sharedDataObjectData) => sharedDataObjectData));
   }
 
   // -------------------------------------- helper calls --------------------------------------

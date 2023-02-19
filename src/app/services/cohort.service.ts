@@ -20,15 +20,13 @@ import { ApiI2b2Timing } from '../models/api-request-models/medco-node/api-i2b2-
 import { ApiCohortResponse } from '../models/api-response-models/medco-node/api-cohort-response';
 import { CombinationState } from '../models/constraint-models/combination-state';
 import { CombinationConstraint } from '../models/constraint-models/combination-constraint';
-import { ApiCohort } from '../models/api-request-models/medco-node/api-cohort';
 import { HttpErrorResponse } from '@angular/common/http';
 import { QueryService } from './query.service';
-import { ApiI2b2Panel } from '../models/api-request-models/medco-node/api-i2b2-panel';
 import { ApiQueryDefinition } from '../models/api-request-models/medco-node/api-query-definition';
 import { ApiNodeMetadata } from '../models/api-response-models/medco-network/api-node-metadata';
 import { ErrorHelper } from '../utilities/error-helper';
 import { ApiI2b2SequentialOperator } from '../models/api-request-models/medco-node/api-sequence-of-events/api-i2b2-sequential-operator';
-import { map, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { ApiI2b2TimingSequenceSpan } from '../models/api-request-models/medco-node/api-sequence-of-events/api-i2b2-span/api-i2b2-timing-sequence-span';
 import { SequentialConstraint } from '../models/constraint-models/sequential-constraint';
 

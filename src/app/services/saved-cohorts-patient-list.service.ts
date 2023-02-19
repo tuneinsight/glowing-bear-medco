@@ -8,15 +8,11 @@
  */
 
 import { Injectable } from '@angular/core';
-import {forkJoin, Observable, Subject, throwError} from 'rxjs';
-import { of } from 'rxjs';
-import {catchError, map, switchMap, tap} from 'rxjs/operators';
+import { Observable, Subject} from 'rxjs';
 import { ExploreCohortsService } from './api/medco-node/explore-cohorts.service';
 import { AuthenticationService } from './authentication.service';
 import { CryptoService } from './crypto.service';
 import {ApiNodeMetadata} from '../models/api-response-models/medco-network/api-node-metadata';
-import {MessageHelper} from '../utilities/message-helper';
-import {ApiCohortsPatientLists} from '../models/api-request-models/medco-node/api-cohorts-patient-lists';
 import {OperationStatus} from '../models/operation-status';
 import {ExploreQueryType} from '../models/query-models/explore-query-type';
 import {ErrorHelper} from '../utilities/error-helper';
@@ -41,16 +37,6 @@ export class SavedCohortsPatientListService {
 
   _statusSubjectStorage = new Map<string, Subject<OperationStatus>>()
 
-  /*
-  * Generates a newID for a query.
-  */
-  private static generateId(): string {
-    let d = new Date();
-    let id = `MedCo_Cohorts_Patient_List_${d.getUTCFullYear()}${d.getUTCMonth()}${d.getUTCDate()}${d.getUTCHours()}` +
-      `${d.getUTCMinutes()}${d.getUTCSeconds()}${d.getUTCMilliseconds()}`;
-
-    return id
-  }
 
   constructor(private cryptoService: CryptoService,
     private exploreCohortsService: ExploreCohortsService,

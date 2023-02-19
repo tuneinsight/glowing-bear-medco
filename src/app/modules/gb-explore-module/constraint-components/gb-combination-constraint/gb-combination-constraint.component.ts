@@ -6,18 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { GbConstraintComponent } from '../gb-constraint/gb-constraint.component';
+import { Component, ElementRef, OnInit } from '@angular/core';
 import { CombinationConstraint } from '../../../../models/constraint-models/combination-constraint';
-import { Constraint } from '../../../../models/constraint-models/constraint';
-import { AutoComplete } from 'primeng';
 import { CombinationState } from '../../../../models/constraint-models/combination-state';
-import { TreeNode } from '../../../../models/tree-models/tree-node';
-import { UIHelper } from '../../../../utilities/ui-helper';
-import {MessageHelper} from '../../../../utilities/message-helper';
-import { Cohort } from 'src/app/models/cohort-models/cohort';
-import { Cohort as ConstraintCohort } from 'src/app/models/constraint-models/cohort';
-import { CohortConstraint } from 'src/app/models/constraint-models/cohort-constraint';
 import { GbCompositeConstraintComponent } from '../gb-composite-constraint/gb-composite-constraint.component';
 import { AppConfig } from 'src/app/config/app.config';
 import { GenomicAnnotationsService } from 'src/app/services/api/genomic-annotations.service';

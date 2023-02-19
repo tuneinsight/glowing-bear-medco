@@ -140,17 +140,6 @@ export class ReferenceIntervalComputer {
         this._binWidth = first.higherBound - first.lowerBound
     }
 
-
-    // Input: Vector of the counts per bin
-    // Output: Vector of the density per bin
-    private calculateDensity(): number[] {
-        // Calculate the total sum of all bins (add all counts).
-        const totalCount = this.intervals.reduce((sum, i) => sum + i.count, 0)
-
-        return this.intervals.map(i => i.count / totalCount)
-    }
-
-
     /*
     * Implementing a very basic bootstrapping technique using the recreated data set. We recreate the data set
     * by creating new data points with the value of each Bin Mids and the amount specified in the count variable.

@@ -136,7 +136,6 @@ export class SurvivalService {
 
   runSurvivalAnalysis() {
     let apiSurvivalAnalysis = new ApiSurvivalAnalysis()
-    let d = new Date()
     apiSurvivalAnalysis.id = uuidv4();
     if (!this.startConcept) {
       throw ErrorHelper.handleNewError('Start event is undefined')

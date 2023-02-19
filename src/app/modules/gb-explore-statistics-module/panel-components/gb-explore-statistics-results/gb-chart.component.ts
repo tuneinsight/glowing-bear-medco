@@ -1,10 +1,9 @@
 
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { Chart, ChartConfiguration, ChartData, ChartOptions, ChartType, ScriptableLineSegmentContext } from 'chart.js';
-import { boolean } from 'mathjs';
 import { PDF } from 'src/app/utilities/files/pdf';
 import { ChartInformation, ConfidenceInterval } from '../../../../services/explore-statistics.service';
-import { ReferenceIntervalComponent, SVGConvertible } from './gb-explore-statistics-results.component';
+import { SVGConvertible } from './gb-explore-statistics-results.component';
 
 
 

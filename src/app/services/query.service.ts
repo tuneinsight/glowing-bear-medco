@@ -8,24 +8,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { v4 as uuidv4 } from 'uuid';
-import { Injectable, Query } from '@angular/core';
+
+import { Injectable } from '@angular/core';
 import { TreeNodeService } from './tree-node.service';
 import { ExploreQuery } from '../models/query-models/explore-query';
 import { ConstraintService } from './constraint.service';
 import { AppConfig } from '../config/app.config';
 import { ExploreQueryType } from '../models/query-models/explore-query-type';
 import { AuthenticationService } from './authentication.service';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { ExploreQueryService } from './api/medco-node/explore-query.service';
-import { ApiExploreQueryResult } from '../models/api-response-models/medco-node/api-explore-query-result';
 import { CryptoService } from './crypto.service';
 import { GenomicAnnotationsService } from './api/genomic-annotations.service';
 import { ExploreQueryResult } from '../models/query-models/explore-query-result';
-import { Observable, ReplaySubject, throwError, Subject, of, NextObserver } from 'rxjs';
+import { Observable, ReplaySubject, throwError, Subject } from 'rxjs';
 import { ErrorHelper } from '../utilities/error-helper';
 import { MessageHelper } from '../utilities/message-helper';
-import { ApiNodeMetadata } from '../models/api-response-models/medco-network/api-node-metadata';
 import { ApiI2b2Panel } from '../models/api-request-models/medco-node/api-i2b2-panel';
 import { ApiI2b2Timing } from '../models/api-request-models/medco-node/api-i2b2-timing';
 import { OperationType } from '../models/operation-models/operation-types';

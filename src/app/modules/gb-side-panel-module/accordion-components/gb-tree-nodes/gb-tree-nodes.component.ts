@@ -109,9 +109,7 @@ export class GbTreeNodesComponent implements AfterViewInit, AfterViewChecked {
     let index = 0;
     for (let elm of treeNodeElements) {
       let dataObject: TreeNode = treeNodes[index];
-      let metadata = dataObject.metadata;
       let treeNodeElm = elm.querySelector('li.ui-treenode');
-      let treeNodeElmIcon = elm.querySelector('li.ui-treenode .ui-treenode-icon');
       let treeNodeToggler = elm.querySelector('li.ui-treenode .ui-tree-toggler');
       let treeNodeContent = elm.querySelector('li.ui-treenode .ui-treenode-content');
       let onClickTreeNodeContent = (function() {
