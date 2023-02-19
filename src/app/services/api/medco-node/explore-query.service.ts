@@ -84,6 +84,7 @@ export class ExploreQueryService {
         targetPublicKey: publicKey,
         parameters: {
           id: queryId,
+          patientList: haveRightsForPatientList,
           definition: {
             selectionPanels: selectionPanels,
             sequentialPanels: sequentialPanels,
