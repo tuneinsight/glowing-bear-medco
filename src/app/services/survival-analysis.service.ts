@@ -178,9 +178,9 @@ export class SurvivalService {
           constraint: {
             queryTiming: sg.timing,
             selectionPanels: this.constraintMappingService.mapConstraint(sg.rootSelectionConstraint,
-              this.queryService.queryTiming === QueryTemporalSetting.independent),
+              this.queryService.queryTiming === QueryTemporalSetting.sameinstance),
             sequentialPanels: this.constraintMappingService.mapConstraint(sg.rootSequentialConstraint,
-              this.queryService.queryTiming === QueryTemporalSetting.independent),
+              this.queryService.queryTiming === QueryTemporalSetting.sameinstance),
             sequentialOperators: sg.rootSequentialConstraint.temporalSequence,
           }
         }
