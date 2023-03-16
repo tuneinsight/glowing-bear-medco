@@ -1,6 +1,6 @@
 {
   "name": "glowing-bear-medco",
-  "version": "0.1.0-ti4health-spo",
+  "version": "0.5.1",
   "license": "MPL-2.0",
   "scripts": {
     "ng": "./node_modules/@angular/cli/bin/ng",
@@ -26,7 +26,7 @@
     "@angular/platform-server": "^9.1.13",
     "@angular/router": "^9.1.13",
     "@fullcalendar/core": "^5.10.1",
-    "@tuneinsight/geco-cryptolib": "0.4.4-ti4health-main-eb7b210",
+    "@tuneinsight/geco-cryptolib": "0.5.1-main-8d96ea0d2",
     "@types/chart.js": "^2.9.34",
     "@types/elliptic": "^6.4.12",
     "canvas": "^2.8.0",
