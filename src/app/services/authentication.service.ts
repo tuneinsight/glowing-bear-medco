@@ -15,11 +15,12 @@ import {KeycloakService} from 'keycloak-angular';
 @Injectable()
 export class AuthenticationService {
 
-  static readonly GECO_PROJECT_CREATOR_ROLE = 'project_creator';
   static readonly GECO_PATIENT_LIST_ROLE = 'patient_list';
   static readonly GECO_GLOBAL_COUNT_ROLE = 'global_count';
-  static readonly GECO_SURVIVAL_ANALYSIS_ROLE = 'survival_query';
-  static readonly GECO_EXPLORE_STATS_ROLE = 'statistics_query';
+  static readonly GECO_GLOBAL_COUNT_OBFUSCATED_ROLE = 'global_count_obfuscated';
+  static readonly GECO_SURVIVAL_QUERY_ROLE = 'survival_query';
+  static readonly GECO_STATISTICS_QUERY_ROLE = 'statistics_query';
+  static readonly GECO_STATISTICS_QUERY_OBFUSCATED_ROLE = 'statistics_query_obfuscated';
 
   constructor(private config: AppConfig,
               private keycloakService: KeycloakService) { }
@@ -51,29 +52,60 @@ export class AuthenticationService {
     });
   }
 
-  public hasExploreStatsRole(): boolean {
-    return this.userRoles.includes(AuthenticationService.GECO_EXPLORE_STATS_ROLE);
-  }
-
   /**
-   * Returns true if the user has the minimum set of roles needed for the basic operation of MedCo.
+   * Returns true if the user has the minimum set of roles needed for the basic operation of TI4Health.
    */
   public hasMinimumRoles(): boolean {
     return  (
               this.userRoles.includes(AuthenticationService.GECO_PATIENT_LIST_ROLE) ||
-              this.userRoles.includes(AuthenticationService.GECO_GLOBAL_COUNT_ROLE)
+              this.userRoles.includes(AuthenticationService.GECO_GLOBAL_COUNT_ROLE) ||
+              this.userRoles.includes(AuthenticationService.GECO_GLOBAL_COUNT_OBFUSCATED_ROLE)
             ) &&
-            (
-              this.userRoles.includes(AuthenticationService.GECO_SURVIVAL_ANALYSIS_ROLE) ||
-              this.userRoles.includes(AuthenticationService.GECO_EXPLORE_STATS_ROLE)
-            )
+            this.userRoles.includes(AuthenticationService.GECO_SURVIVAL_QUERY_ROLE) ||
+            this.userRoles.includes(AuthenticationService.GECO_STATISTICS_QUERY_ROLE) ||
+            this.userRoles.includes(AuthenticationService.GECO_STATISTICS_QUERY_OBFUSCATED_ROLE)
   }
 
   /**
-   * Returns true if the user has the authorization for analysis.
+   * Returns true if the user has the role for patient list.
    */
-  get hasAnalysisAuth(): boolean {
-    return this.userRoles.includes(AuthenticationService.GECO_SURVIVAL_ANALYSIS_ROLE);
+  public hasPatientListRole(): boolean {
+    return this.userRoles.includes(AuthenticationService.GECO_PATIENT_LIST_ROLE);
+  }
+
+  /**
+   * Returns true if the user has the role for global count.
+   */
+  public hasGlobalCountRole(): boolean {
+    return this.userRoles.includes(AuthenticationService.GECO_GLOBAL_COUNT_ROLE);
+  }
+
+  /**
+   * Returns true if the user has the role for global count obfuscated.
+   */
+  public hasGlobalCountObfuscatedRole(): boolean {
+    return this.userRoles.includes(AuthenticationService.GECO_GLOBAL_COUNT_OBFUSCATED_ROLE);
+  }
+
+  /**
+   * Returns true if the user has the role for survival query.
+   */
+  get hasSurvivalQueryRole(): boolean {
+    return this.userRoles.includes(AuthenticationService.GECO_SURVIVAL_QUERY_ROLE);
+  }
+
+  /**
+   * Returns true if the user has the role for statistics query.
+   */
+  public hasStatisticsQueryRole(): boolean {
+    return this.userRoles.includes(AuthenticationService.GECO_STATISTICS_QUERY_ROLE);
+  }
+
+  /**
+   * Returns true if the user has the role for statistics query.
+   */
+  public hasStatisticsQueryObfuscatedRole(): boolean {
+    return this.userRoles.includes(AuthenticationService.GECO_STATISTICS_QUERY_OBFUSCATED_ROLE);
   }
 
   /**

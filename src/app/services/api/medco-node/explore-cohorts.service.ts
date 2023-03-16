@@ -32,12 +32,10 @@ export class ExploreCohortsService {
     const countSharedId = uuidv4();
     const patientSharedId = uuidv4();
 
-    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
-
     return this.apiEndpointService.postCall(
       `projects/${this.config.projectId}/datasource/query`,
       {
-        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        aggregationType: 'per_node',
         operation: 'getCohorts',
         parameters: {
           projectID: this.config.projectId,
@@ -57,7 +55,7 @@ export class ExploreCohortsService {
     return this.apiEndpointService.postCall(
       `projects/${this.config.projectId}/datasource/query`,
       {
-        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        aggregationType: 'per_node',
         operation: 'addCohort',
         broadcast: true,
         parameters: {
@@ -75,7 +73,7 @@ export class ExploreCohortsService {
     return this.apiEndpointService.postCall(
       `projects/${this.config.projectId}/datasource/query`,
       {
-        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        aggregationType: 'per_node',
         operation: 'deleteCohort',
         broadcast: true,
         parameters: {
