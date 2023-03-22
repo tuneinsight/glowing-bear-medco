@@ -50,6 +50,7 @@ ENV GB_MEDCO_NODE_URL="http://localhost:3100" \
     GB_KEYCLOAK_URL="http://localhost:8080/auth" \
     GB_KEYCLOAK_REALM="ti-realm" \
     GB_KEYCLOAK_CLIENT_ID="glowing-bear" \
+    GB_ONTOLOGY_SEARCH_LIMT="" \
     GB_FOOTER_TEXT="" \
     GB_BOOTR="" \
     GB_MIN_SAMPLE_SIZE="" \

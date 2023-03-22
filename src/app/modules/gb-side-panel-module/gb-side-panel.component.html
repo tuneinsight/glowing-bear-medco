@@ -1,12 +1,12 @@
 <div>
   <p-accordion [multiple]="true">
-
+    
     <div>
       <p-accordionTab header="Project" [selected]="true">
         <gb-summary></gb-summary>
       </p-accordionTab>
     </div>
-
+    
     <div *ngIf="navbarService.isExplore ||  navbarService.isAnalysis">
       <p-accordionTab header="Ontology" [selected]="true">
         <div class="gb-sidepanel-navbar">
@@ -17,10 +17,11 @@
           <input value="{{termSearchService.searchTerm}}" class="ui-inputtext" (input)="termSearchService.onTermChange($event)" placeholder="Search in Ontology (min. 3 characters)" />
           <p-button label="Search" (onClick)="termSearchService.onSearch()"></p-button>
           <span class="no-result-text" *ngIf="termSearchService.isNoResults">No results</span>
+          <p *ngIf="termSearchService.results.length > 0" style="margin: 0; padding-top: 1em; opacity: 0.7; font-size: 0.8em;" >Please expand the results with ">" to verify the ontology path</p>
           <p-accordionTab #accordionTab *ngFor="let ontologyElement of termSearchService.results" draggable="true"
               class="ui-ontology-elements">
               <p-header class="ui-ontology-elements" draggable="true">
-                <span class="ui-button-text ui-unselectable-text">{{ontologyElement.name}}</span>
+                <span class="ui-button-text ui-unselectable-text" title="{{ ontologyElement.fullPathString }}">{{ontologyElement.name}}</span><span title="{{ ontologyElement.fullPathString }}" style="display:block; opacity: 0.7; font-size: 0.8em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ ontologyElement.fullPathString }}</span>
               </p-header>
               <span class="full-path" style="font-size: 0.8em;" *ngFor="let nodePath of ontologyElement.fullPath; let last = last">
                 <span [ngClass]="{'bold': !!nodePath.isBold}">{{nodePath.name}}</span>
@@ -49,11 +50,11 @@
       </p-accordionTab>
     </div>
 
-  </p-accordion>
+</p-accordion>
 
-  <br>
-  <br>
-  <br>
-  <br>
-  <br>
+<br>
+<br>
+<br>
+<br>
+<br>
 </div>
