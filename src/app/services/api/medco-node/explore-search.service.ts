@@ -81,7 +81,7 @@ export class ExploreSearchService {
         `projects/${this.config.projectId}/datasource/query`,
         {
           operation: 'searchOntology',
-          aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+          aggregationType:  'per_node',
           outputDataObjectsNames: ['searchConcept'],
           parameters: {
             searchString,
@@ -104,13 +104,12 @@ export class ExploreSearchService {
     }
 
   private exploreSearchConcept(operation: string, root: string, unlimitedChildren?: boolean): Observable<TreeNode[]> {
-    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
     return this.apiEndpointService.postCall(
       `projects/${this.config.projectId}/datasource/query`,
       {
         operation: 'searchConcept',
-        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        aggregationType: 'per_node',
         outputDataObjectsNames: ['patientList', 'count'],
         parameters: {
           operation: operation,
@@ -157,13 +156,12 @@ export class ExploreSearchService {
     appliedPath: string,
     appliedConcept: string,
     unlimitedChildren?: boolean): Observable<TreeNode[] | { retry: boolean }> {
-    const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
     return this.apiEndpointService.postCall(
       `projects/${this.config.projectId}/datasource/query`,
       {
         operation: 'searchModifier',
-        aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
+        aggregationType: 'per_node',
         outputDataObjectsNames: ['patientList', 'count'],
         parameters: {
           operation: operation,

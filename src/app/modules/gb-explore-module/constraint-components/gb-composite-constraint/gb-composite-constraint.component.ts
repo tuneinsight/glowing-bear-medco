@@ -87,6 +87,7 @@ export class GbCompositeConstraintComponent extends GbConstraintComponent implem
     } else {
       const constraintCohort = new ConstraintCohort();
       constraintCohort.name = this.cohortService.selectedCohort.name;
+      constraintCohort.exploreQueryId = this.cohortService.selectedCohort.exploreQueryId;
 
       const cohortConstraint = CohortConstraint.NewCohortConstraintFromCohort(constraintCohort)
       this.droppedConstraint = cohortConstraint;

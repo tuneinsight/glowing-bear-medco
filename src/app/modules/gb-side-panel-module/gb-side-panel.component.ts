@@ -13,7 +13,7 @@ import {OntologyNavbarService} from '../../services/ontology-navbar.service';
 import {SavedCohortsPatientListService} from '../../services/saved-cohorts-patient-list.service';
 import {AccordionTab} from 'primeng';
 import { AppConfig } from 'src/app/config/app.config';
-import { KeycloakService } from 'keycloak-angular';
+import { AuthenticationService } from '../../services/authentication.service';
 import { ExploreStatisticsService } from 'src/app/services/explore-statistics.service';
 
 @Component({
@@ -30,7 +30,7 @@ export class GbSidePanelComponent {
               public termSearchService: TermSearchService,
               public renderer: Renderer2,
               private config: AppConfig,
-              private keycloakService: KeycloakService,
+              private authenticationService: AuthenticationService,
               private exploreStatsService: ExploreStatisticsService) { }
 
     inExploreStatsTab(): boolean {
@@ -61,9 +61,10 @@ export class GbSidePanelComponent {
       });
     }
 
-    get isGlobalCountOrPatientList(): boolean {
-      return this.keycloakService.isUserInRole('global_count') ||
-              this.keycloakService.isUserInRole('patient_list');
+    get userHasRolesForSavedCohorts(): boolean {
+      return this.authenticationService.hasGlobalCountObfuscatedRole() ||
+            this.authenticationService.hasGlobalCountRole() ||
+            this.authenticationService.hasPatientListRole();
     }
 
     get isBiorefMode(): boolean {

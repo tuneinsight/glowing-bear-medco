@@ -13,7 +13,7 @@
         <span class="gb-data-selection-accordion-sub-header-3 float-left">
           <span class="gb-data-selection-emphasis-text">{{globalCount | async}} subjects</span>
         </span>
-        <span id="save-box" *ngIf="!isBiorefMode && isGlobalCountOrPatientList">
+        <span id="save-box" *ngIf="!isBiorefMode && userHasRolesForSavedCohorts">
           <input class="gb-cohort-input" [(ngModel)]="cohortName" pInputText (keydown)="saveIfEnter($event)" placeholder="Cohort name" (drop)="preventDefault($event)"/>
           <button
             class="btn btn-outline-primary btn-sm gb-data-selection-overview-panel-btn {{lastSuccessfulSet ?  '' : 'gb-explore-waiting-cohort'}}"
@@ -26,7 +26,7 @@
 
           <!-- display of explore query type -->
           <ng-template #noAuthorization>
-            <span class="float-right">No authorization for explore query.</span>
+            <span *ngIf="!isBiorefMode" class="float-right">No authorization for explore query.</span>
           </ng-template>
 
           <span>

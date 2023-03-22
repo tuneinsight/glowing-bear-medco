@@ -31,6 +31,7 @@ import {isCipherFormat} from 'src/app/utilities/is-cipher-format';
 import {MessageHelper} from '../utilities/message-helper';
 import {QueryTemporalSetting} from '../models/query-models/query-temporal-setting';
 import {ApiQueryDefinition} from '../models/api-request-models/medco-node/api-query-definition';
+import {AuthenticationService} from './authentication.service';
 
 export class ConfidenceInterval {
     constructor(public readonly lowerBound: number, public readonly middle: number, public readonly higherBound: number) {
@@ -168,7 +169,8 @@ export class ExploreStatisticsService {
         private queryService: QueryService,
         private constraintMappingService: ConstraintMappingService,
         private reverseConstraintMappingService: ConstraintReverseMappingService,
-        private navbarService: NavbarService
+        private navbarService: NavbarService,
+        private authenticationService: AuthenticationService,
     ) {
 
 
@@ -391,7 +393,7 @@ export class ExploreStatisticsService {
                         return [ ...intervalsResult, new Interval(i.lowerBound, i.higherBound, i.count) ];
                     }, []);
                     if (totalObservation <= this._minSampleSize || totalObservation <= 0) {
-                        MessageHelper.alert('info', `No observations (${totalObservation}) insufficient to compute reference interval (minimum ${this._minSampleSize})`);
+                        MessageHelper.alert('info', `Number of observations (${totalObservation}) insufficient to compute reference interval (minimum ${this._minSampleSize})`);
                         this.navbarService.navigateToExploreTab();
                         return responseResult;
                     }
@@ -444,7 +446,7 @@ export class ExploreStatisticsService {
             `projects/${this.config.projectId}/datasource/query`,
             {
               operation: 'statisticsQuery',
-              aggregationType: 'aggregated',
+              aggregationType: this.authenticationService.hasStatisticsQueryRole() ? 'aggregated' : 'obfuscated',
               broadcast: true,
               outputDataObjectsNames: Object.keys(this._analytes),
               parameters: apiRequest,
