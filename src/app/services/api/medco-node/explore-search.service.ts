@@ -74,7 +74,7 @@ export class ExploreSearchService {
       });
     }
 
-    private exploreSearch(searchString: string, limit: number): Observable<TreeNode[]> {
+    private exploreSearch(searchString: string, limit: string): Observable<TreeNode[]> {
       const haveRightsForPatientList = !!this.keycloakService.getUserRoles().find((role) => role === 'patient_list');
 
       return this.apiEndpointService.postCall(
@@ -84,7 +84,8 @@ export class ExploreSearchService {
           aggregationType: haveRightsForPatientList ? 'per_node' : 'aggregated',
           outputDataObjectsNames: ['searchConcept'],
           parameters: {
-            searchString
+            searchString,
+            limit
           }
         }
       ).pipe(
@@ -98,7 +99,7 @@ export class ExploreSearchService {
      *
      * @returns {Observable<Object>}
      */
-    exploreSearchTerm(searchString: string, limit: number = 50): Observable<TreeNode[]> {
+    exploreSearchTerm(searchString: string, limit: string = '50'): Observable<TreeNode[]> {
       return this.exploreSearch(searchString, limit);
     }
 

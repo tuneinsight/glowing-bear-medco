@@ -16,6 +16,7 @@ import { ErrorHelper } from '../utilities/error-helper';
 import { TreeNode } from '../models/tree-models/tree-node';
 import { TreeNodeType } from '../models/tree-models/tree-node-type';
 import { DropMode } from '../models/drop-mode';
+import { AppConfig } from '../config/app.config';
 
 interface NodeFullPath {
   name: string;
@@ -45,7 +46,8 @@ export class TermSearchService {
 
   public searchResultObservable: ReplaySubject<ResultType[]> = new ReplaySubject();
 
-  constructor(private treeNodeService: TreeNodeService,
+  constructor(
+    private config: AppConfig,
     private injector: Injector) {
     this.results = [];
 
@@ -101,7 +103,7 @@ export class TermSearchService {
 
     const searchTerm = this.searchTerm;
 
-    this.exploreSearchService.exploreSearchTerm(this.searchTerm).subscribe((nodes) => {
+    this.exploreSearchService.exploreSearchTerm(this.searchTerm, this.config.getConfig('ontology-search-limit')).subscribe((nodes) => {
       if (searchTerm !== this.searchTerm) {
         return;
       }

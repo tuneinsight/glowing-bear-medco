@@ -5,5 +5,7 @@
   "keycloak-realm": "ti-realm",
   "keycloak-client-id": "glowing-bear",
 
+  "ontology-search-limit": "30",
+
   "footer-text": ""
 }
