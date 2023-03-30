@@ -46,7 +46,7 @@ export class TermSearchService {
 
   public searchResultObservable: ReplaySubject<ResultType[]> = new ReplaySubject();
 
-  constructor(
+  constructor(private treeNodeService: TreeNodeService,
     private config: AppConfig,
     private injector: Injector) {
     this.results = [];
